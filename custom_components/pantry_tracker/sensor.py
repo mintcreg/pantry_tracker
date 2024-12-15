@@ -1,5 +1,3 @@
-# pantry_tracker/custom_components/pantry_tracker/sensor.py
-
 """Pantry Tracker Sensor Platform with Persistent Counts."""
 
 import logging
@@ -16,11 +14,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.entity_registry import async_get as async_get_entity_registry
+
 
 _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "pantry_tracker"
-SCAN_INTERVAL = timedelta(seconds=5)  # Set to 30 seconds for regular updates
+SCAN_INTERVAL = timedelta(seconds=30)  # Set to 30 seconds for regular updates
 BASE_URL = "http://127.0.0.1:5000"  # Adjust if API is hosted elsewhere
 
 INCREASE_COUNT_SCHEMA = vol.Schema({
@@ -33,19 +33,21 @@ DECREASE_COUNT_SCHEMA = vol.Schema({
     vol.Optional("amount", default=1): vol.Coerce(int)
 })
 
+
 def sanitize_entity_id(name: str) -> str:
     """Sanitize the product name to create a unique entity ID without category."""
     return f"sensor.product_{name.lower().replace(' ', '_').replace('-', '_')}"
 
 async def remove_entity_async(hass: HomeAssistant, entity_id: str):
     """Remove an entity from Home Assistant's Entity Registry asynchronously."""
-    entity_registry = await hass.helpers.entity_registry.async_get_registry()
+    entity_registry = async_get_entity_registry(hass)
     entry = entity_registry.async_get(entity_id)
     if entry:
         entity_registry.async_remove(entry.entity_id)
         _LOGGER.info(f"Removed entity from registry: {entity_id}")
     else:
         _LOGGER.warning(f"Entity not found in registry: {entity_id}")
+
 
 async def async_setup_platform(
     hass: HomeAssistant,
@@ -235,9 +237,9 @@ async def async_setup_platform(
             # Detect and remove deleted entities
             removed_entity_ids = existing_entity_ids - fetched_entity_ids - {"pantry_categories"}
             for entity_id in removed_entity_ids:
-                hass.data[DOMAIN]["entities"].pop(entity_id)
+                hass.data[DOMAIN]["entities"].pop(entity_id, None)
                 _LOGGER.info(f"Removed sensor for entity_id {entity_id} as it's no longer present.")
-                
+
                 # Remove the entity from HA Registry
                 await remove_entity_async(hass, entity_id)
 
@@ -246,7 +248,7 @@ async def async_setup_platform(
                 _LOGGER.info("Adding %d new product sensors.", len(new_prod_sensors))
                 async_add_entities(new_prod_sensors, True)
 
-            # **Update Counts for Existing Sensors**
+            # Update Counts for Existing Sensors
             for entity_id, count in hass.data[DOMAIN]["product_counts"].items():
                 if entity_id in hass.data[DOMAIN]["entities"]:
                     sensor = hass.data[DOMAIN]["entities"][entity_id]
@@ -403,6 +405,7 @@ class ProductSensor(SensorEntity):
             "product_name": self._product_name,
             "url": self._url,
             "category": self._category
+
         }
 
     def update_attributes(self, url: str, category: str):
