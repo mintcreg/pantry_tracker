@@ -29,15 +29,15 @@ Assign products to specific categories for better organization.
 Sensors in Home Assistant are updated in real time to reflect changes made via the API or the interface.
 
 # Installation
-1: Add to HACS Repo's
+1: Add [https://github.com/mintcreg/pantry_tracker/](https://github.com/mintcreg/pantry_tracker/) to repositories to the addon store
 
-2: Install Addon
+2: Install Addon from the addon store
 
 3: Install [Pantry Tracker - Custom Components](https://github.com/mintcreg/pantry_tracker_components)
 
-4: (Optional) Install [Pantry Tracker Card](https://github.com/mintcreg/pantry_tracker_card)
+4: *(Optional) Install [Pantry Tracker Card](https://github.com/mintcreg/pantry_tracker_card)*
 
-5: Navigate to http:(HA-LOCAL-IP):5000
+5: Navigate to http://(HA-LOCAL-IP):5000
 
 
 
