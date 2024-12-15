@@ -1,6 +1,11 @@
-# Pantry Tracker - HomeAssistant
+# <p align="center"> Pantry Tracker - HomeAssistant </p>
 
-# ***NOTE THIS IS A WIP ***
+<p align="center">
+<img src="images/logo.webp" alt="Alt Text" width="400" height="400">
+</p>
+
+# <p align="center"> NOTE THIS IS A WIP</p>
+
 
 # Description
 The Pantry Tracker add-on is a Home Assistant integration designed to help you keep track of products in your kitchen, pantry, or any other storage space. With a user-friendly interface and a powerful backend, this add-on simplifies the organization and management of your items by allowing you to create categories, assign products to them, and maintain an up-to-date inventory.
