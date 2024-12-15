@@ -1,4 +1,4 @@
-[# Pantry Tracker - HomeAssistant
+# Pantry Tracker - HomeAssistant
 
 # ***NOTE THIS IS A WIP ***
 
