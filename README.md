@@ -1,4 +1,4 @@
-# Pantry Tracker - HomeAssistant
+[# Pantry Tracker - HomeAssistant
 
 # ***NOTE THIS IS A WIP ***
 
@@ -62,3 +62,4 @@ Sensors in Home Assistant are updated in real time to reflect changes made via t
 ``` 
 
 
+](https://github.com/mintcreg/pantry_tracker/tree/dev)
