@@ -2,7 +2,7 @@
   "name": "Pantry Tracker",
   "version": "1.0.34",
   "slug": "pantry_tracker",
-  "description": "An add-on to track pantry items",
+  "description": "A Home Assistant add-on to manage and track pantry items, with product categorization, real-time inventory updates, and intuitive controls.",
   "startup": "services",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
   "boot": "auto",
