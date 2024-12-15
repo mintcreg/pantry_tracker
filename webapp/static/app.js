@@ -74,7 +74,11 @@ const displayCategories = (categories) => {
     table.appendChild(tableBody);
     categoriesContainer.appendChild(table);
 } else {
-    categoriesContainer.innerHTML = '<p>No categories available.</p>';
+    categoriesContainer.innerHTML = `
+        <p style="text-align: center; font-weight: bold; color: red;">
+            No categories available.
+        </p>
+    `;
 }
 
 
@@ -210,7 +214,11 @@ const displayProducts = (products) => {
     table.appendChild(tableBody);
     productsContainer.appendChild(table);
 } else {
-    productsContainer.innerHTML = '<p>No products available.</p>';
+    productsContainer.innerHTML = `
+        <p style="text-align: center; font-weight: bold; color: red;">
+            No products available.
+        </p>
+    `;
 }
 
 
