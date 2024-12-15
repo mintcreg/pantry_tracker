@@ -1,0 +1,6 @@
+Flask==2.2.5
+SQLAlchemy
+portalocker
+marshmallow
+sqlalchemy
+
