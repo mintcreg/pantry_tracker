@@ -46,32 +46,37 @@ const fetchCategories = async () => {
 const displayCategories = (categories) => {
     const categoriesContainer = document.getElementById('categories-container');
     categoriesContainer.innerHTML = ''; // Clear existing content
-
-    const table = document.createElement('table');
-    const tableHead = `
-        <thead>
-            <tr>
-                <th onclick="sortCategories()">Category Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-    `;
-    const tableBody = document.createElement('tbody');
-
-    categories.forEach(category => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${category}</td>
-            <td>
-                <button class="remove-btn" onclick="removeCategory('${category}')">Remove</button>
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
+	
+	if (categories.length > 0) {
+		const table = document.createElement('table');
+		const tableHead = `
+			<thead>
+				<tr>
+					<th onclick="sortCategories()">Category Name</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+		`;
+		const tableBody = document.createElement('tbody');
+	
+		categories.forEach(category => {
+			const row = document.createElement('tr');
+			row.innerHTML = `
+				<td>${category}</td>
+				<td>
+					<button class="remove-btn" onclick="removeCategory('${category}')">Remove</button>
+				</td>
+			`;
+			tableBody.appendChild(row);
+		});
 
     table.innerHTML = tableHead;
     table.appendChild(tableBody);
     categoriesContainer.appendChild(table);
+} else {
+    categoriesContainer.innerHTML = '<p>No categories available.</p>';
+}
+
 
     // Add category form below the table
     const addCategoryTable = document.createElement('table');
@@ -172,37 +177,42 @@ const displayProducts = (products) => {
     const productsContainer = document.getElementById('products-container');
     productsContainer.innerHTML = ''; // Clear existing content
 
-    const table = document.createElement('table');
-    const tableHead = `
-        <thead>
-            <tr>
-                <th class="sortable" onclick="sortProducts('name')">Product Name</th>
-                <th class="sortable" onclick="sortProducts('category')">Category</th>
-                <th>Image</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-    `;
-    const tableBody = document.createElement('tbody');
-
-    products.forEach(product => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${product.name}</td>
-            <td>${product.category}</td>
-            <td>
-                <img src="${product.url}" alt="${product.name}" class="product-image">
-            </td>
-            <td>
-                <button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
+	if (products.length > 0) {
+		const table = document.createElement('table');
+		const tableHead = `
+			<thead>
+				<tr>
+					<th class="sortable" onclick="sortProducts('name')">Product Name</th>
+					<th class="sortable" onclick="sortProducts('category')">Category</th>
+					<th>Image</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+		`;
+		const tableBody = document.createElement('tbody');
+	
+		products.forEach(product => {
+			const row = document.createElement('tr');
+			row.innerHTML = `
+				<td>${product.name}</td>
+				<td>${product.category}</td>
+				<td>
+					<img src="${product.url}" alt="${product.name}" class="product-image">
+				</td>
+				<td>
+					<button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
+				</td>
+			`;
+			tableBody.appendChild(row);
+		});
 
     table.innerHTML = tableHead;
     table.appendChild(tableBody);
     productsContainer.appendChild(table);
+} else {
+    productsContainer.innerHTML = '<p>No products available.</p>';
+}
+
 
     // Add product form below the table
     const addProductTable = document.createElement('table');
