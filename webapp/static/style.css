@@ -1,0 +1,304 @@
+/* General Styles */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 100%;
+    width: 90%;
+    margin: 40px auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+h1 {
+    text-align: center;
+    color: #333;
+}
+.category-buttons {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.category-buttons button {
+    padding: 12px 20px;
+    font-size: 16px;
+    margin: 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.category-buttons button:hover {
+    background-color: #0056b3;
+}
+
+/* Tab Content */
+.tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.hidden {
+    display: none;
+}
+
+/* Home Tab Styles */
+.category-header {
+    font-weight: bold;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 15px;
+    text-align: center;
+    margin-top: 15px;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 18px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.category-header:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+.category-content {
+    margin-bottom: 20px;
+}
+
+/* Product Image */
+.product-image {
+    max-width: 50px;
+    max-height: 50px;
+}
+
+/* Table Styles */
+.table-container {
+    overflow-x: auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}
+th {
+    background-color: #007bff;
+    color: white;
+}
+tr:nth-child(even) td {
+    background-color: #f1f1f1;
+}
+tr:hover td {
+    background-color: #e8f0fe;
+}
+
+/* Add/Remove Buttons */
+.add-remove-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    align-items: center;
+    padding: 25px;
+    height: 100%;
+    box-sizing: border-box;
+}
+.add-remove-buttons button {
+    padding: 4px 8px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 30px;
+    box-sizing: border-box;
+}
+
+.add-remove-buttons .add-btn {
+    background-color: #28a745;
+    color: white;
+}
+.add-remove-buttons .add-btn:hover {
+    background-color: #218838;
+}
+.add-remove-buttons .remove-btn {
+    background-color: #dc3545;
+    color: white;
+}
+.add-remove-buttons .remove-btn:hover {
+    background-color: #c82333;
+}
+
+/* Config Page Styles */
+.generate-form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+.form-section {
+    flex: 1;
+    min-width: 300px;
+    margin: 10px;
+}
+.form-section h3 {
+    text-align: center;
+}
+#category-rows, #product-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Input Fields */
+.input-field {
+    flex: 1;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Add Category Section */
+.add-category-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+.add-category-container .input-field {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+.add-category-container .add-row-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.add-category-container .add-row-btn:hover {
+    background-color: #218838;
+}
+
+/* Config Row */
+.config-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.remove-btn {
+    padding: 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.remove-btn:hover {
+    background-color: #c82333;
+}
+
+.add-row-btn {
+    width: 100%;
+    background-color: #28a745;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+.add-row-btn:hover {
+    background-color: #218838;
+}
+.generate-btn {
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    padding: 15px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    margin: 20px 0;
+    font-size: 16px;
+    border-radius: 5px;
+}
+.generate-btn:hover {
+    background-color: #0056b3;
+}
+
+/* No Data Message */
+.no-data-message {
+    text-align: center;
+    margin-top: 20px;
+}
+.no-data-message button {
+    padding: 12px 20px;
+    font-size: 16px;
+    margin: 5px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.no-data-message button:hover {
+    background-color: #218838;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    .category-buttons button {
+        width: 100%;
+        margin: 10px 0;
+    }
+    table, th, td {
+        font-size: 14px;
+    }
+    .add-remove-buttons button {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+    .product-image {
+        max-width: 40px;
+        max-height: 40px;
+    }
+    .generate-form {
+        flex-direction: column;
+    }
+    .form-section {
+        width: 100%;
+    }
+    .add-row-btn, .generate-btn {
+        padding: 15px;
+    }
+}
