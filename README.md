@@ -73,11 +73,11 @@ Sensors in Home Assistant are updated in real time to reflect changes made via t
 
 
 <details>
-<summary>Video</summary>
+<summary>Demo</summary>
  
 <br>
 
-![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/categories.PNG)
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/demo.gif)
 
 </details>
 
