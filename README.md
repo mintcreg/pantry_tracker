@@ -4,7 +4,8 @@
 <img src="images/logo.webp" alt="Alt Text" width="400" height="400">
 </p>
 
-# <p align="center"> NOTE THIS IS A WIP</p>
+> [!CAUTION]
+> This is a work in progress and made using GPT and basic knowledge.
 
 
 # Description
@@ -40,9 +41,14 @@ Sensors in Home Assistant are updated in real time to reflect changes made via t
 
 3: Install [Pantry Tracker - Custom Components](https://github.com/mintcreg/pantry_tracker_components) (*Note; this needs to be installed after the pantry_tracker addon*)
 
-4: Navigate to http://(HA-LOCAL-IP):5000 and add products/categories 
+4: Restart Home Assistant
 
-5: *(Optional) Install [Pantry Tracker Card](https://github.com/mintcreg/pantry_tracker_card)*
+5: Navigate to [http://homeassistant.local:5000/](http://homeassistant.local:5000/) and add products/categories 
+
+
+> [!TIP]
+> (Optional) Install [Pantry Tracker Card](https://github.com/mintcreg/pantry_tracker_card) to display the data within lovelace.
+
 
 
 ## Screenshots & Video
