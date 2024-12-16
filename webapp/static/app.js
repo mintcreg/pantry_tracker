@@ -101,7 +101,7 @@ const displayCategories = (categories) => {
                     <input type="text" id="new-category-input" class="input-field" placeholder="New Category Name">
                 </td>
                 <td>
-                    <button class="add-row-btn" onclick="addCategory()">Add Category</button>
+                    <button class="add-row-btn green-btn" onclick="addCategory()">Add Category</button>
                 </td>
             </tr>
         </tbody>
@@ -255,7 +255,7 @@ const displayProducts = (products) => {
                     <input type="text" id="new-product-url" class="input-field" placeholder="Image URL">
                 </td>
                 <td>
-                    <button class="add-row-btn" onclick="addProductFromForm()">Add Product</button>
+                    <button class="add-row-btn green-btn" onclick="addProductFromForm()">Add Product</button>
                 </td>
             </tr>
         </tbody>
