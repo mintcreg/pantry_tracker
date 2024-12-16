@@ -1,6 +1,6 @@
 # pantry_tracker/webapp/app.py
 
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_file, redirect, url_for
 import os
 import logging
 from sqlalchemy import create_engine
@@ -275,8 +275,6 @@ def update_count():
     finally:
         Session.remove()
 
-
-
 @app.route("/counts", methods=["GET"])
 def get_counts():
     session = Session()
@@ -298,6 +296,43 @@ def get_counts():
 def health():
     """Health check endpoint."""
     return jsonify({"status": "healthy"}), 200
+
+###################################
+# New Backup & Restore Functionality
+###################################
+
+
+# Display the backup/restore page
+@app.route("/backup", methods=["GET"], endpoint="backup_page")
+def backup():
+    return render_template("backup.html")
+
+
+# Download the current database file
+@app.route("/download_db", methods=["GET"])
+def download_db():
+    if os.path.exists(DB_FILE):
+        return send_file(DB_FILE, as_attachment=True, download_name="pantry_data.db")
+    else:
+        return "Database file not found.", 404
+
+# Upload a new database file
+@app.route("/upload_db", methods=["POST"])
+def upload_db():
+    if 'file' not in request.files:
+        return "No file part in the request.", 400
+    file = request.files['file']
+    if file.filename == '':
+        return "No file selected.", 400
+
+    # Replace the existing database with the uploaded file
+    file.save(DB_FILE)
+
+    # Optionally, reinitialize database session if needed
+    # Since we use scoped_session, the next DB operation will use the new file
+    # It's recommended to restart or re-initialize data if necessary.
+
+    return redirect(url_for('backup_page'))
 
 if __name__ == "__main__":
     # For ingress, listen on port 5000
