@@ -6,9 +6,9 @@ let productSortOrder = {
     category: "asc" // Default sort order for product category
 };
 
-// A helper function to check if a string is alphanumeric
+// A helper function to check if a string is alphanumeric and can contain spaces
 function isAlphanumeric(str) {
-    return /^[a-zA-Z0-9]+$/.test(str);
+    return /^[a-zA-Z0-9 ]+$/.test(str);
 }
 
 // Show the selected tab
