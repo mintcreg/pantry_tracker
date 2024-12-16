@@ -357,6 +357,8 @@ const sortCategories = () => {
 };
 
 // Initialize the page
-document.addEventListener('DOMContentLoaded', () => {
-    showTab('products'); // Default to products tab
+document.addEventListener('DOMContentLoaded', async () => {
+    await fetchCategories(); 
+    showTab('products'); 
 });
+
