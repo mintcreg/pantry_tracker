@@ -47,13 +47,33 @@ Sensors in Home Assistant are updated in real time to reflect changes made via t
 
 ## Screenshots & Video
 
-
+<details>
+<summary>Products</summary>
  
-![Early Preview](screenshots/Demo.gif)
+<br>
 
-![App Screenshot](https://github.com/mintcreg/simple_pantry/blob/main/screenshots/demo.gif?raw=true)
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/products.PNG)
+
+</details>
+
+<details>
+<summary>Categories</summary>
+ 
+<br>
+
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/categories.PNG)
+
+</details>
 
 
+<details>
+<summary>Video</summary>
+ 
+<br>
+
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/categories.PNG)
+
+</details>
 
 
 ## API Endpoints
