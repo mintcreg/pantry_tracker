@@ -5,7 +5,6 @@
     <title>Pantry Manager</title>
     <link rel="stylesheet" href="static/style.css">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
-
 </head>
 <body>
 
@@ -14,7 +13,9 @@
 
     <div class="category-buttons">
         <button onclick="showTab('products')">Products</button>
-		<button onclick="showTab('categories')">Categories</button>
+        <button onclick="showTab('categories')">Categories</button>
+        <!-- Changed this from an anchor link to a styled button-like link -->
+        <a href="{{ url_for('backup_page') }}" class="add-row-btn" style="text-decoration: none;">Backup & Restore</a>
     </div>
 
     <!-- Categories Tab -->
@@ -29,12 +30,12 @@
             <div class="form-section">
                 <h3>Categories</h3>
                 <div id="category-rows"></div>
-                <button class="add-row-btn" onclick="addCategoryRow()">Add Category</button>
+                <button class="add-row-btn green-btn" onclick="addCategoryRow()">Add Category</button>
             </div>
             <div class="form-section">
                 <h3>Products</h3>
                 <div id="product-rows"></div>
-                <button class="add-row-btn" onclick="addProductRow()">Add Product</button>
+                <button class="add-row-btn green-btn" onclick="addProductRow()">Add Product</button>
             </div>
         </div>
         <button class="generate-btn" onclick="saveEntities()">Save</button>
