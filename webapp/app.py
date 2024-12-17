@@ -233,21 +233,21 @@ def products():
 def update_count():
     session = Session()
     data = request.get_json()
-    entity_id = data.get("entity_id")
+    product_name = data.get("product_name")  # Use product_name directly now
     action = data.get("action")
     amount = data.get("amount", 1)
 
-    if not all([entity_id, action]):
+    # Check that we have the required parameters
+    if not all([product_name, action]):
         logger.warning("Missing required parameters in update_count")
         Session.remove()
         return jsonify({"status": "error", "message": "Missing required parameters"}), 400
 
     try:
-        # Extract product name without altering its case
-        product_name = entity_id.replace("sensor.product_", "").replace("_", " ")
         product = session.query(Product).filter_by(name=product_name).first()
         if not product:
             logger.warning("Product '%s' not found in update_count", product_name)
+            Session.remove()
             return jsonify({"status": "error", "message": "Product not found"}), 404
 
         count_entry = session.query(Count).filter_by(product_id=product.id).first()
@@ -262,6 +262,7 @@ def update_count():
             count_entry.count = max(count_entry.count - amount, 0)
         else:
             logger.warning("Invalid action '%s' in update_count", action)
+            session.remove()
             return jsonify({"status": "error", "message": "Invalid action"}), 400
 
         session.commit()
@@ -269,10 +270,11 @@ def update_count():
         return jsonify({"status": "ok", "count": count_entry.count})
     except Exception as e:
         session.rollback()
-        logger.error(f"Error updating count for {entity_id}: {e}")
+        logger.error(f"Error updating count for {product_name}: {e}")
         return jsonify({"status": "error", "message": "Failed to update count"}), 500
     finally:
         Session.remove()
+
 
 
 @app.route("/counts", methods=["GET"])

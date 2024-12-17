@@ -1,6 +1,12 @@
-# Pantry Tracker - HomeAssistant
+# <p align="center"> Pantry Tracker - HomeAssistant </p>
 
-# ***NOTE THIS IS A WIP ***
+<p align="center">
+<img src="images/logo.webp" alt="Alt Text" width="400" height="400">
+</p>
+
+> [!CAUTION]
+> This is a work in progress and made using GPT and basic knowledge.
+
 
 # Description
 The Pantry Tracker add-on is a Home Assistant integration designed to help you keep track of products in your kitchen, pantry, or any other storage space. With a user-friendly interface and a powerful backend, this add-on simplifies the organization and management of your items by allowing you to create categories, assign products to them, and maintain an up-to-date inventory.
@@ -35,23 +41,48 @@ Sensors in Home Assistant are updated in real time to reflect changes made via t
 
 3: Install [Pantry Tracker - Custom Components](https://github.com/mintcreg/pantry_tracker_components) (*Note; this needs to be installed after the pantry_tracker addon*)
 
-4: Navigate to http://(HA-LOCAL-IP):5000 and add products/categories 
+4: Restart Home Assistant
 
-5: *(Optional) Install [Pantry Tracker Card](https://github.com/mintcreg/pantry_tracker_card)*
+5: Navigate to [http://homeassistant.local:5000/](http://homeassistant.local:5000/) and add products/categories 
+
+
+> [!TIP]
+> (Optional) Install [Pantry Tracker Card](https://github.com/mintcreg/pantry_tracker_card) to display the data within lovelace.
+
 
 
 ## Screenshots & Video
 
-
+<details>
+<summary>Products</summary>
  
-![Early Preview](screenshots/Demo.gif)
+<br>
 
-![App Screenshot](https://github.com/mintcreg/simple_pantry/blob/main/screenshots/demo.gif?raw=true)
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/products.PNG)
+
+</details>
+
+<details>
+<summary>Categories</summary>
+ 
+<br>
+
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/categories.PNG)
+
+</details>
 
 
+<details>
+<summary>Demo</summary>
+ 
+<br>
+
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/demo.gif)
+
+</details>
 
 
-## API Endpoints Table
+## API Endpoints
 
 | **Endpoint**         | **Method** | **Description**                                                                                  | **Parameters (Body)**                                                                                   | **Response**                                                                                                                                                 |
 |-----------------------|------------|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|

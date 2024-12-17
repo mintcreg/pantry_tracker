@@ -6,6 +6,11 @@ let productSortOrder = {
     category: "asc" // Default sort order for product category
 };
 
+// A helper function to check if a string is alphanumeric and can contain spaces
+function isAlphanumeric(str) {
+    return /^[a-zA-Z0-9 ]+$/.test(str);
+}
+
 // Show the selected tab
 function showTab(tab) {
     // Hide all tabs
@@ -46,41 +51,40 @@ const fetchCategories = async () => {
 const displayCategories = (categories) => {
     const categoriesContainer = document.getElementById('categories-container');
     categoriesContainer.innerHTML = ''; // Clear existing content
-	
-	if (categories.length > 0) {
-		const table = document.createElement('table');
-		const tableHead = `
-			<thead>
-				<tr>
-					<th onclick="sortCategories()">Category Name</th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-		`;
-		const tableBody = document.createElement('tbody');
-	
-		categories.forEach(category => {
-			const row = document.createElement('tr');
-			row.innerHTML = `
-				<td>${category}</td>
-				<td>
-					<button class="remove-btn" onclick="removeCategory('${category}')">Remove</button>
-				</td>
-			`;
-			tableBody.appendChild(row);
-		});
 
-    table.innerHTML = tableHead;
-    table.appendChild(tableBody);
-    categoriesContainer.appendChild(table);
-} else {
-    categoriesContainer.innerHTML = `
-        <p style="text-align: center; font-weight: bold; color: red;">
-            No categories available.
-        </p>
-    `;
-}
+    if (categories.length > 0) {
+        const table = document.createElement('table');
+        const tableHead = `
+            <thead>
+                <tr>
+                    <th onclick="sortCategories()">Category Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        `;
+        const tableBody = document.createElement('tbody');
 
+        categories.forEach(category => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${category}</td>
+                <td>
+                    <button class="remove-btn" onclick="removeCategory('${category}')">Remove</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        table.innerHTML = tableHead;
+        table.appendChild(tableBody);
+        categoriesContainer.appendChild(table);
+    } else {
+        categoriesContainer.innerHTML = `
+            <p style="text-align: center; font-weight: bold; color: red;">
+                No categories available.
+            </p>
+        `;
+    }
 
     // Add category form below the table
     const addCategoryTable = document.createElement('table');
@@ -110,6 +114,12 @@ const addCategory = async () => {
     const categoryName = document.getElementById('new-category-input').value.trim();
     if (!categoryName) {
         alert('Category name cannot be empty');
+        return;
+    }
+
+    // Check if categoryName is alphanumeric
+    if (!isAlphanumeric(categoryName)) {
+        alert('Category name must be alphanumeric');
         return;
     }
 
@@ -181,46 +191,45 @@ const displayProducts = (products) => {
     const productsContainer = document.getElementById('products-container');
     productsContainer.innerHTML = ''; // Clear existing content
 
-	if (products.length > 0) {
-		const table = document.createElement('table');
-		const tableHead = `
-			<thead>
-				<tr>
-					<th class="sortable" onclick="sortProducts('name')">Product Name</th>
-					<th class="sortable" onclick="sortProducts('category')">Category</th>
-					<th>Image</th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-		`;
-		const tableBody = document.createElement('tbody');
-	
-		products.forEach(product => {
-			const row = document.createElement('tr');
-			row.innerHTML = `
-				<td>${product.name}</td>
-				<td>${product.category}</td>
-				<td>
-					<img src="${product.url}" alt="${product.name}" class="product-image">
-				</td>
-				<td>
-					<button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
-				</td>
-			`;
-			tableBody.appendChild(row);
-		});
+    if (products.length > 0) {
+        const table = document.createElement('table');
+        const tableHead = `
+            <thead>
+                <tr>
+                    <th class="sortable" onclick="sortProducts('name')">Product Name</th>
+                    <th class="sortable" onclick="sortProducts('category')">Category</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        `;
+        const tableBody = document.createElement('tbody');
 
-    table.innerHTML = tableHead;
-    table.appendChild(tableBody);
-    productsContainer.appendChild(table);
-} else {
-    productsContainer.innerHTML = `
-        <p style="text-align: center; font-weight: bold; color: red;">
-            No products available.
-        </p>
-    `;
-}
+        products.forEach(product => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${product.name}</td>
+                <td>${product.category}</td>
+                <td>
+                    <img src="${product.url}" alt="${product.name}" class="product-image">
+                </td>
+                <td>
+                    <button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
 
+        table.innerHTML = tableHead;
+        table.appendChild(tableBody);
+        productsContainer.appendChild(table);
+    } else {
+        productsContainer.innerHTML = `
+            <p style="text-align: center; font-weight: bold; color: red;">
+                No products available.
+            </p>
+        `;
+    }
 
     // Add product form below the table
     const addProductTable = document.createElement('table');
@@ -267,6 +276,17 @@ const addProductFromForm = () => {
 const addProduct = async (productName, categoryName, productUrl) => {
     if (!productName || !categoryName || !productUrl) {
         alert('Product name, category, and image URL are required');
+        return;
+    }
+
+    // Check if productName and categoryName are alphanumeric
+    if (!isAlphanumeric(productName)) {
+        alert('Product name must be alphanumeric');
+        return;
+    }
+
+    if (!isAlphanumeric(categoryName)) {
+        alert('Category name must be alphanumeric');
         return;
     }
 
@@ -337,6 +357,8 @@ const sortCategories = () => {
 };
 
 // Initialize the page
-document.addEventListener('DOMContentLoaded', () => {
-    showTab('products'); // Default to products tab
+document.addEventListener('DOMContentLoaded', async () => {
+    await fetchCategories(); 
+    showTab('products'); 
 });
+
