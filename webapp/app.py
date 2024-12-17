@@ -275,6 +275,8 @@ def update_count():
     finally:
         Session.remove()
 
+
+        
 @app.route("/counts", methods=["GET"])
 def get_counts():
     session = Session()
