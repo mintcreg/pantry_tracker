@@ -43,9 +43,12 @@ The ability to save a copy of the database and restore an existing database
 
 [![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fmintcreg%2Fpantry_tracker)
 
-2: Install Addon from the addon store
+2: Install the addon
 
 3: Install [Pantry Tracker - Custom Components](https://github.com/mintcreg/pantry_tracker_components) (*Note; this needs to be installed after the pantry_tracker addon*)
+
+> [!IMPORTANT]
+> In order for Home Assistant to create sensors, custom_components must be installed
 
 4: Restart Home Assistant
 
