@@ -34,6 +34,10 @@ Assign products to specific categories for better organization.
 
 Sensors in Home Assistant are updated in real time to reflect changes made via the API or the interface.
 
+💾 Backup & Restore
+
+The ability to save a copy of the database and restore an existing database
+
 # Installation
 1: Add [https://github.com/mintcreg/pantry_tracker/](https://github.com/mintcreg/pantry_tracker/) to repositories to the addon store
 

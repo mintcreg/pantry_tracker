@@ -191,7 +191,7 @@ tr:hover td {
 .add-category-container .add-row-btn {
     padding: 10px 20px;
     font-size: 16px;
-    background-color: #28a745;
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
@@ -199,7 +199,7 @@ tr:hover td {
     transition: background-color 0.3s ease;
 }
 .add-category-container .add-row-btn:hover {
-    background-color: #218838;
+    background-color: #0056b3;
 }
 
 /* Config Row */
@@ -222,9 +222,10 @@ tr:hover td {
     background-color: #c82333;
 }
 
+/* Updated to use blue for add-row-btn like generate-btn */
 .add-row-btn {
     width: 100%;
-    background-color: #28a745;
+    background-color: #007bff;
     color: white;
     padding: 10px;
     border: none;
@@ -234,8 +235,9 @@ tr:hover td {
     border-radius: 5px;
 }
 .add-row-btn:hover {
-    background-color: #218838;
+    background-color: #0056b3;
 }
+
 .generate-btn {
     width: 100%;
     background-color: #007bff;
@@ -261,7 +263,7 @@ tr:hover td {
     padding: 12px 20px;
     font-size: 16px;
     margin: 5px;
-    background-color: #28a745;
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
@@ -269,7 +271,7 @@ tr:hover td {
     transition: background-color 0.3s ease;
 }
 .no-data-message button:hover {
-    background-color: #218838;
+    background-color: #0056b3;
 }
 
 /* Responsive Styles */
@@ -302,3 +304,44 @@ tr:hover td {
         padding: 15px;
     }
 }
+/* Separator Line for Backup Page */
+.line-separator {
+    width: 1px;
+    background-color: #ddd;
+    height: 80%; /* Adjust height as necessary */
+    margin: auto;
+}
+/* Hide the default file input */
+#file-upload {
+    display: none;
+}
+
+/* Styled "Choose File" Button */
+.file-upload-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #28a745; /* Green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin-right: 10px; /* Add spacing between the file button and upload button */
+    transition: background-color 0.3s ease;
+}
+
+.file-upload-btn:hover {
+    background-color: #218838;
+}
+/* Green Buttons (e.g., Add Product, Add Category) */
+.green-btn {
+    background-color: #28a745; /* Green */
+    color: white;
+}
+
+.green-btn:hover {
+    background-color: #218838;
+}
+
+
