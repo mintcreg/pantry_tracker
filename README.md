@@ -69,6 +69,15 @@ The ability to save a copy of the database and restore an existing database
 </details>
 
 <details>
+<summary>Edit Products</summary>
+ 
+<br>
+
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/dev/images/edit-product.PNG)
+
+</details>
+
+<details>
 <summary>Categories</summary>
  
 <br>
