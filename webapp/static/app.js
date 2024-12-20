@@ -484,6 +484,92 @@ const saveEditedProduct = async () => {
     }
 };
 
+// Define the addProductFromForm function
+const addProductFromForm = async () => {
+    const name = document.getElementById('new-product-name').value.trim();
+    const category = document.getElementById('new-product-category').value;
+    const url = document.getElementById('new-product-url').value.trim();
+    const barcode = document.getElementById('new-product-barcode').value.trim();
+
+    if (!name || !category || !url) {
+        alert('Product name, category, and image URL are required.');
+        return;
+    }
+
+    if (!isAlphanumeric(name)) {
+        alert('Product name must be alphanumeric.');
+        return;
+    }
+
+    if (!isAlphanumeric(category)) {
+        alert('Category name must be alphanumeric.');
+        return;
+    }
+
+    if (barcode && !/^\d{8,13}$/.test(barcode)) {
+        alert('Barcode must be numeric and between 8 to 13 digits.');
+        return;
+    }
+
+    try {
+        const payload = {
+            name,
+            category,
+            url,
+            barcode: barcode || null
+        };
+
+        const response = await fetch('/products', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to add product: ${response.statusText}`);
+        }
+
+        alert('Product added successfully.');
+        fetchProducts(); // Refresh the product list
+    } catch (error) {
+        console.error('Error adding product:', error);
+        alert(error.message);
+    }
+};
+
+
+// Attach the function to the global scope
+window.addProductFromForm = addProductFromForm;
+
+
+// Attach the function to the global scope
+window.addProductFromForm = addProductFromForm;
+
+// Remove a product via API
+const removeProduct = async (productName) => {
+    try {
+        const response = await fetch('/products', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: productName })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to remove product: ${response.statusText}`);
+        }
+
+        alert('Product removed successfully');
+        fetchProducts(); // Refresh the product list
+    } catch (error) {
+        console.error('Error removing product:', error);
+    }
+};
+
+
 // Sort products by name or category
 const sortProducts = (field) => {
     const sortOrder = productSortOrder[field];
@@ -633,3 +719,5 @@ const fetchBarcode = () => {
         alert('Please enter a barcode to fetch product data.');
     }
 };
+
+
