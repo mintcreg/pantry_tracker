@@ -168,6 +168,20 @@ tr:hover td {
 .add-remove-buttons .remove-btn:hover {
     background-color: #c82333;
 }
+.edit-btn {
+    padding: 10px 20px; /* Same padding as the Remove button */
+    font-size: 14px;    /* Same font size */
+    background-color: #ffa500; /* Orange */
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px; /* Same border radius */
+    transition: background-color 0.3s ease;
+    box-sizing: border-box; /* Ensures consistent box model */
+}
+.edit-btn:hover {
+    background-color: #e59400; /* Darker orange on hover */
+}
 
 /* Config Page Styles */
 .generate-form {
@@ -368,7 +382,7 @@ tr:hover td {
 }
 /* Green Buttons (e.g., Add Product, Add Category) */
 .green-btn {
-    background-color: #28a745; /* Green */
+    background-color: #28a745; 
     color: white;
 }
 
@@ -486,4 +500,89 @@ tr:hover td {
 
 .fetch-barcode-btn:hover {
     background-color: #218838;
+}
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; /* 10% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 40%; /* Could be more or less, depending on screen size */
+    border-radius: 5px;
+}
+
+/* Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Save Button */
+.save-btn {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Input Fields */
+.input-field {
+    width: 100%;
+    padding: 8px 12px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+.barcode-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between input and buttons */
+}
+
+.barcode-container .input-field {
+    flex: 1; /* Make the input field take up remaining space */
+}
+
+.barcode-container .fetch-barcode-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #28a745; /* Green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.barcode-container .fetch-barcode-btn:hover {
+    background-color: #218838; /* Darker green on hover */
 }

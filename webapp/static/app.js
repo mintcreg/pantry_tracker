@@ -69,6 +69,7 @@ const displayCategories = (categories) => {
             row.innerHTML = `
                 <td>${category}</td>
                 <td>
+                    <button class="edit-btn" onclick="openEditCategoryModal('${category}')">Edit</button>
                     <button class="remove-btn" onclick="removeCategory('${category}')">Remove</button>
                 </td>
             `;
@@ -173,7 +174,69 @@ const removeCategory = async (categoryName) => {
     }
 };
 
+// ==============================
+// Edit Functionality for Categories
+// ==============================
+
+// Open the edit category modal
+function openEditCategoryModal(categoryName) {
+    // Populate the input with the current category name
+    document.getElementById('edit-category-input').value = categoryName;
+    document.getElementById('edit-category-old-name').value = categoryName; // Hidden input to keep track of old name
+
+    // Show the modal
+    document.getElementById('edit-category-modal').style.display = 'block';
+}
+
+// Close the edit category modal
+function closeEditCategoryModal() {
+    document.getElementById('edit-category-modal').style.display = 'none';
+}
+
+// Save the edited category
+const saveEditedCategory = async () => {
+    const newName = document.getElementById('edit-category-input').value.trim();
+    const oldName = document.getElementById('edit-category-old-name').value.trim();
+
+    if (!newName) {
+        alert('New category name cannot be empty');
+        return;
+    }
+
+    // Check if newName is alphanumeric
+    if (!isAlphanumeric(newName)) {
+        alert('Category name must be alphanumeric');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/categories/${encodeURIComponent(oldName)}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ new_name: newName })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || `Failed to edit category: ${response.statusText}`);
+        }
+
+        alert('Category updated successfully');
+        closeEditCategoryModal();
+        fetchCategories(); // Refresh the category list
+    } catch (error) {
+        console.error('Error editing category:', error);
+        alert(error.message);
+    }
+};
+
+// ==============================
 // Fetch products from the backend
+// ==============================
+
 const fetchProducts = async () => {
     try {
         const response = await fetch('/products', {
@@ -218,20 +281,22 @@ const displayProducts = (products) => {
             const imageUrl = product.image_front_small_url ? product.image_front_small_url : product.url;
             const imageAlt = product.image_front_small_url ? `${product.name} Image` : `${product.name} Image (Manual)`;
 
-            // Conditional link to OpenFoodFacts if barcode exists
-            const productLink = product.barcode
-                ? `<a href="https://world.openfoodfacts.org/product/${product.barcode}" target="_blank" rel="noopener noreferrer">${product.name}</a>`
-                : product.name;
+            // **Updated Section: Move link to Barcode**
+            // Instead of linking the product name, link the barcode
+            const barcodeLink = product.barcode
+                ? `<a href="https://world.openfoodfacts.org/product/${product.barcode}" target="_blank" rel="noopener noreferrer">${product.barcode}</a>`
+                : 'N/A';
 
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${productLink}</td>
+                <td>${product.name}</td> <!-- Product Name as plain text -->
                 <td>${product.category}</td>
                 <td>
                     ${imageUrl ? `<img src="${imageUrl}" alt="${imageAlt}" class="product-image">` : 'No Image'}
                 </td>
-                <td>${product.barcode ? product.barcode : 'N/A'}</td>
+                <td>${barcodeLink}</td> <!-- Barcode with link if available -->
                 <td>
+                    <button class="edit-btn" onclick="initEditProductModal('${encodeURIComponent(product.name)}')">Edit</button>
                     <button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
                 </td>
             `;
@@ -273,11 +338,13 @@ const displayProducts = (products) => {
                     <input type="text" id="new-product-url" class="input-field" placeholder="Image URL">
                 </td>
                 <td>
-                    <input type="text" id="new-product-barcode" class="input-field" placeholder="Barcode (Optional)">
-                    <button onclick="fetchBarcode()" class="fetch-barcode-btn">Fetch</button>
-                    <!-- Scan Barcode Button -->
-                    <button onclick="openBarcodeModal()" class="fetch-barcode-btn">Scan Barcode</button>
-                </td>
+					<div class="barcode-container">
+						<input type="text" id="new-product-barcode" class="input-field" placeholder="Barcode (Optional)">
+						<button onclick="fetchBarcode()" class="fetch-barcode-btn">Fetch</button>
+						<button onclick="openBarcodeModal()" class="fetch-barcode-btn">Scan Barcode</button>
+					</div>
+				</td>
+				
                 <td>
                     <button class="add-row-btn green-btn" onclick="addProductFromForm()">Add Product</button>
                 </td>
@@ -287,92 +354,132 @@ const displayProducts = (products) => {
     productsContainer.appendChild(addProductTable);
 };
 
-// Add a product from form inputs
-const addProductFromForm = async () => {
-    const productName = document.getElementById('new-product-name').value.trim();
-    const categoryName = document.getElementById('new-product-category').value;
-    const productUrl = document.getElementById('new-product-url').value.trim();
-    const productBarcode = document.getElementById('new-product-barcode').value.trim();
 
-    addProduct(productName, categoryName, productUrl, productBarcode);
+// Initialize edit product modal with product data
+const initEditProductModal = async (encodedProductName) => {
+    const productName = decodeURIComponent(encodedProductName);
+    try {
+        // Fetch products
+        const productResponse = await fetch('/products', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!productResponse.ok) {
+            throw new Error(`Failed to fetch products: ${productResponse.statusText}`);
+        }
+        const allProducts = await productResponse.json();
+        const product = allProducts.find(p => p.name === productName);
+
+        if (!product) {
+            alert('Product not found.');
+            return;
+        }
+
+        // Fetch categories
+        const categoryResponse = await fetch('/categories', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!categoryResponse.ok) {
+            throw new Error(`Failed to fetch categories: ${categoryResponse.statusText}`);
+        }
+        categories = await categoryResponse.json(); // Update the global categories array
+
+        // Open modal with product and categories
+        openEditProductModal(product);
+    } catch (error) {
+        console.error('Error initializing edit product modal:', error);
+        alert('Failed to load product data.');
+    }
 };
 
-// Add a new product via API
-const addProduct = async (productName, categoryName, productUrl, productBarcode) => {
-    if (!productName || !categoryName || !productUrl) {
+
+// Open the edit product modal with product data
+function openEditProductModal(product) {
+    // Populate the input fields with the current product details
+    document.getElementById('edit-product-name').value = product.name;
+    document.getElementById('edit-product-url').value = product.url;
+    document.getElementById('edit-product-barcode').value = product.barcode || '';
+    document.getElementById('edit-product-old-name').value = product.name; // Hidden input to keep track of old name
+
+    // Populate the category dropdown
+    const categoryDropdown = document.getElementById('edit-product-category');
+    categoryDropdown.innerHTML = `<option value="">Select Category</option>`;
+    categories.forEach(category => {
+        const selected = category === product.category ? 'selected' : '';
+        categoryDropdown.innerHTML += `<option value="${category}" ${selected}>${category}</option>`;
+    });
+
+    // Show the modal
+    document.getElementById('edit-product-modal').style.display = 'block';
+}
+
+// Close the edit product modal
+function closeEditProductModal() {
+    document.getElementById('edit-product-modal').style.display = 'none';
+}
+
+// Save the edited product
+const saveEditedProduct = async () => {
+    const newName = document.getElementById('edit-product-name').value.trim();
+    const newCategory = document.getElementById('edit-product-category').value;
+    const newUrl = document.getElementById('edit-product-url').value.trim();
+    const newBarcode = document.getElementById('edit-product-barcode').value.trim();
+    const oldName = document.getElementById('edit-product-old-name').value.trim();
+
+    if (!newName || !newCategory || !newUrl) {
         alert('Product name, category, and image URL are required');
         return;
     }
 
-    // Check if productName and categoryName are alphanumeric
-    if (!isAlphanumeric(productName)) {
+    // Check if newName and newCategory are alphanumeric
+    if (!isAlphanumeric(newName)) {
         alert('Product name must be alphanumeric');
         return;
     }
 
-    if (!isAlphanumeric(categoryName)) {
+    if (!isAlphanumeric(newCategory)) {
         alert('Category name must be alphanumeric');
         return;
     }
 
     // If barcode is provided, ensure it's numeric and of valid length (e.g., 8-13 digits)
-    if (productBarcode && !/^\d{8,13}$/.test(productBarcode)) {
+    if (newBarcode && !/^\d{8,13}$/.test(newBarcode)) {
         alert('Barcode must be numeric and between 8 to 13 digits');
         return;
     }
 
     try {
-        const response = await fetch('/products', {
-            method: 'POST',
+        const payload = {
+            new_name: newName,
+            category: newCategory,
+            url: newUrl,
+            barcode: newBarcode || null
+        };
+
+        const response = await fetch(`/products/${encodeURIComponent(oldName)}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                name: productName,
-                category: categoryName,
-                url: productUrl,
-                barcode: productBarcode || null
-            })
+            body: JSON.stringify(payload)
         });
 
         const result = await response.json();
 
         if (!response.ok) {
-            throw new Error(result.message || `Failed to add product: ${response.statusText}`);
+            throw new Error(result.message || `Failed to edit product: ${response.statusText}`);
         }
 
-        alert('Product added successfully');
+        alert('Product updated successfully');
+        closeEditProductModal();
         fetchProducts(); // Refresh the product list
     } catch (error) {
-        console.error('Error adding product:', error);
-        alert(error.message);
-    }
-};
-
-// Remove a product via API
-const removeProduct = async (productName) => {
-    if (!confirm(`Are you sure you want to remove the product "${productName}"?`)) {
-        return;
-    }
-
-    try {
-        const response = await fetch('/products', {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name: productName })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || `Failed to remove product: ${response.statusText}`);
-        }
-
-        alert('Product removed successfully');
-        fetchProducts(); // Refresh the product list
-    } catch (error) {
-        console.error('Error removing product:', error);
+        console.error('Error editing product:', error);
         alert(error.message);
     }
 };

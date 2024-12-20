@@ -45,15 +45,47 @@
 
 </div>
 
-<!-- Barcode Scanner Modal -->
-<div id="barcode-modal">
-    <div id="barcode-modal-content">
-        <span class="close-modal" onclick="closeBarcodeModal()">&times;</span>
-        <h2>Scan Barcode</h2>
-        <div id="loading-spinner"></div> <!-- Loading spinner -->
-        <div id="barcode-scanner"></div> <!-- Camera feed -->
+<!-- Edit Category Modal -->
+<div id="edit-category-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditCategoryModal()">&times;</span>
+        <h2>Edit Category</h2>
+        <input type="hidden" id="edit-category-old-name">
+        <input type="text" id="edit-category-input" class="input-field" placeholder="New Category Name">
+        <button class="save-btn" onclick="saveEditedCategory()">Save Changes</button>
     </div>
 </div>
+
+<!-- Edit Product Modal -->
+<div id="edit-product-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditProductModal()">&times;</span>
+        <h2>Edit Product</h2>
+        <input type="hidden" id="edit-product-old-name">
+        <input type="text" id="edit-product-name" class="input-field" placeholder="New Product Name">
+        <select id="edit-product-category" class="input-field">
+            <option value="">Select Category</option>
+            <!-- Dynamically populate categories -->
+            <!-- Example: -->
+            <!-- <option value="Fruits">Fruits</option> -->
+        </select>
+        <input type="text" id="edit-product-url" class="input-field" placeholder="New Image URL">
+        <input type="text" id="edit-product-barcode" class="input-field" placeholder="New Barcode (Optional)">
+        <button class="save-btn" onclick="saveEditedProduct()">Save Changes</button>
+    </div>
+</div>
+
+<!-- Barcode Scanner Modal -->
+<div id="barcode-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeBarcodeModal()">&times;</span>
+        <h2>Scan Barcode</h2>
+        <div id="loading-spinner" style="display: none;">Loading...</div>
+        <div id="barcode-scanner" style="width: 100%; height: 400px;"></div>
+    </div>
+</div>
+
+
 
 <!-- Include the script at the end of the body -->
 <script src="static/app.js"></script>

@@ -6,7 +6,7 @@ import logging
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models import Base, Category, Product, Count
-from schemas import CategorySchema, ProductSchema
+from schemas import CategorySchema, UpdateCategorySchema, ProductSchema, UpdateProductSchema
 from marshmallow import ValidationError
 import requests  # For interacting with OpenFoodFacts
 
@@ -32,10 +32,6 @@ SessionFactory = sessionmaker(bind=engine)
 # Create a scoped session
 Session = scoped_session(SessionFactory)
 
-# Initialize Marshmallow Schemas
-category_schema = CategorySchema()
-product_schema = ProductSchema()
-
 def sanitize_entity_id(name: str) -> str:
     """Sanitize the product name to create a unique entity ID without category."""
     return f"sensor.product_{name.lower().replace(' ', '_').replace('-', '_')}"
@@ -46,7 +42,7 @@ def index():
     return render_template("index.html")
 
 @app.route("/categories", methods=["GET", "POST", "DELETE"])
-def categories():
+def categories_route():
     session = Session()
     if request.method == "GET":
         try:
@@ -62,9 +58,8 @@ def categories():
     
     if request.method == "POST":
         try:
-            data = category_schema.load(request.get_json())
+            data = CategorySchema().load(request.get_json())
         except ValidationError as err:
-            Session.remove()
             logger.warning("Validation error on adding category: %s", err.messages)
             return jsonify({"status": "error", "errors": err.messages}), 400
         
@@ -93,7 +88,6 @@ def categories():
         data = request.get_json()
         category_name = data.get("name")
         if not category_name:
-            Session.remove()
             logger.warning("Category name missing in delete request")
             return jsonify({"status": "error", "message": "Category name is required for deletion"}), 400
         
@@ -136,8 +130,171 @@ def categories():
         finally:
             Session.remove()
 
+# ==============================
+# New Endpoints for Editing Categories and Products
+# ==============================
+
+@app.route("/categories/<old_name>", methods=["PUT"])
+def edit_category(old_name):
+    """
+    Edit an existing category's name.
+    Payload:
+    {
+        "new_name": "New Category Name"
+    }
+    """
+    session = Session()
+    try:
+        data = UpdateCategorySchema().load(request.get_json())
+        new_name = data.get("new_name")
+        
+        # Check if new_name already exists
+        existing_cat = session.query(Category).filter_by(name=new_name).first()
+        if existing_cat:
+            logger.warning("Attempted to rename to an existing category: %s", new_name)
+            return jsonify({"status": "error", "message": "Category with the new name already exists"}), 400
+
+        # Fetch the category to be edited
+        category = session.query(Category).filter_by(name=old_name).first()
+        if not category:
+            logger.warning("Category '%s' not found for editing", old_name)
+            return jsonify({"status": "error", "message": "Category not found"}), 404
+
+        # Update the category name
+        category.name = new_name
+        session.commit()
+        logger.info(f"Category renamed from '{old_name}' to '{new_name}'")
+
+        # Return updated list of categories
+        category_names = [cat.name for cat in session.query(Category).all()]
+        return jsonify({"status": "ok", "categories": category_names})
+    
+    except ValidationError as err:
+        logger.warning("Validation error on editing category: %s", err.messages)
+        return jsonify({"status": "error", "errors": err.messages}), 400
+
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error editing category '{old_name}': {e}")
+        return jsonify({"status": "error", "message": "Failed to edit category"}), 500
+
+    finally:
+        Session.remove()
+
+
+@app.route("/products/<old_name>", methods=["PUT"])
+def edit_product(old_name):
+    """
+    Edit an existing product's details.
+    Payload can include any of the following fields:
+    {
+        "new_name": "New Product Name",
+        "category": "New Category Name",
+        "url": "New Image URL",
+        "barcode": "New Barcode"
+    }
+    """
+    session = Session()
+    try:
+        data = UpdateProductSchema().load(request.get_json())
+        
+        # Extract fields
+        new_name = data.get("new_name")
+        category_name = data.get("category")
+        url = data.get("url")
+        barcode = data.get("barcode")
+
+        # Fetch the product to be edited
+        product = session.query(Product).filter_by(name=old_name).first()
+        if not product:
+            logger.warning("Product '%s' not found for editing", old_name)
+            return jsonify({"status": "error", "message": "Product not found"}), 404
+
+        # Update product name if provided
+        if new_name:
+            new_name = new_name.strip()
+            if not new_name:
+                logger.warning("Invalid new product name provided")
+                return jsonify({"status": "error", "message": "Invalid new product name"}), 400
+
+            # Check if new_name already exists
+            existing_product = session.query(Product).filter_by(name=new_name).first()
+            if existing_product and existing_product.id != product.id:
+                logger.warning("Attempted to rename to an existing product: %s", new_name)
+                return jsonify({"status": "error", "message": "Product with the new name already exists"}), 400
+
+            product.name = new_name
+            logger.info(f"Product name updated from '{old_name}' to '{new_name}'")
+
+        # Update category if provided
+        if category_name:
+            category_name = category_name.strip()
+            if not category_name:
+                logger.warning("Invalid category name provided for product edit")
+                return jsonify({"status": "error", "message": "Invalid category name"}), 400
+
+            category = session.query(Category).filter_by(name=category_name).first()
+            if not category:
+                logger.warning("Category '%s' not found for product edit", category_name)
+                return jsonify({"status": "error", "message": "Category does not exist"}), 400
+
+            product.category = category
+            logger.info(f"Product '{product.name}' category updated to '{category_name}'")
+
+        # Update URL if provided
+        if url:
+            url = url.strip()
+            if not url:
+                logger.warning("Invalid URL provided for product edit")
+                return jsonify({"status": "error", "message": "Invalid URL"}), 400
+            product.url = url
+            logger.info(f"Product '{product.name}' URL updated to '{url}'")
+
+        # Update barcode if provided
+        if barcode is not None:  # Allow setting barcode to null
+            if barcode:
+                barcode = barcode.strip()
+                if not barcode.isdigit() or not (8 <= len(barcode) <= 13):
+                    logger.warning("Invalid barcode provided for product edit: '%s'", barcode)
+                    return jsonify({"status": "error", "message": "Barcode must be numeric and between 8 to 13 digits"}), 400
+
+                # Check if barcode already exists
+                existing_barcode = session.query(Product).filter_by(barcode=barcode).first()
+                if existing_barcode and existing_barcode.id != product.id:
+                    logger.warning("Attempted to set duplicate barcode: %s", barcode)
+                    return jsonify({"status": "error", "message": "Barcode already exists"}), 400
+
+                product.barcode = barcode
+                logger.info(f"Product '{product.name}' barcode updated to '{barcode}'")
+            else:
+                # If barcode is set to null or empty, remove it
+                product.barcode = None
+                logger.info(f"Product '{product.name}' barcode removed")
+
+        session.commit()
+        logger.info(f"Product '{old_name}' edited successfully")
+
+        # Return updated list of products
+        products = session.query(Product).all()
+        product_list = [
+            {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode} for prod in products
+        ]
+        return jsonify({"status": "ok", "products": product_list})
+
+    except ValidationError as err:
+        logger.warning("Validation error on editing product: %s", err.messages)
+        return jsonify({"status": "error", "errors": err.messages}), 400
+
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error editing product '{old_name}': {e}")
+        return jsonify({"status": "error", "message": "Failed to edit product"}), 500
+
+    finally:
+        Session.remove()
+
 @app.route("/products", methods=["GET", "POST", "DELETE"])
-def products():
+def products_route():
     session = Session()
     if request.method == "GET":
         try:
@@ -155,9 +312,8 @@ def products():
     
     elif request.method == "POST":
         try:
-            data = product_schema.load(request.get_json())
+            data = ProductSchema().load(request.get_json())
         except ValidationError as err:
-            Session.remove()
             logger.warning("Validation error on adding product: %s", err.messages)
             return jsonify({"status": "error", "errors": err.messages}), 400
         
@@ -212,7 +368,6 @@ def products():
         data = request.get_json()
         product_name = data.get("name")
         if not product_name:
-            Session.remove()
             logger.warning("Product name missing in delete request")
             return jsonify({"status": "error", "message": "Product name is required for deletion"}), 400
         
@@ -249,14 +404,12 @@ def update_count():
     # Check that we have the required parameters
     if not all([product_name, action]):
         logger.warning("Missing required parameters in update_count")
-        Session.remove()
         return jsonify({"status": "error", "message": "Missing required parameters"}), 400
 
     try:
         product = session.query(Product).filter_by(name=product_name).first()
         if not product:
             logger.warning("Product '%s' not found in update_count", product_name)
-            Session.remove()
             return jsonify({"status": "error", "message": "Product not found"}), 404
 
         count_entry = session.query(Count).filter_by(product_id=product.id).first()
@@ -271,16 +424,17 @@ def update_count():
             count_entry.count = max(count_entry.count - amount, 0)
         else:
             logger.warning("Invalid action '%s' in update_count", action)
-            Session.remove()
             return jsonify({"status": "error", "message": "Invalid action"}), 400
 
         session.commit()
         logger.info("Updated count for %s: %s", product_name, count_entry.count)
         return jsonify({"status": "ok", "count": count_entry.count})
+
     except Exception as e:
         session.rollback()
         logger.error("Error updating count for %s: %s", product_name, e)
         return jsonify({"status": "error", "message": "Failed to update count"}), 500
+
     finally:
         Session.remove()
 
@@ -307,7 +461,7 @@ def health():
     return jsonify({"status": "healthy"}), 200
 
 ###################################
-# New Backup & Restore Functionality
+# Backup & Restore Functionality
 ###################################
 
 # Display the backup/restore page
@@ -347,7 +501,7 @@ def upload_db():
 
 def fetch_product_from_openfoodfacts(barcode: str):
     """Fetch product data from OpenFoodFacts using the barcode."""
-    url = f"https://world.openfoodfacts.net/api/v0/product/{barcode}.json"  # CHANGEME Need to .org for production
+    url = f"https://world.openfoodfacts.net/api/v0/product/{barcode}.json"  # Use .org for production
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()
@@ -369,7 +523,6 @@ def fetch_product_from_openfoodfacts(barcode: str):
     except requests.RequestException as e:
         logger.error(f"Error fetching product from OpenFoodFacts: {e}")
         return None
-
 
 @app.route("/fetch_product", methods=["GET"])
 def fetch_product():
