@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from models import Base, Category, Product, Count
 from schemas import CategorySchema, ProductSchema
 from marshmallow import ValidationError
+import requests  # For interacting with OpenFoodFacts
 
 app = Flask(__name__)
 
@@ -142,7 +143,7 @@ def products():
         try:
             products = session.query(Product).all()
             product_list = [
-                {"name": prod.name, "url": prod.url, "category": prod.category.name} for prod in products
+                {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode} for prod in products
             ]
             logger.info("Fetched products: %s", product_list)
             return jsonify(product_list)
@@ -163,6 +164,7 @@ def products():
         name = data.get("name")
         url = data.get("url")
         category_name = data.get("category")
+        barcode = data.get("barcode")  # Optional barcode
         
         try:
             # Check if category exists
@@ -177,7 +179,14 @@ def products():
                 logger.warning("Duplicate product attempted: %s", name)
                 return jsonify({"status": "error", "message": "Duplicate product"}), 400
             
-            new_product = Product(name=name, url=url, category=category)
+            # If barcode is provided, ensure it's unique
+            if barcode:
+                existing_barcode = session.query(Product).filter_by(barcode=barcode).first()
+                if existing_barcode:
+                    logger.warning("Duplicate barcode attempted: %s", barcode)
+                    return jsonify({"status": "error", "message": "Barcode already exists"}), 400
+            
+            new_product = Product(name=name, url=url, category=category, barcode=barcode)
             session.add(new_product)
             
             # Initialize count to 0
@@ -189,12 +198,12 @@ def products():
             
             products = session.query(Product).all()
             product_list = [
-                {"name": prod.name, "url": prod.url, "category": prod.category.name} for prod in products
+                {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode} for prod in products
             ]
             return jsonify({"status": "ok", "products": product_list})
         except Exception as e:
             session.rollback()
-            logger.error(f"Error adding product '{name}': {e}")
+            logger.error("Error adding product '%s': %s", name, e)
             return jsonify({"status": "error", "message": "Failed to add product"}), 500
         finally:
             Session.remove()
@@ -219,12 +228,12 @@ def products():
             
             products = session.query(Product).all()
             product_list = [
-                {"name": prod.name, "url": prod.url, "category": prod.category.name} for prod in products
+                {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode} for prod in products
             ]
             return jsonify({"status": "ok", "products": product_list})
         except Exception as e:
             session.rollback()
-            logger.error(f"Error deleting product '{product_name}': {e}")
+            logger.error("Error deleting product '%s': %s", product_name, e)
             return jsonify({"status": "error", "message": "Failed to delete product"}), 500
         finally:
             Session.remove()
@@ -262,21 +271,19 @@ def update_count():
             count_entry.count = max(count_entry.count - amount, 0)
         else:
             logger.warning("Invalid action '%s' in update_count", action)
-            session.remove()
+            Session.remove()
             return jsonify({"status": "error", "message": "Invalid action"}), 400
 
         session.commit()
-        logger.info(f"Updated count for {product_name}: {count_entry.count}")
+        logger.info("Updated count for %s: %s", product_name, count_entry.count)
         return jsonify({"status": "ok", "count": count_entry.count})
     except Exception as e:
         session.rollback()
-        logger.error(f"Error updating count for {product_name}: {e}")
+        logger.error("Error updating count for %s: %s", product_name, e)
         return jsonify({"status": "error", "message": "Failed to update count"}), 500
     finally:
         Session.remove()
 
-
-        
 @app.route("/counts", methods=["GET"])
 def get_counts():
     session = Session()
@@ -289,7 +296,7 @@ def get_counts():
         logger.info("Fetched counts: %s", counts)
         return jsonify(counts)
     except Exception as e:
-        logger.error(f"Error fetching counts: {e}")
+        logger.error("Error fetching counts: %s", e)
         return jsonify({"status": "error", "message": "Failed to fetch counts"}), 500
     finally:
         Session.remove()
@@ -303,12 +310,10 @@ def health():
 # New Backup & Restore Functionality
 ###################################
 
-
 # Display the backup/restore page
 @app.route("/backup", methods=["GET"], endpoint="backup_page")
 def backup():
     return render_template("backup.html")
-
 
 # Download the current database file
 @app.route("/download_db", methods=["GET"])
@@ -336,6 +341,57 @@ def upload_db():
 
     return redirect(url_for('backup_page'))
 
+###################################
+# OpenFoodFacts Integration
+###################################
+
+def fetch_product_from_openfoodfacts(barcode: str):
+    """Fetch product data from OpenFoodFacts using the barcode."""
+    url = f"https://world.openfoodfacts.net/api/v0/product/{barcode}.json"  # CHANGEME Need to .org for production
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        if data.get('status') == 1:
+            product_data = data.get('product', {})
+            # Extract desired fields. Modify as needed.
+            extracted_data = {
+                "name": product_data.get('product_name', 'Unknown Product'),
+                "barcode": barcode,
+                "category": product_data.get('categories', 'Uncategorized').split(',')[0].strip(),
+                "image_front_small_url": product_data.get('image_front_small_url', None)  # New field
+                # Add more fields as needed
+            }
+            return extracted_data
+        else:
+            logger.warning(f"Product with barcode {barcode} not found in OpenFoodFacts.")
+            return None
+    except requests.RequestException as e:
+        logger.error(f"Error fetching product from OpenFoodFacts: {e}")
+        return None
+
+
+@app.route("/fetch_product", methods=["GET"])
+def fetch_product():
+    """Endpoint to fetch product data from OpenFoodFacts using a barcode."""
+    barcode = request.args.get('barcode')
+    if not barcode:
+        logger.warning("Barcode not provided in fetch_product request.")
+        return jsonify({"status": "error", "message": "Barcode is required"}), 400
+    
+    product_data = fetch_product_from_openfoodfacts(barcode)
+    if product_data:
+        return jsonify({"status": "ok", "product": product_data})
+    else:
+        return jsonify({"status": "error", "message": "Product not found or failed to fetch data"}), 404
+
 if __name__ == "__main__":
-    # For ingress, listen on port 5000
-    app.run(host="0.0.0.0", port=5000)
+    # For ingress, listen on port 5000 with SSL
+    CERT_FILE = '/config/pantry_data/keys/cert.pem'
+    KEY_FILE = '/config/pantry_data/keys/key.pem'
+    
+    if not os.path.exists(CERT_FILE) or not os.path.exists(KEY_FILE):
+        logger.error("SSL certificates not found. Exiting.")
+        exit(1)
+    
+    app.run(host="0.0.0.0", port=5000, ssl_context=(CERT_FILE, KEY_FILE))

@@ -3,4 +3,4 @@ SQLAlchemy
 portalocker
 marshmallow
 sqlalchemy
-
+requests

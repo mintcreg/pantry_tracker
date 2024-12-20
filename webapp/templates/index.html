@@ -5,7 +5,8 @@
     <title>Pantry Manager</title>
     <link rel="stylesheet" href="static/style.css">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
-
+    <!-- Include QuaggaJS locally -->
+    <script src="static/js/quagga.min.js"></script>
 </head>
 <body>
 
@@ -16,7 +17,7 @@
         <button onclick="showTab('products')">Products</button>
         <button onclick="showTab('categories')">Categories</button>
         <!-- Changed this from an anchor link to a styled button-like link -->
-        <a href="{{ url_for('backup_page') }}" class="add-row-btn" style="text-decoration: none;">Backup & Restore</a>
+        <a href="{{ url_for('backup_page') }}" class="additional-buttons">Backup & Restore</a>
     </div>
 
     <!-- Categories Tab -->
@@ -42,6 +43,16 @@
         <button class="generate-btn" onclick="saveEntities()">Save</button>
     </div>
 
+</div>
+
+<!-- Barcode Scanner Modal -->
+<div id="barcode-modal">
+    <div id="barcode-modal-content">
+        <span class="close-modal" onclick="closeBarcodeModal()">&times;</span>
+        <h2>Scan Barcode</h2>
+        <div id="loading-spinner"></div> <!-- Loading spinner -->
+        <div id="barcode-scanner"></div> <!-- Camera feed -->
+    </div>
 </div>
 
 <!-- Include the script at the end of the body -->
