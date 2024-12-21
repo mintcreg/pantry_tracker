@@ -2,7 +2,7 @@
 # Start the Flask app with SSL
 
 # Enable debug mode for the shell script (optional but helpful for troubleshooting)
-set -x
+#set -x
 
 # Define absolute paths to the SSL certificates
 CERT_FILE="/config/pantry_data/keys/cert.pem"
