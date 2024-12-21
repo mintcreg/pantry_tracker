@@ -13,7 +13,27 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Adds space between sections */
 }
+
+.attribution {
+    text-align: right; /* Align text to the right */
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 20px; /* Adds spacing above the attribution */
+}
+
+.attribution a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.attribution a:hover {
+    text-decoration: underline;
+}
+
 h1 {
     text-align: center;
     color: #333;
@@ -586,3 +606,4 @@ tr:hover td {
 .barcode-container .fetch-barcode-btn:hover {
     background-color: #218838; /* Darker green on hover */
 }
+
