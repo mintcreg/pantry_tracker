@@ -9,6 +9,7 @@ from models import Base, Category, Product, Count
 from schemas import CategorySchema, UpdateCategorySchema, ProductSchema, UpdateProductSchema
 from marshmallow import ValidationError
 import requests  # For interacting with OpenFoodFacts
+from migrate import migrate_database
 
 app = Flask(__name__)
 
@@ -22,6 +23,9 @@ DB_FILE = "/config/pantry_data/pantry_data.db"
 # Ensure the pantry_data directory exists
 DB_DIR = os.path.dirname(DB_FILE)
 os.makedirs(DB_DIR, exist_ok=True)
+
+# Ensure the database schema is valid
+migrate_database(DB_FILE)
 
 # Initialize the database
 engine = create_engine(f'sqlite:///{DB_FILE}', connect_args={'check_same_thread': False}, echo=False)
@@ -481,19 +485,43 @@ def download_db():
 @app.route("/upload_db", methods=["POST"])
 def upload_db():
     if 'file' not in request.files:
-        return "No file part in the request.", 400
+        return jsonify({"status": "error", "message": "No file part in the request."}), 400
+
     file = request.files['file']
     if file.filename == '':
-        return "No file selected.", 400
+        return jsonify({"status": "error", "message": "No file selected."}), 400
 
-    # Replace the existing database with the uploaded file
-    file.save(DB_FILE)
+    # Save the uploaded database file
+    temp_db_path = os.path.join(DB_DIR, "uploaded_temp.db")
+    file.save(temp_db_path)
 
-    # Optionally, reinitialize database session if needed
-    # Since we use scoped_session, the next DB operation will use the new file
-    # It's recommended to restart or re-initialize data if necessary.
+    # Validate and migrate the uploaded database
+    try:
+        migrate_database(temp_db_path)
+    except Exception as e:
+        logger.error(f"Error migrating the uploaded database: {e}")
+        os.remove(temp_db_path)  # Cleanup temporary file
+        return jsonify({"status": "error", "message": "Failed to migrate the uploaded database."}), 500
 
-    return redirect(url_for('backup_page'))
+    # Replace the current database with the uploaded one
+    try:
+        os.replace(temp_db_path, DB_FILE)  # Atomically replace the database
+        logger.info("Uploaded database successfully replaced the existing database.")
+    except Exception as e:
+        logger.error(f"Error replacing the database: {e}")
+        return jsonify({"status": "error", "message": "Failed to replace the database."}), 500
+
+    # Reinitialize the database session
+    global engine
+    global Session
+    engine.dispose()
+    engine = create_engine(f'sqlite:///{DB_FILE}', connect_args={'check_same_thread': False}, echo=False)
+    SessionFactory = sessionmaker(bind=engine)
+    Session = scoped_session(SessionFactory)
+
+    # Redirect to the backup page after successful upload and migration
+    return redirect(url_for('index'), code=302)
+
 
 ###################################
 # OpenFoodFacts Integration
@@ -501,9 +529,16 @@ def upload_db():
 
 def fetch_product_from_openfoodfacts(barcode: str):
     """Fetch product data from OpenFoodFacts using the barcode."""
-    url = f"https://world.openfoodfacts.net/api/v0/product/{barcode}.json"  # Use .org for production
+    url = f"https://world.openfoodfacts.org/api/v0/product/{barcode}.json"
+    
+    # Define a custom User-Agent
+    headers = {
+        "User-Agent": "PantryManager/1.0.5 (mint@mintcreg.co.uk)"
+    }
+    
     try:
-        response = requests.get(url, timeout=5)
+        # Include the custom headers in the request
+        response = requests.get(url, headers=headers, timeout=5)
         response.raise_for_status()
         data = response.json()
         if data.get('status') == 1:
@@ -523,6 +558,7 @@ def fetch_product_from_openfoodfacts(barcode: str):
     except requests.RequestException as e:
         logger.error(f"Error fetching product from OpenFoodFacts: {e}")
         return None
+
 
 @app.route("/fetch_product", methods=["GET"])
 def fetch_product():
