@@ -107,13 +107,15 @@ The ability to save a copy of the database and restore an existing database
                                                                                          |
 
 
-# Roadmap
-```bash
-  > Full ability to manage existing products
-  
-  > Integrate with UPC/EAN Database
+## Attribution
 
-  > Provide functionality for barcode scanning to add/remove/increase/decrease quantities
-``` 
+This project uses data and images provided by [OpenFoodFacts](https://world.openfoodfacts.org/).
+
+![OpenFoodFacts Logo](https://static.openfoodfacts.org/images/logos/off-logo-horizontal-light.svg)
+
+- Data and images are licensed under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/) and the [Database Contents License (DbCL)](https://opendatacommons.org/licenses/dbcl/1-0/).
+- You are encouraged to contribute to OpenFoodFacts by adding missing products and improving data accuracy.
+
+Visit [OpenFoodFacts](https://world.openfoodfacts.org/) to learn more.
 
 
