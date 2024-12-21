@@ -206,14 +206,15 @@ tr:hover td {
 /* Config Page Styles */
 .generate-form {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Prevent wrapping to maintain side-by-side layout */
     justify-content: space-between;
-    margin-top: 20px;
+    align-items: stretch; /* Ensures children stretch to the same height */
+    position: relative; /* Added to establish stacking context */
 }
 .form-section {
     flex: 1;
     min-width: 300px;
-    margin: 10px;
+    margin: 45px;
 }
 .form-section h3 {
     text-align: center;
@@ -373,8 +374,14 @@ tr:hover td {
 .line-separator {
     width: 1px;
     background-color: #ddd;
-    height: 80%; /* Adjust height as necessary */
-    margin: auto;
+    height: 100%; /* Changed from 80% to 100% */
+    margin: 0 20px; /* Added horizontal spacing */
+    position: absolute; /* Position absolutely within generate-form */
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2; /* Ensures it's above other elements */
 }
 
 /* Hide the default file input */
@@ -606,4 +613,3 @@ tr:hover td {
 .barcode-container .fetch-barcode-btn:hover {
     background-color: #218838; /* Darker green on hover */
 }
-
