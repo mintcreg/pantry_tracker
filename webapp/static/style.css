@@ -418,6 +418,121 @@ tr:hover td {
 }
 
 /* ============================
+   New Styles for Add Product Button
+   ============================ */
+
+/* Container for the Add Product button */
+.add-product-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Style for the large Add Product button */
+.add-product-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    background-color: #28a745; /* Green background */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-product-btn:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+/* ============================
+   New Styles for Add Product Modal
+   ============================ */
+
+/* Add Product Modal */
+#add-product-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+#add-product-modal .modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; /* 10% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 40%; /* Could be more or less, depending on screen size */
+    border-radius: 5px;
+}
+
+/* Close Button */
+#add-product-modal .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#add-product-modal .close:hover,
+#add-product-modal .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Save Button */
+#add-product-modal .add-row-btn {
+    background-color: #28a745;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#add-product-modal .add-row-btn:hover {
+    background-color: #218838;
+}
+
+/* Barcode Container within Add Product Modal */
+#add-product-modal .barcode-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between input and buttons */
+}
+
+#add-product-modal .barcode-container .input-field {
+    flex: 1; /* Make the input field take up remaining space */
+}
+
+#add-product-modal .fetch-barcode-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #28a745; /* Green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#add-product-modal .fetch-barcode-btn:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+/* ============================
    Updated Styles for Barcode Modal
    ============================ */
 
@@ -435,7 +550,7 @@ tr:hover td {
 }
 
 /* Full-Screen Modal Content */
-#barcode-modal-content {
+#barcode-modal .modal-content {
     position: relative;
     width: 100%;
     height: 100%;
@@ -447,7 +562,7 @@ tr:hover td {
 }
 
 /* Close Button Styling */
-.close-modal {
+#barcode-modal .close {
     position: absolute;
     top: 20px;
     right: 30px;
@@ -458,15 +573,15 @@ tr:hover td {
     z-index: 1001;
 }
 
-.close-modal:hover,
-.close-modal:focus {
+#barcode-modal .close:hover,
+#barcode-modal .close:focus {
     color: #bbb;
     text-decoration: none;
     cursor: pointer;
 }
 
 /* Header Inside Modal */
-#barcode-modal-content h2 {
+#barcode-modal .modal-content h2 {
     position: absolute;
     top: 20px;
     left: 50%;
@@ -478,7 +593,7 @@ tr:hover td {
 }
 
 /* Loading Spinner Styles */
-#loading-spinner {
+#barcode-modal .modal-content #loading-spinner {
     display: none; /* Hidden by default */
     border: 8px solid #f3f3f3;
     border-top: 8px solid #3498db;
@@ -495,7 +610,7 @@ tr:hover td {
 }
 
 /* Barcode Scanner Styling */
-#barcode-scanner {
+#barcode-modal .modal-content #barcode-scanner {
     width: 100%;
     height: 100%;
     flex: 1; /* Occupy remaining space */
@@ -503,7 +618,7 @@ tr:hover td {
 }
 
 /* Ensure the video inside #barcode-scanner fills the container */
-#barcode-scanner video {
+#barcode-modal .modal-content #barcode-scanner video {
     width: 100%;
     height: 100%;
     object-fit: cover; /* Ensures the video covers the container without distortion */
@@ -511,23 +626,8 @@ tr:hover td {
 
 /* ============================
    Fetch Barcode Button Styles
-============================ */
-.fetch-barcode-btn {
-    padding: 12px 20px;
-    font-size: 16px;
-    margin: 5px;
-    background-color: #28a745; /* Green color for fetch action */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    display: inline-block;
-}
+   ============================ */
 
-.fetch-barcode-btn:hover {
-    background-color: #218838;
-}
 /* The Modal (background) */
 .modal {
     display: none; /* Hidden by default */
@@ -550,8 +650,9 @@ tr:hover td {
     width: 40%; /* Could be more or less, depending on screen size */
     border-radius: 5px;
 }
+
 /* Close Button */
-.close {
+.modal-content .close {
     color: #aaa;
     float: right;
     font-size: 28px;
@@ -559,15 +660,15 @@ tr:hover td {
     cursor: pointer;
 }
 
-.close:hover,
-.close:focus {
+.modal-content .close:hover,
+.modal-content .close:focus {
     color: black;
     text-decoration: none;
     cursor: pointer;
 }
 
 /* Save Button */
-.save-btn {
+.modal-content .save-btn {
     background-color: #4CAF50;
     border: none;
     color: white;
@@ -582,23 +683,23 @@ tr:hover td {
 }
 
 /* Input Fields */
-.input-field {
+.modal-content .input-field {
     width: 100%;
     padding: 8px 12px;
     margin: 8px 0;
     box-sizing: border-box;
 }
-.barcode-container {
+.modal-content .barcode-container {
     display: flex;
     align-items: center;
     gap: 10px; /* Space between input and buttons */
 }
 
-.barcode-container .input-field {
+.modal-content .barcode-container .input-field {
     flex: 1; /* Make the input field take up remaining space */
 }
 
-.barcode-container .fetch-barcode-btn {
+.modal-content .fetch-barcode-btn {
     padding: 8px 12px;
     font-size: 14px;
     background-color: #28a745; /* Green */
@@ -609,6 +710,105 @@ tr:hover td {
     transition: background-color 0.3s ease;
 }
 
-.barcode-container .fetch-barcode-btn:hover {
+.modal-content .fetch-barcode-btn:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+/* ============================
+   New Styles for Add Product Modal
+   ============================ */
+
+/* Add Product Modal */
+#add-product-modal .modal-content {
+    /* Inherits general modal-content styles */
+}
+
+/* ============================
+   New Styles for Edit Product Modal
+   ============================ */
+
+/* Edit Product Modal */
+#edit-product-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1001; /* Sit on top, higher than other modals */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+#edit-product-modal .modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; /* 10% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 40%; /* Could be more or less, depending on screen size */
+    border-radius: 5px;
+}
+
+/* Close Button */
+#edit-product-modal .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#edit-product-modal .close:hover,
+#edit-product-modal .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Save Button */
+#edit-product-modal .save-btn {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Input Fields */
+#edit-product-modal .input-field {
+    width: 100%;
+    padding: 8px 12px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+
+#edit-product-modal .barcode-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between input and buttons */
+}
+
+#edit-product-modal .barcode-container .input-field {
+    flex: 1; /* Make the input field take up remaining space */
+}
+
+#edit-product-modal .fetch-barcode-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #28a745; /* Green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#edit-product-modal .fetch-barcode-btn:hover {
     background-color: #218838; /* Darker green on hover */
 }
