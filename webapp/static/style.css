@@ -550,7 +550,6 @@ tr:hover td {
     width: 40%; /* Could be more or less, depending on screen size */
     border-radius: 5px;
 }
-
 /* Close Button */
 .close {
     color: #aaa;
@@ -569,7 +568,7 @@ tr:hover td {
 
 /* Save Button */
 .save-btn {
-    background-color: #4CAF50; /* Green */
+    background-color: #4CAF50;
     border: none;
     color: white;
     padding: 10px 20px;
