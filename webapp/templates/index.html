@@ -50,7 +50,7 @@
 			Built with the assistance of <a href="https://openai.com" target="_blank" rel="noopener noreferrer">ChatGPT by OpenAI</a>.
 		</p>
 	</div>
-	</div>
+</div>
 
 <!-- Edit Category Modal -->
 <div id="edit-category-modal" class="modal">
@@ -69,14 +69,21 @@
         <span class="close" onclick="closeEditProductModal()">&times;</span>
         <h2>Edit Product</h2>
         <input type="hidden" id="edit-product-old-name">
+
+        <!-- Added Label for Product Name -->
+        <label for="edit-product-name">Name:</label>
         <input type="text" id="edit-product-name" class="input-field" placeholder="New Product Name">
-        <select id="edit-product-category" class="input-field">
+
+        <label for="edit-product-category">Category:</label>
+		<select id="edit-product-category" class="input-field">
             <option value="">Select Category</option>
             <!-- Dynamically populate categories -->
             <!-- Example: -->
             <!-- <option value="Fruits">Fruits</option> -->
         </select>
-        <input type="text" id="edit-product-url" class="input-field" placeholder="New Image URL">
+        <label for="edit-product-image">Image Address:</label>
+		<input type="text" id="edit-product-url" class="input-field" placeholder="New Image URL">
+		<label for="edit-product-barcode">Barcode:</label>
         <input type="text" id="edit-product-barcode" class="input-field" placeholder="New Barcode (Optional)">
         <button class="save-btn" onclick="saveEditedProduct()">Save Changes</button>
     </div>
@@ -91,8 +98,6 @@
         <div id="barcode-scanner" style="width: 100%; height: 400px;"></div>
     </div>
 </div>
-
-
 
 <!-- Include the script at the end of the body -->
 <script src="static/app.js"></script>

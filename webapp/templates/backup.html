@@ -27,7 +27,7 @@
     <!-- Two form sections side-by-side -->
     <div class="generate-form" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start;">
         <!-- Download Section (Left) -->
-        <div class="form-section" style="flex: 0 0 48%;">
+        <div class="form-section" style="flex: 0 0 41%;">
             <h2>Download Current Database</h2>
             <p>You can download the current database to keep a backup:</p>
 			<br>
@@ -38,7 +38,7 @@
         <div class="line-separator"></div>
 
         <!-- Upload Section (Right) -->
-        <div class="form-section" style="flex: 0 0 48%;">
+        <div class="form-section" style="flex: 0 0 41%;">
             <h2>Upload a Database Backup</h2>
             <p>If you have a previously saved backup, you can upload it to restore:</p>
             <form action="{{ url_for('upload_db') }}" method="post" enctype="multipart/form-data" class="backup-form" onsubmit="showConfirmation()">
