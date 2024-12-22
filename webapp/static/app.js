@@ -140,6 +140,9 @@ const addCategory = async () => {
 
         alert('Category added successfully');
         fetchCategories(); // Refresh the category list
+
+        // Clear the input field
+        document.getElementById('new-category-input').value = '';
     } catch (error) {
         console.error('Error adding category:', error);
         alert(error.message);
@@ -190,6 +193,10 @@ function openEditCategoryModal(categoryName) {
 
 // Close the edit category modal
 function closeEditCategoryModal() {
+    // Clear the form fields
+    document.getElementById('edit-category-input').value = '';
+    document.getElementById('edit-category-old-name').value = '';
+
     document.getElementById('edit-category-modal').style.display = 'none';
 }
 
@@ -314,46 +321,21 @@ const displayProducts = (products) => {
         `;
     }
 
-    // Add product form below the table
-    const addProductTable = document.createElement('table');
-    addProductTable.classList.add('add-product-table');
-    addProductTable.innerHTML = `
-        <thead>
-            <tr>
-                <th colspan="5">Add Product</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <input type="text" id="new-product-name" class="input-field" placeholder="Product Name">
-                </td>
-                <td>
-                    <select id="new-product-category" class="input-field">
-                        <option value="">Select Category</option>
-                        ${categories.map(category => `<option value="${category}">${category}</option>`).join('')}
-                    </select>
-                </td>
-                <td>
-                    <input type="text" id="new-product-url" class="input-field" placeholder="Image URL">
-                </td>
-                <td>
-					<div class="barcode-container">
-						<input type="text" id="new-product-barcode" class="input-field" placeholder="Barcode (Optional)">
-						<button onclick="fetchBarcode()" class="fetch-barcode-btn">Fetch</button>
-						<button onclick="openBarcodeModal()" class="fetch-barcode-btn">Scan Barcode</button>
-					</div>
-				</td>
-				
-                <td>
-                    <button class="add-row-btn green-btn" onclick="addProductFromForm()">Add Product</button>
-                </td>
-            </tr>
-        </tbody>
-    `;
-    productsContainer.appendChild(addProductTable);
-};
+    // Add the large "Add Product" button
+    const addProductButtonContainer = document.createElement('div');
+    addProductButtonContainer.classList.add('add-product-button-container');
 
+    const addProductButton = document.createElement('button');
+    addProductButton.classList.add('add-product-btn'); // Define this class in CSS for styling
+    addProductButton.textContent = 'Add Product';
+    addProductButton.onclick = () => {
+        // Open the add product modal
+        openAddProductModal();
+    };
+
+    addProductButtonContainer.appendChild(addProductButton);
+    productsContainer.appendChild(addProductButtonContainer);
+};
 
 // Initialize edit product modal with product data
 const initEditProductModal = async (encodedProductName) => {
@@ -397,7 +379,6 @@ const initEditProductModal = async (encodedProductName) => {
     }
 };
 
-
 // Open the edit product modal with product data
 function openEditProductModal(product) {
     // Populate the input fields with the current product details
@@ -420,6 +401,12 @@ function openEditProductModal(product) {
 
 // Close the edit product modal
 function closeEditProductModal() {
+    // Clear the form fields
+    document.getElementById('edit-product-name').value = '';
+    document.getElementById('edit-product-url').value = '';
+    document.getElementById('edit-product-barcode').value = '';
+    document.getElementById('edit-product-old-name').value = '';
+
     document.getElementById('edit-product-modal').style.display = 'none';
 }
 
@@ -486,10 +473,10 @@ const saveEditedProduct = async () => {
 
 // Define the addProductFromForm function
 const addProductFromForm = async () => {
-    const name = document.getElementById('new-product-name').value.trim();
-    const category = document.getElementById('new-product-category').value;
-    const url = document.getElementById('new-product-url').value.trim();
-    const barcode = document.getElementById('new-product-barcode').value.trim();
+    const name = document.getElementById('add-product-name').value.trim();
+    const category = document.getElementById('add-product-category').value;
+    const url = document.getElementById('add-product-url').value.trim();
+    const barcode = document.getElementById('add-product-barcode').value.trim();
 
     if (!name || !category || !url) {
         alert('Product name, category, and image URL are required.');
@@ -528,10 +515,12 @@ const addProductFromForm = async () => {
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to add product: ${response.statusText}`);
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Failed to add product: ${response.statusText}`);
         }
 
         alert('Product added successfully.');
+        closeAddProductModal(); // Close the modal after adding
         fetchProducts(); // Refresh the product list
     } catch (error) {
         console.error('Error adding product:', error);
@@ -539,16 +528,15 @@ const addProductFromForm = async () => {
     }
 };
 
-
-// Attach the function to the global scope
-window.addProductFromForm = addProductFromForm;
-
-
 // Attach the function to the global scope
 window.addProductFromForm = addProductFromForm;
 
 // Remove a product via API
 const removeProduct = async (productName) => {
+    if (!confirm(`Are you sure you want to remove the product "${productName}"?`)) {
+        return;
+    }
+
     try {
         const response = await fetch('/products', {
             method: 'DELETE',
@@ -559,16 +547,17 @@ const removeProduct = async (productName) => {
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to remove product: ${response.statusText}`);
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Failed to remove product: ${response.statusText}`);
         }
 
         alert('Product removed successfully');
         fetchProducts(); // Refresh the product list
     } catch (error) {
         console.error('Error removing product:', error);
+        alert(error.message);
     }
 };
-
 
 // Sort products by name or category
 const sortProducts = (field) => {
@@ -605,8 +594,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Barcode Scanning Functionality
 //////////////////////////////////////
 
+// Function to hide the Add Product Modal without clearing the form
+function hideAddProductModal() {
+    document.getElementById('add-product-modal').style.display = 'none';
+}
+
 // Open the barcode scanner modal
 function openBarcodeModal() {
+    // Hide the Add Product modal
+    hideAddProductModal();
+
+    // Show the barcode scanner modal
     const modal = document.getElementById('barcode-modal');
     modal.style.display = 'block';
     startBarcodeScanner();
@@ -669,14 +667,14 @@ function onBarcodeDetected(result) {
     const code = result.codeResult.code;
     console.log('Barcode detected and processed : [' + code + ']');
     // Populate the barcode input field
-    document.getElementById('new-product-barcode').value = code;
-    // Optionally, close the modal automatically after detection
+    document.getElementById('add-product-barcode').value = code;
+    // Close the barcode modal
     closeBarcodeModal();
-    // Fetch product data from OpenFoodFacts
+    // Fetch product data from API
     fetchProductData(code);
 }
 
-// Fetch product data from OpenFoodFacts based on the scanned barcode
+// Fetch product data from API based on the scanned barcode
 const fetchProductData = async (barcode) => {
     try {
         const response = await fetch(`/fetch_product?barcode=${barcode}`, {
@@ -691,18 +689,26 @@ const fetchProductData = async (barcode) => {
         if (response.ok && result.status === 'ok') {
             const product = result.product;
             // Pre-fill the form fields with fetched data
-            document.getElementById('new-product-name').value = product.name || '';
-            document.getElementById('new-product-category').value = product.category || '';
-            document.getElementById('new-product-url').value = product.image_front_small_url || '';
+            document.getElementById('add-product-name').value = product.name || '';
+            document.getElementById('add-product-category').value = product.category || '';
+            document.getElementById('add-product-url').value = product.image_front_small_url || '';
             // Barcode is already filled
+
+            // Reopen the Add Product modal with pre-filled data
+            document.getElementById('add-product-modal').style.display = 'block';
+
             // Optionally, display a success message
             alert(`Product "${product.name}" fetched successfully!`);
         } else {
             alert('Product not found in OpenFoodFacts. Please enter details manually.');
+            // Reopen the Add Product modal for manual entry
+            document.getElementById('add-product-modal').style.display = 'block';
         }
     } catch (error) {
         console.error('Error fetching product data:', error);
         alert('Failed to fetch product data. Please enter details manually.');
+        // Reopen the Add Product modal for manual entry
+        document.getElementById('add-product-modal').style.display = 'block';
     }
 };
 
@@ -712,7 +718,7 @@ const fetchProductData = async (barcode) => {
 
 // Fetch product data based on manually entered barcode via the "Fetch" button
 const fetchBarcode = () => {
-    const barcode = document.getElementById('new-product-barcode').value.trim();
+    const barcode = document.getElementById('add-product-barcode').value.trim();
     if (barcode) {
         fetchProductData(barcode);
     } else {
@@ -720,4 +726,49 @@ const fetchBarcode = () => {
     }
 };
 
+// Open the Add Product Modal
+function openAddProductModal() {
+    // Populate the category dropdown in the modal
+    const categoryDropdown = document.getElementById('add-product-category');
+    categoryDropdown.innerHTML = `<option value="">Select Category</option>`;
+    categories.forEach(category => {
+        categoryDropdown.innerHTML += `<option value="${category}">${category}</option>`;
+    });
 
+    // Show the modal
+    document.getElementById('add-product-modal').style.display = 'block';
+}
+
+// Close the Add Product Modal (clears the form)
+function closeAddProductModal() {
+    // Clear the form fields
+    document.getElementById('add-product-name').value = '';
+    document.getElementById('add-product-category').value = '';
+    document.getElementById('add-product-url').value = '';
+    document.getElementById('add-product-barcode').value = '';
+
+    document.getElementById('add-product-modal').style.display = 'none';
+}
+
+// Ensure the modals close when clicking outside of them
+window.onclick = function(event) {
+    const addProductModal = document.getElementById('add-product-modal');
+    if (event.target == addProductModal) {
+        closeAddProductModal();
+    }
+
+    const barcodeModal = document.getElementById('barcode-modal');
+    if (event.target == barcodeModal) {
+        closeBarcodeModal();
+    }
+
+    const editProductModal = document.getElementById('edit-product-modal');
+    if (event.target == editProductModal) {
+        closeEditProductModal();
+    }
+
+    const editCategoryModal = document.getElementById('edit-category-modal');
+    if (event.target == editCategoryModal) {
+        closeEditCategoryModal();
+    }
+};
