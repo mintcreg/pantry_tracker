@@ -1,6 +1,6 @@
 {
   "name": "Pantry Tracker",
-  "version": "1.0.5",
+  "version": "1.0.51",
   "slug": "pantry_tracker",
   "description": "A Home Assistant add-on to manage and track pantry items, with product categorization, real-time inventory updates, and intuitive controls.",
   "startup": "services",
@@ -14,13 +14,13 @@
   "schema": {
     "database_path": "str?"
   },
-  "ports": {
-    "5000/tcp": 5000
-  },
   "map": [
     "addon_config:rw"
   ],
-  "host_network": true,
+  "ingress": true,
+  "ingress_stream": false,
+  "panel_icon": "mdi:fridge",
+  "panel_admin": true,
   "init": false,
   "build_from": {
     "aarch64": "ghcr.io/home-assistant/aarch64-base-python:3.10-alpine3.17",

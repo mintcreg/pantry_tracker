@@ -1,3 +1,8 @@
+// app.js
+
+// Define a dynamic base path based on the current location
+const basePath = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+
 // Global arrays for categories and products
 let categories = [];
 let products = [];
@@ -29,7 +34,7 @@ function showTab(tab) {
 // Fetch categories from the backend
 const fetchCategories = async () => {
     try {
-        const response = await fetch('/categories', {
+        const response = await fetch(`${basePath}categories`, { // Updated to use basePath
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -125,7 +130,7 @@ const addCategory = async () => {
     }
 
     try {
-        const response = await fetch('/categories', {
+        const response = await fetch(`${basePath}categories`, { // Updated to use basePath
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -156,7 +161,7 @@ const removeCategory = async (categoryName) => {
     }
 
     try {
-        const response = await fetch('/categories', {
+        const response = await fetch(`${basePath}categories`, { // Updated to use basePath
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -217,7 +222,7 @@ const saveEditedCategory = async () => {
     }
 
     try {
-        const response = await fetch(`/categories/${encodeURIComponent(oldName)}`, {
+        const response = await fetch(`${basePath}categories/${encodeURIComponent(oldName)}`, { // Updated to use basePath
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -246,7 +251,7 @@ const saveEditedCategory = async () => {
 
 const fetchProducts = async () => {
     try {
-        const response = await fetch('/products', {
+        const response = await fetch(`${basePath}products`, { // Updated to use basePath
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -342,7 +347,7 @@ const initEditProductModal = async (encodedProductName) => {
     const productName = decodeURIComponent(encodedProductName);
     try {
         // Fetch products
-        const productResponse = await fetch('/products', {
+        const productResponse = await fetch(`${basePath}products`, { // Updated to use basePath
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -360,7 +365,7 @@ const initEditProductModal = async (encodedProductName) => {
         }
 
         // Fetch categories
-        const categoryResponse = await fetch('/categories', {
+        const categoryResponse = await fetch(`${basePath}categories`, { // Updated to use basePath
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -448,7 +453,7 @@ const saveEditedProduct = async () => {
             barcode: newBarcode || null
         };
 
-        const response = await fetch(`/products/${encodeURIComponent(oldName)}`, {
+        const response = await fetch(`${basePath}products/${encodeURIComponent(oldName)}`, { // Updated to use basePath
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -506,7 +511,7 @@ const addProductFromForm = async () => {
             barcode: barcode || null
         };
 
-        const response = await fetch('/products', {
+        const response = await fetch(`${basePath}products`, { // Updated to use basePath
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -538,7 +543,7 @@ const removeProduct = async (productName) => {
     }
 
     try {
-        const response = await fetch('/products', {
+        const response = await fetch(`${basePath}products`, { // Updated to use basePath
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -677,7 +682,7 @@ function onBarcodeDetected(result) {
 // Fetch product data from API based on the scanned barcode
 const fetchProductData = async (barcode) => {
     try {
-        const response = await fetch(`/fetch_product?barcode=${barcode}`, {
+        const response = await fetch(`${basePath}fetch_product?barcode=${barcode}`, { // Updated to use basePath
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

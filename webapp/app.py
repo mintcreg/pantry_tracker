@@ -25,7 +25,7 @@ DB_DIR = os.path.dirname(DB_FILE)
 os.makedirs(DB_DIR, exist_ok=True)
 
 # Ensure the database schema is valid
-migrate_database(DB_FILE)
+#migrate_database(DB_FILE)
 
 # Initialize the database
 engine = create_engine(f'sqlite:///{DB_FILE}', connect_args={'check_same_thread': False}, echo=False)
@@ -575,12 +575,5 @@ def fetch_product():
         return jsonify({"status": "error", "message": "Product not found or failed to fetch data"}), 404
 
 if __name__ == "__main__":
-    # For ingress, listen on port 5000 with SSL
-    CERT_FILE = '/config/pantry_data/keys/cert.pem'
-    KEY_FILE = '/config/pantry_data/keys/key.pem'
-    
-    if not os.path.exists(CERT_FILE) or not os.path.exists(KEY_FILE):
-        logger.error("SSL certificates not found. Exiting.")
-        exit(1)
-    
-    app.run(host="0.0.0.0", port=5000, ssl_context=(CERT_FILE, KEY_FILE))
+    # Do not run app.run() since Gunicorn handles it
+    app.run(host="0.0.0.0", port=8099)
