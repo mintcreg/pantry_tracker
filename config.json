@@ -16,8 +16,10 @@
     "8099/tcp": 8099
   },
   "ingress_stream": false,
+  "ingress_panel": true,
   "panel_icon": "mdi:fridge",
-  "panel_admin": true,
+  "panel_title": "Pantry Tracker",
+  "panel_admin": false,
   "init": false,
   "build_from": {
     "aarch64": "ghcr.io/home-assistant/aarch64-base-python:3.10-alpine3.17",
