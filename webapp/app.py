@@ -30,6 +30,7 @@ DB_DIR = os.path.dirname(DB_FILE)
 os.makedirs(DB_DIR, exist_ok=True)
 
 # Ensure the database schema is valid
+# Removed as initially from 1.0.4 > 1.0.5 (no schema changes 1.0.5 > 1.0.6)
 #migrate_database(DB_FILE)
 
 # Initialize the database
