@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Backup & Restore Database</title>
-    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="static/style.css">
     <script>
         // Show confirmation prompt after a successful upload
         function showConfirmation() {
@@ -19,9 +18,9 @@
 	
 	    <!-- Back to Pantry Manager at the top -->
     <div style="text-align: center; margin-bottom: 20px;">
-        <a href="{{ url_for('index') }}" class="add-row-btn" style="text-decoration: none; display: inline-block; width: auto;">
-            Back to Pantry Manager
-        </a>
+        <a href="{{ base_path }}" class="add-row-btn">
+			Back to Pantry Manager
+		</a>
     </div>
 
     <!-- Two form sections side-by-side -->
@@ -31,7 +30,7 @@
             <h2>Download Current Database</h2>
             <p>You can download the current database to keep a backup:</p>
 			<br>
-            <a href="{{ url_for('download_db') }}" class="add-row-btn" style="text-decoration: none;">Download DB</a>
+            <a href="download_db" class="add-row-btn" style="text-decoration: none;">Download DB</a>
         </div>
 
         <!-- Separator Line -->
@@ -41,7 +40,7 @@
         <div class="form-section" style="flex: 0 0 41%;">
             <h2>Upload a Database Backup</h2>
             <p>If you have a previously saved backup, you can upload it to restore:</p>
-            <form action="{{ url_for('upload_db') }}" method="post" enctype="multipart/form-data" class="backup-form" onsubmit="showConfirmation()">
+            <form action="upload_db" method="post" enctype="multipart/form-data" class="backup-form" onsubmit="showConfirmation()">
 				<label for="file-upload" class="file-upload-btn">Choose File</label>
 				<input id="file-upload" type="file" name="file" accept=".db" required>
 				<input type="submit" value="Upload" class="add-row-btn">

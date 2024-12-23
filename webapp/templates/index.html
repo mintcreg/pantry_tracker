@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Pantry Manager</title>
     <link rel="stylesheet" href="static/style.css">
-    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
     <!-- Include QuaggaJS locally -->
     <script src="static/js/quagga.min.js"></script>
 </head>
@@ -17,7 +16,7 @@
         <button onclick="showTab('products')">Products</button>
         <button onclick="showTab('categories')">Categories</button>
         <!-- Changed this from an anchor link to a styled button-like link -->
-        <a href="{{ url_for('backup_page') }}" class="additional-buttons">Backup & Restore</a>
+        <a href="backup" class="additional-buttons">Backup & Restore</a>
     </div>
 
     <!-- Categories Tab -->

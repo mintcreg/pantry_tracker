@@ -1,5 +1,3 @@
-// app.js
-
 // Define a dynamic base path based on the current location
 const basePath = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
 
@@ -593,7 +591,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await fetchCategories(); 
     showTab('products'); 
 });
-
 
 //////////////////////////////////////
 // Barcode Scanning Functionality
