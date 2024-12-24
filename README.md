@@ -11,7 +11,7 @@
 # Description
 The Pantry Tracker add-on is a Home Assistant designed to help you keep track of products in your kitchen, pantry, or any other storage space. With a user-friendly interface and a powerful backend, this add-on simplifies the organization and management of your items by allowing you to create categories, assign products to them, and maintain an up-to-date inventory.
 
-The add-on operates using a Flask API server hosted locally on port 5000 (restricted to the local network for security). All product and category data is stored persistently in a .db file using JSON, ensuring your data is retained across reboots.
+The add-on operates using a Flask API server hosted locally. All product and category data is stored persistently in a .db file using JSON, ensuring your data is retained across reboots.
 
 
 # **Features**
