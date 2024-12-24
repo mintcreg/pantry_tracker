@@ -104,7 +104,7 @@ The ability to save a copy of the database and restore an existing database
 | `/barcode_increase`  | `POST`     | Increase the count of a product by scanning its barcode.                                        | `{"barcode": "1234567890123", "amount": 1}`                                                             | `200`: Updated count. <br> Example: `{"status": "ok", "count": 6}` <br> `400`: Validation errors. <br> `404`: Barcode not found. <br> `500`: Error message.  |
 | `/barcode_decrease`  | `POST`     | Decrease the count of a product by scanning its barcode.                                        | `{"barcode": "1234567890123", "amount": 1}`                                                             | `200`: Updated count. <br> Example: `{"status": "ok", "count": 4}` <br> `400`: Validation errors. <br> `404`: Barcode not found. <br> `500`: Error message.  |
 | `/health`            | `GET`      | Health check endpoint to verify the service is running.                                         | None                                                                                                    | `200`: Health status. <br> Example: `{"status": "healthy"}`                                                                                                 |
-                                                                                         |
+                                                                                        
 
 
 ## Attribution
