@@ -64,7 +64,7 @@ The ability to save a copy of the database and restore an existing database
  
 <br>
 
-![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/products.PNG)
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/dev/images/products.PNG)
 
 </details>
 
@@ -73,7 +73,7 @@ The ability to save a copy of the database and restore an existing database
  
 <br>
 
-![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/categories.PNG)
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/dev/images/categories.PNG)
 
 </details>
 
@@ -83,7 +83,7 @@ The ability to save a copy of the database and restore an existing database
  
 <br>
 
-![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/demo.gif)
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/dev/images/demo.gif)
 
 </details>
 
@@ -101,16 +101,21 @@ The ability to save a copy of the database and restore an existing database
 | `/products`          | `DELETE`   | Delete a product by name.                                                                       | `{"name": "ProductName"}`                                                                              | `200`: Updated list of products. <br> `400`: Validation errors. <br> `404`: Product not found. <br> `500`: Error message if deletion fails.                 |
 | `/update_count`      | `POST`     | Update the count of a specific product by entity ID.                                            | `{"entity_id": "sensor.product_name", "action": "increase/decrease", "amount": 1}`                      | `200`: Updated count. <br> Example: `{"status": "ok", "count": 5}` <br> `400`: Validation errors. <br> `404`: Product not found. <br> `500`: Error message. |
 | `/counts`            | `GET`      | Fetch the current count of all products.                                                        | None                                                                                                    | `200`: Dictionary of product counts keyed by `entity_id`. <br> Example: `{"sensor.product_apple": 5}` <br> `500`: Error message if fetch fails.             |
+| `/barcode_increase`  | `POST`     | Increase the count of a product by scanning its barcode.                                        | `{"barcode": "1234567890123", "amount": 1}`                                                             | `200`: Updated count. <br> Example: `{"status": "ok", "count": 6}` <br> `400`: Validation errors. <br> `404`: Barcode not found. <br> `500`: Error message.  |
+| `/barcode_decrease`  | `POST`     | Decrease the count of a product by scanning its barcode.                                        | `{"barcode": "1234567890123", "amount": 1}`                                                             | `200`: Updated count. <br> Example: `{"status": "ok", "count": 4}` <br> `400`: Validation errors. <br> `404`: Barcode not found. <br> `500`: Error message.  |
 | `/health`            | `GET`      | Health check endpoint to verify the service is running.                                         | None                                                                                                    | `200`: Health status. <br> Example: `{"status": "healthy"}`                                                                                                 |
+                                                                                         |
 
 
-# Roadmap
-```bash
-  > Full ability to manage existing products
-  
-  > Integrate with UPC/EAN Database
+## Attribution
 
-  > Provide functionality for barcode scanning to add/remove/increase/decrease quantities
-``` 
+This project uses data and images provided by [OpenFoodFacts](https://world.openfoodfacts.org/).
+
+![OpenFoodFacts Logo](https://static.openfoodfacts.org/images/logos/off-logo-horizontal-light.svg)
+
+- Data and images are licensed under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/) and the [Database Contents License (DbCL)](https://opendatacommons.org/licenses/dbcl/1-0/).
+- You are encouraged to contribute to OpenFoodFacts by adding missing products and improving data accuracy.
+
+Visit [OpenFoodFacts](https://world.openfoodfacts.org/) to learn more.
 
 

@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>Pantry Manager</title>
     <link rel="stylesheet" href="static/style.css">
-    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
-
+    <!-- Include QuaggaJS locally -->
+    <script src="static/js/quagga.min.js"></script>
 </head>
 <body>
 
@@ -16,7 +16,7 @@
         <button onclick="showTab('products')">Products</button>
         <button onclick="showTab('categories')">Categories</button>
         <!-- Changed this from an anchor link to a styled button-like link -->
-        <a href="{{ url_for('backup_page') }}" class="add-row-btn" style="text-decoration: none;">Backup & Restore</a>
+        <a href="backup" class="additional-buttons">Backup & Restore</a>
     </div>
 
     <!-- Categories Tab -->
@@ -31,17 +31,101 @@
             <div class="form-section">
                 <h3>Categories</h3>
                 <div id="category-rows"></div>
-                <button class="add-row-btn green-btn" onclick="addCategoryRow()">Add Category</button>
+                <button class="add-row-btn green-btn" onclick="addCategory()">Add Category</button>
             </div>
             <div class="form-section">
                 <h3>Products</h3>
                 <div id="product-rows"></div>
-                <button class="add-row-btn green-btn" onclick="addProductRow()">Add Product</button>
+                <!-- Add Product Button will be inserted here via app.js -->
             </div>
         </div>
         <button class="generate-btn" onclick="saveEntities()">Save</button>
     </div>
 
+    <!-- Attribution Section -->
+    <div class="attribution">
+        <p>
+            Powered by data from <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener noreferrer">OpenFoodFacts</a>.
+            Built with the assistance of <a href="https://openai.com" target="_blank" rel="noopener noreferrer">ChatGPT by OpenAI</a>.
+        </p>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div id="edit-category-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditCategoryModal()">&times;</span>
+        <h2>Edit Category</h2>
+        <input type="hidden" id="edit-category-old-name">
+        <input type="text" id="edit-category-input" class="input-field" placeholder="New Category Name">
+        <button class="save-btn" onclick="saveEditedCategory()">Save Changes</button>
+    </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div id="edit-product-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditProductModal()">&times;</span>
+        <h2>Edit Product</h2>
+        <input type="hidden" id="edit-product-old-name">
+
+        <!-- Added Label for Product Name -->
+        <label for="edit-product-name">Name:</label>
+        <input type="text" id="edit-product-name" class="input-field" placeholder="New Product Name">
+
+        <label for="edit-product-category">Category:</label>
+        <select id="edit-product-category" class="input-field">
+            <option value="">Select Category</option>
+            <!-- Dynamically populate categories -->
+            <!-- Example: -->
+            <!-- <option value="Fruits">Fruits</option> -->
+        </select>
+        <label for="edit-product-image">Image Address:</label>
+        <input type="text" id="edit-product-url" class="input-field" placeholder="New Image URL">
+        <label for="edit-product-barcode">Barcode:</label>
+        <input type="text" id="edit-product-barcode" class="input-field" placeholder="New Barcode (Optional)">
+        <button class="save-btn" onclick="saveEditedProduct()">Save Changes</button>
+    </div>
+</div>
+
+<!-- Barcode Scanner Modal -->
+<div id="barcode-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeBarcodeModal()">&times;</span>
+        <h2>Scan Barcode</h2>
+        <div id="loading-spinner"></div>
+        <div id="barcode-scanner"></div>
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div id="add-product-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAddProductModal()">&times;</span>
+        <h2>Add Product</h2>
+        <div class="form-section">
+            <input type="text" id="add-product-name" class="input-field" placeholder="Product Name">
+        </div>
+        <div class="form-section">
+            <select id="add-product-category" class="input-field">
+                <option value="">Select Category</option>
+                <!-- Categories will be populated dynamically via JavaScript -->
+            </select>
+        </div>
+        <div class="form-section">
+            <input type="text" id="add-product-url" class="input-field" placeholder="Image URL">
+        </div>
+        <div class="form-section">
+            <div class="barcode-container">
+                <input type="text" id="add-product-barcode" class="input-field" placeholder="Barcode (Optional)">
+                <button onclick="fetchBarcode()" class="fetch-barcode-btn">Fetch</button>
+                <button onclick="openBarcodeModal()" class="fetch-barcode-btn">Scan Barcode</button>
+            </div>
+        </div>
+        <div class="form-section">
+            <button class="add-row-btn green-btn" onclick="addProductFromForm()">Add Product</button>
+        </div>
+    </div>
 </div>
 
 <!-- Include the script at the end of the body -->

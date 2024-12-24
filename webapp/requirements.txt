@@ -3,4 +3,5 @@ SQLAlchemy
 portalocker
 marshmallow
 sqlalchemy
-
+requests
+gunicorn
