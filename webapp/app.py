@@ -31,7 +31,7 @@ os.makedirs(DB_DIR, exist_ok=True)
 
 # Ensure the database schema is valid
 # Removed as initially from 1.0.4 > 1.0.5 (no schema changes 1.0.5 > 1.0.6)
-#migrate_database(DB_FILE)
+migrate_database(DB_FILE)
 
 # Initialize the database
 engine = create_engine(f'sqlite:///{DB_FILE}', connect_args={'check_same_thread': False}, echo=False)
