@@ -10,8 +10,13 @@ from schemas import CategorySchema, UpdateCategorySchema, ProductSchema, UpdateP
 from marshmallow import ValidationError
 import requests  # For interacting with OpenFoodFacts
 from migrate import migrate_database
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
+
+# Apply ProxyFix middleware to handle Ingress headers correctly
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +30,8 @@ DB_DIR = os.path.dirname(DB_FILE)
 os.makedirs(DB_DIR, exist_ok=True)
 
 # Ensure the database schema is valid
-migrate_database(DB_FILE)
+# Removed as initially from 1.0.4 > 1.0.5 (no schema changes 1.0.5 > 1.0.6)
+#migrate_database(DB_FILE)
 
 # Initialize the database
 engine = create_engine(f'sqlite:///{DB_FILE}', connect_args={'check_same_thread': False}, echo=False)
@@ -43,6 +49,10 @@ def sanitize_entity_id(name: str) -> str:
 @app.route("/")
 def index():
     """Root endpoint to render the HTML UI."""
+    return render_template("index.html")
+	
+@app.route("/index.html")
+def index_html():
     return render_template("index.html")
 
 @app.route("/categories", methods=["GET", "POST", "DELETE"])
@@ -471,7 +481,17 @@ def health():
 # Display the backup/restore page
 @app.route("/backup", methods=["GET"], endpoint="backup_page")
 def backup():
-    return render_template("backup.html")
+    # The real prefix used by Home Assistant’s Ingress
+    # e.g. "/api/hassio_ingress/1ab2c3d4e5f6abcdef"
+    ingress_prefix = request.headers.get("X-Ingress-Path", "")
+    if not ingress_prefix.endswith("/"):
+        ingress_prefix += "/"
+
+    # Now, "ingress_prefix" is the real path the user is on
+    # e.g. "/api/hassio_ingress/1ab2c3d4e5f6abcdef/"
+    # So linking to ingress_prefix + "index.html" yields a proper path.
+    return render_template("backup.html", base_path=ingress_prefix)
+
 
 # Download the current database file
 @app.route("/download_db", methods=["GET"])
@@ -519,8 +539,32 @@ def upload_db():
     SessionFactory = sessionmaker(bind=engine)
     Session = scoped_session(SessionFactory)
 
-    # Redirect to the backup page after successful upload and migration
-    return redirect(url_for('index'), code=302)
+    #
+    # 1) Use X-Ingress-Path to get the real HA Ingress prefix (with the UUID).
+    # 2) We'll do a client-side JS redirect with "window.location.href" to stay *in the same iframe*.
+    #
+    ingress_prefix = request.headers.get("X-Ingress-Path", "")
+    if not ingress_prefix.endswith("/"):
+        ingress_prefix += "/"
+    # If you prefer the root route, replace with: redirect_url = ingress_prefix
+    redirect_url = ingress_prefix
+
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Redirecting</title>
+        <script>
+            // Reload inside the *same* iframe, staying in HA
+            window.location.href = "{redirect_url}";
+        </script>
+    </head>
+    <body>
+        <p>Database uploaded successfully. Reloading page...</p>
+    </body>
+    </html>
+    """
 
 
 ###################################
@@ -575,12 +619,5 @@ def fetch_product():
         return jsonify({"status": "error", "message": "Product not found or failed to fetch data"}), 404
 
 if __name__ == "__main__":
-    # For ingress, listen on port 5000 with SSL
-    CERT_FILE = '/config/pantry_data/keys/cert.pem'
-    KEY_FILE = '/config/pantry_data/keys/key.pem'
-    
-    if not os.path.exists(CERT_FILE) or not os.path.exists(KEY_FILE):
-        logger.error("SSL certificates not found. Exiting.")
-        exit(1)
-    
-    app.run(host="0.0.0.0", port=5000, ssl_context=(CERT_FILE, KEY_FILE))
+    # Do not run app.run() since Gunicorn handles it
+    app.run(host="0.0.0.0", port=8099)
