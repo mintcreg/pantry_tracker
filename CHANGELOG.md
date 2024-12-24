@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 1.0.5
+## Version 1.0.51 (Skipped 1.0.5)
 - Styling updates
 - Improved error handling
 - Improved Logging
