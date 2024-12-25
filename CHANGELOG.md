@@ -1,6 +1,37 @@
 # Changelog
 
 ## Version 1.0.51 (Skipped 1.0.5)
+
+### Breaking Changes
+
+Version 1.0.51 will not automatically work with databases from 1.0.4 due to schema changes.
+
+Please ensure you follow the checklist below to retain product data.
+
+
+### Update Checklist (Retain data)
+
+1. Backup database from 'Backup & Restore'
+2. Remove all products and categories _(Verify they have been removed within HA)_
+3. DELETE database from _(addon_configs/pantry_tracker/pantry_data/pantry_data.db)_
+> [!CAUTION]
+> Failure to delete the database from addon_configs will result in a partially working webui
+4. Update Addon
+5. Update Pantry Tracker Components to 1.0.4
+6. Update configuration.yaml (remove source)
+9. Restart HA
+8. Upload previous database 
+
+
+```yaml
+sensor:
+ - platform: pantry_tracker
+   scan_interval: 1  # Defaults to 30 seconds if not set
+``` 
+> [!IMPORTANT]
+> If you do not need to save a copy of your database complete the above steps (EXCEPT step 1)
+
+## Updates 
 - Styling updates
 - Improved error handling
 - Improved Logging
