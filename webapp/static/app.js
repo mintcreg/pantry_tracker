@@ -32,7 +32,7 @@ function showTab(tab) {
 // Fetch categories from the backend
 const fetchCategories = async () => {
     try {
-        const response = await fetch(`${basePath}categories`, { // Updated to use basePath
+        const response = await fetch(`${basePath}categories`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -81,7 +81,13 @@ const displayCategories = (categories) => {
 
         table.innerHTML = tableHead;
         table.appendChild(tableBody);
-        categoriesContainer.appendChild(table);
+
+        // Wrap table in a scrollable container
+        const tableContainer = document.createElement('div');
+        tableContainer.classList.add('table-container');
+        tableContainer.appendChild(table);
+
+        categoriesContainer.appendChild(tableContainer);
     } else {
         categoriesContainer.innerHTML = `
             <p style="text-align: center; font-weight: bold; color: red;">
@@ -91,26 +97,33 @@ const displayCategories = (categories) => {
     }
 
     // Add category form below the table
-    const addCategoryTable = document.createElement('table');
-    addCategoryTable.classList.add('add-category-table');
-    addCategoryTable.innerHTML = `
-        <thead>
-            <tr>
-                <th colspan="2">Add Category</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <input type="text" id="new-category-input" class="input-field" placeholder="New Category Name">
-                </td>
-                <td>
-                    <button class="add-row-btn green-btn" onclick="addCategory()">Add Category</button>
-                </td>
-            </tr>
-        </tbody>
-    `;
-    categoriesContainer.appendChild(addCategoryTable);
+	const addCategoryTable = document.createElement('table');
+	addCategoryTable.classList.add('add-category-table'); // Add a specific class to the table
+	addCategoryTable.innerHTML = `
+		<thead>
+			<tr>
+				<th colspan="2">Add Category</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					<input type="text" id="new-category-input" class="input-field" placeholder="New Category Name">
+				</td>
+				<td>
+					<button class="add-row-btn green-btn" onclick="addCategory()">Add Category</button>
+				</td>
+			</tr>
+		</tbody>
+	`;
+	
+	// Wrap addCategoryTable in a uniquely identifiable container
+	const addCategoryTableContainer = document.createElement('div');
+	addCategoryTableContainer.classList.add('add-category-container'); // Add a specific class to the container
+	addCategoryTableContainer.appendChild(addCategoryTable);
+	
+	categoriesContainer.appendChild(addCategoryTableContainer);
+
 };
 
 // Add a new category via API
@@ -128,7 +141,7 @@ const addCategory = async () => {
     }
 
     try {
-        const response = await fetch(`${basePath}categories`, { // Updated to use basePath
+        const response = await fetch(`${basePath}categories`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -159,7 +172,7 @@ const removeCategory = async (categoryName) => {
     }
 
     try {
-        const response = await fetch(`${basePath}categories`, { // Updated to use basePath
+        const response = await fetch(`${basePath}categories`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -220,7 +233,7 @@ const saveEditedCategory = async () => {
     }
 
     try {
-        const response = await fetch(`${basePath}categories/${encodeURIComponent(oldName)}`, { // Updated to use basePath
+        const response = await fetch(`${basePath}categories/${encodeURIComponent(oldName)}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -249,7 +262,7 @@ const saveEditedCategory = async () => {
 
 const fetchProducts = async () => {
     try {
-        const response = await fetch(`${basePath}products`, { // Updated to use basePath
+        const response = await fetch(`${basePath}products`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -291,20 +304,18 @@ const displayProducts = (products) => {
             const imageUrl = product.image_front_small_url ? product.image_front_small_url : product.url;
             const imageAlt = product.image_front_small_url ? `${product.name} Image` : `${product.name} Image (Manual)`;
 
-            // **Updated Section: Move link to Barcode**
-            // Instead of linking the product name, link the barcode
             const barcodeLink = product.barcode
                 ? `<a href="https://world.openfoodfacts.org/product/${product.barcode}" target="_blank" rel="noopener noreferrer">${product.barcode}</a>`
                 : 'N/A';
 
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${product.name}</td> <!-- Product Name as plain text -->
+                <td>${product.name}</td>
                 <td>${product.category}</td>
                 <td>
                     ${imageUrl ? `<img src="${imageUrl}" alt="${imageAlt}" class="product-image">` : 'No Image'}
                 </td>
-                <td>${barcodeLink}</td> <!-- Barcode with link if available -->
+                <td>${barcodeLink}</td>
                 <td>
                     <button class="edit-btn" onclick="initEditProductModal('${encodeURIComponent(product.name)}')">Edit</button>
                     <button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
@@ -315,7 +326,13 @@ const displayProducts = (products) => {
 
         table.innerHTML = tableHead;
         table.appendChild(tableBody);
-        productsContainer.appendChild(table);
+
+        // Wrap table in a scrollable container
+        const tableContainer = document.createElement('div');
+        tableContainer.classList.add('table-container');
+        tableContainer.appendChild(table);
+
+        productsContainer.appendChild(tableContainer);
     } else {
         productsContainer.innerHTML = `
             <p style="text-align: center; font-weight: bold; color: red;">
@@ -329,10 +346,9 @@ const displayProducts = (products) => {
     addProductButtonContainer.classList.add('add-product-button-container');
 
     const addProductButton = document.createElement('button');
-    addProductButton.classList.add('add-product-btn'); // Define this class in CSS for styling
+    addProductButton.classList.add('add-product-btn');
     addProductButton.textContent = 'Add Product';
     addProductButton.onclick = () => {
-        // Open the add product modal
         openAddProductModal();
     };
 
@@ -345,7 +361,7 @@ const initEditProductModal = async (encodedProductName) => {
     const productName = decodeURIComponent(encodedProductName);
     try {
         // Fetch products
-        const productResponse = await fetch(`${basePath}products`, { // Updated to use basePath
+        const productResponse = await fetch(`${basePath}products`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -363,7 +379,7 @@ const initEditProductModal = async (encodedProductName) => {
         }
 
         // Fetch categories
-        const categoryResponse = await fetch(`${basePath}categories`, { // Updated to use basePath
+        const categoryResponse = await fetch(`${basePath}categories`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -437,7 +453,7 @@ const saveEditedProduct = async () => {
         return;
     }
 
-    // If barcode is provided, ensure it's numeric and of valid length (e.g., 8-13 digits)
+    // If barcode is provided, ensure it's numeric and of valid length (8-13 digits)
     if (newBarcode && !/^\d{8,13}$/.test(newBarcode)) {
         alert('Barcode must be numeric and between 8 to 13 digits');
         return;
@@ -451,7 +467,7 @@ const saveEditedProduct = async () => {
             barcode: newBarcode || null
         };
 
-        const response = await fetch(`${basePath}products/${encodeURIComponent(oldName)}`, { // Updated to use basePath
+        const response = await fetch(`${basePath}products/${encodeURIComponent(oldName)}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -509,7 +525,7 @@ const addProductFromForm = async () => {
             barcode: barcode || null
         };
 
-        const response = await fetch(`${basePath}products`, { // Updated to use basePath
+        const response = await fetch(`${basePath}products`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -541,7 +557,7 @@ const removeProduct = async (productName) => {
     }
 
     try {
-        const response = await fetch(`${basePath}products`, { // Updated to use basePath
+        const response = await fetch(`${basePath}products`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -588,8 +604,8 @@ const sortCategories = () => {
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', async () => {
-    await fetchCategories(); 
-    showTab('products'); 
+    await fetchCategories();
+    showTab('products');
 });
 
 //////////////////////////////////////
@@ -629,15 +645,15 @@ function startBarcodeScanner() {
         inputStream: {
             name: "Live",
             type: "LiveStream",
-            target: document.querySelector('#barcode-scanner'), // Or '#yourElement' (optional)
+            target: document.querySelector('#barcode-scanner'),
             constraints: {
-                width: 1280, // Increased width for better resolution
-                height: 720, // Increased height for better resolution
-                facingMode: "environment" // or user for front camera
+                width: 1280,
+                height: 720,
+                facingMode: "environment"
             },
         },
         decoder: {
-            readers: ["ean_reader", "ean_8_reader", "code_128_reader"] // Specify the barcode types you want to support
+            readers: ["ean_reader", "ean_8_reader", "code_128_reader"]
         },
     }, function(err) {
         if (err) {
@@ -679,7 +695,7 @@ function onBarcodeDetected(result) {
 // Fetch product data from API based on the scanned barcode
 const fetchProductData = async (barcode) => {
     try {
-        const response = await fetch(`${basePath}fetch_product?barcode=${barcode}`, { // Updated to use basePath
+        const response = await fetch(`${basePath}fetch_product?barcode=${barcode}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

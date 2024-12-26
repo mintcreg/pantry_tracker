@@ -5,6 +5,7 @@ body {
     margin: 0;
     padding: 0;
 }
+
 .container {
     max-width: 100%;
     width: 90%;
@@ -38,25 +39,14 @@ h1 {
     text-align: center;
     color: #333;
 }
+
 .category-buttons {
     text-align: center;
     margin-bottom: 20px;
 }
+
 .category-buttons button,
-.category-buttons a.add-row-btn {
-    padding: 12px 20px;
-    font-size: 16px;
-    margin: 5px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    text-decoration: none; /* For anchor links */
-    display: inline-block; /* Ensure proper spacing for anchor links */
-}
-.category-buttons button,
+.category-buttons a.add-row-btn,
 .category-buttons a.additional-buttons {
     padding: 12px 20px;
     font-size: 16px;
@@ -70,16 +60,12 @@ h1 {
     text-decoration: none; /* For anchor links */
     display: inline-block; /* Ensure proper spacing for anchor links */
 }
+
 .category-buttons button:hover,
-.category-buttons a.add-row-btn:hover {
-    background-color: #0056b3;
-}
-.category-buttons button:hover,
+.category-buttons a.add-row-btn:hover,
 .category-buttons a.additional-buttons:hover {
     background-color: #0056b3;
 }
-
-
 
 /* Tab Content */
 .tab-content {
@@ -87,6 +73,7 @@ h1 {
     flex-direction: column;
     gap: 20px;
 }
+
 .hidden {
     display: none;
 }
@@ -105,10 +92,12 @@ h1 {
     font-size: 18px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .category-header:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
+
 .category-content {
     margin-bottom: 20px;
 }
@@ -126,6 +115,7 @@ h1 {
 .table-container {
     overflow-x: auto;
 }
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -133,6 +123,7 @@ table {
     background-color: #ffffff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
+
 th, td {
     border: 1px solid #ddd;
     padding: 12px;
@@ -140,14 +131,17 @@ th, td {
     background-color: #f9f9f9;
     box-sizing: border-box;
 }
+
 th {
     background-color: #007bff;
     color: white;
     cursor: pointer;
 }
+
 tr:nth-child(even) td {
     background-color: #f1f1f1;
 }
+
 tr:hover td {
     background-color: #e8f0fe;
 }
@@ -162,6 +156,7 @@ tr:hover td {
     height: 100%;
     box-sizing: border-box;
 }
+
 .add-remove-buttons button {
     padding: 4px 8px;
     font-size: 14px;
@@ -178,16 +173,20 @@ tr:hover td {
     background-color: #28a745;
     color: white;
 }
+
 .add-remove-buttons .add-btn:hover {
     background-color: #218838;
 }
+
 .add-remove-buttons .remove-btn {
     background-color: #dc3545;
     color: white;
 }
+
 .add-remove-buttons .remove-btn:hover {
     background-color: #c82333;
 }
+
 .edit-btn {
     padding: 10px 20px; /* Same padding as the Remove button */
     font-size: 14px;    /* Same font size */
@@ -199,6 +198,7 @@ tr:hover td {
     transition: background-color 0.3s ease;
     box-sizing: border-box; /* Ensures consistent box model */
 }
+
 .edit-btn:hover {
     background-color: #e59400; /* Darker orange on hover */
 }
@@ -211,14 +211,17 @@ tr:hover td {
     align-items: stretch; /* Ensures children stretch to the same height */
     position: relative; /* Added to establish stacking context */
 }
+
 .form-section {
     flex: 1;
     min-width: 300px;
     margin: 45px;
 }
+
 .form-section h3 {
     text-align: center;
 }
+
 #category-rows, #product-rows {
     display: flex;
     flex-direction: column;
@@ -243,6 +246,7 @@ tr:hover td {
     margin-top: 20px;
     gap: 10px;
 }
+
 .add-category-container .input-field {
     flex: 1;
     padding: 10px;
@@ -251,6 +255,7 @@ tr:hover td {
     border-radius: 5px;
     box-sizing: border-box;
 }
+
 .add-category-container .add-row-btn {
     padding: 10px 20px;
     font-size: 16px;
@@ -261,6 +266,7 @@ tr:hover td {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
 .add-category-container .add-row-btn:hover {
     background-color: #0056b3;
 }
@@ -281,6 +287,7 @@ tr:hover td {
     cursor: pointer;
     border-radius: 5px;
 }
+
 .remove-btn:hover {
     background-color: #c82333;
 }
@@ -297,6 +304,7 @@ tr:hover td {
     margin: 10px 0;
     border-radius: 5px;
 }
+
 .add-row-btn:hover {
     background-color: #0056b3;
 }
@@ -314,6 +322,7 @@ tr:hover td {
     font-size: 16px;
     border-radius: 5px;
 }
+
 .generate-btn:hover {
     background-color: #0056b3;
 }
@@ -323,6 +332,7 @@ tr:hover td {
     text-align: center;
     margin-top: 20px;
 }
+
 .no-data-message button {
     padding: 12px 20px;
     font-size: 16px;
@@ -334,41 +344,11 @@ tr:hover td {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
 .no-data-message button:hover {
     background-color: #0056b3;
 }
 
-/* Responsive Styles */
-@media (max-width: 768px) {
-    .container {
-        padding: 15px;
-    }
-    .category-buttons button,
-    .category-buttons a.add-row-btn {
-        width: 100%;
-        margin: 10px 0;
-    }
-    table, th, td {
-        font-size: 14px;
-    }
-    .add-remove-buttons button {
-        font-size: 12px;
-        padding: 6px 8px;
-    }
-    .product-image {
-        max-width: 40px;
-        max-height: 40px;
-    }
-    .generate-form {
-        flex-direction: column;
-    }
-    .form-section {
-        width: 100%;
-    }
-    .add-row-btn, .generate-btn {
-        padding: 15px;
-    }
-}
 
 /* Separator Line for Backup Page */
 .line-separator {
@@ -383,6 +363,18 @@ tr:hover td {
     transform: translateX(-50%);
     z-index: 2; /* Ensures it's above other elements */
 }
+
+/* Hide the line-separator for companion app or smaller screens */
+@media (max-width: 768px) {
+    .line-separator {
+        display: none; /* Hide the separator */
+    }
+}
+
+body.companion-app .line-separator {
+    display: none; /* Hide when on companion app */
+}
+
 
 /* Hide the default file input */
 #file-upload {
@@ -407,6 +399,7 @@ tr:hover td {
 .file-upload-btn:hover {
     background-color: #218838;
 }
+
 /* Green Buttons (e.g., Add Product, Add Category) */
 .green-btn {
     background-color: #28a745; 
@@ -467,17 +460,25 @@ tr:hover td {
     margin: 10% auto; /* 10% from the top and centered */
     padding: 20px;
     border: 1px solid #888;
-    width: 40%; /* Could be more or less, depending on screen size */
+    width: 60%; /* Default width for larger screens */
+    max-width: 500px; /* Ensures it doesn't get too wide */
     border-radius: 5px;
+    box-sizing: border-box; /* Ensures padding is included in the width */
+    position: relative; /* To contain the absolutely positioned close button */
+    max-height: 80vh; /* Prevents the modal from exceeding viewport height */
+    overflow-y: auto; /* Adds scroll if content is too long */
 }
 
 /* Close Button */
 #add-product-modal .close {
     color: #aaa;
-    float: right;
+    position: absolute; /* Changed from float to absolute positioning */
+    top: 10px; /* Position it near the top */
+    right: 20px; /* Position it towards the right */
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+    z-index: 1001; /* Ensure it stays on top */
 }
 
 #add-product-modal .close:hover,
@@ -649,15 +650,22 @@ tr:hover td {
     border: 1px solid #888;
     width: 40%; /* Could be more or less, depending on screen size */
     border-radius: 5px;
+    box-sizing: border-box; /* Ensure padding is included in the width */
+    position: relative; /* To contain the absolutely positioned close button */
+    max-height: 80vh; /* Prevents the modal from exceeding viewport height */
+    overflow-y: auto; /* Adds scroll if content is too long */
 }
 
 /* Close Button */
 .modal-content .close {
     color: #aaa;
-    float: right;
+    position: absolute; /* Changed from float to absolute positioning */
+    top: 10px; /* Position it near the top */
+    right: 20px; /* Position it towards the right */
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+    z-index: 1001; /* Ensure it stays on top */
 }
 
 .modal-content .close:hover,
@@ -682,6 +690,10 @@ tr:hover td {
     border-radius: 4px;
 }
 
+.modal-content .save-btn:hover {
+    background-color: #45a049;
+}
+
 /* Input Fields */
 .modal-content .input-field {
     width: 100%;
@@ -689,6 +701,7 @@ tr:hover td {
     margin: 8px 0;
     box-sizing: border-box;
 }
+
 .modal-content .barcode-container {
     display: flex;
     align-items: center;
@@ -715,15 +728,6 @@ tr:hover td {
 }
 
 /* ============================
-   New Styles for Add Product Modal
-   ============================ */
-
-/* Add Product Modal */
-#add-product-modal .modal-content {
-    /* Inherits general modal-content styles */
-}
-
-/* ============================
    New Styles for Edit Product Modal
    ============================ */
 
@@ -745,17 +749,25 @@ tr:hover td {
     margin: 10% auto; /* 10% from the top and centered */
     padding: 20px;
     border: 1px solid #888;
-    width: 40%; /* Could be more or less, depending on screen size */
+    width: 60%; /* Could be more or less, depending on screen size */
+    max-width: 500px; /* Ensures it doesn't get too wide */
     border-radius: 5px;
+    box-sizing: border-box; /* Ensure padding is included in the width */
+    position: relative; /* To contain the absolutely positioned close button */
+    max-height: 80vh; /* Prevents the modal from exceeding viewport height */
+    overflow-y: auto; /* Adds scroll if content is too long */
 }
 
 /* Close Button */
 #edit-product-modal .close {
     color: #aaa;
-    float: right;
+    position: absolute; /* Changed from float to absolute positioning */
+    top: 10px; /* Position it near the top */
+    right: 20px; /* Position it towards the right */
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+    z-index: 1001; /* Ensure it stays on top */
 }
 
 #edit-product-modal .close:hover,
@@ -778,6 +790,10 @@ tr:hover td {
     margin-top: 10px;
     cursor: pointer;
     border-radius: 4px;
+}
+
+#edit-product-modal .save-btn:hover {
+    background-color: #45a049;
 }
 
 /* Input Fields */
@@ -811,4 +827,205 @@ tr:hover td {
 
 #edit-product-modal .fetch-barcode-btn:hover {
     background-color: #218838; /* Darker green on hover */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    /* General adjustments */
+    .container {
+        padding: 15px;
+    }
+
+    .category-buttons button,
+    .category-buttons a.add-row-btn,
+    .category-buttons a.additional-buttons {
+        margin: 10px 0;
+    }
+
+    table, th, td {
+        font-size: 14px;
+    }
+
+    .add-remove-buttons button {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    .product-image {
+        max-width: 40px;
+        max-height: 40px;
+    }
+
+    .generate-form {
+        flex-direction: column;
+    }
+
+    .form-section {
+        width: 100%;
+        margin: 20px 0;
+    }
+
+    .add-row-btn,
+    .generate-btn {
+        padding: 15px;
+    }
+
+    /* General modal adjustments */
+    .modal-content {
+        width: 90%;
+        margin: 20% auto;
+        padding: 15px;
+    }
+
+    /* Adjustments for Add Product Modal */
+    #add-product-modal .modal-content,
+    body.companion-app #add-product-modal .modal-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 10% auto !important;
+        padding: 10px !important;
+        overflow-x: hidden !important;
+    }
+
+    #add-product-modal .close {
+        font-size: 24px;
+        top: 5px;
+        right: 15px;
+    }
+
+    #add-product-modal .barcode-container {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    #add-product-modal .barcode-container .fetch-barcode-btn {
+        width: 100%;
+    }
+
+    /* Adjustments for Edit Product Modal */
+    #edit-product-modal .modal-content,
+    body.companion-app #edit-product-modal .modal-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 10% auto !important;
+        padding: 10px !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Adjustments for Barcode Modal */
+    #barcode-modal .modal-content {
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+    }
+
+    /* Adjust font sizes */
+    .close {
+        font-size: 24px;
+    }
+
+    /* Ensure buttons are tappable */
+    button, .add-row-btn, .save-btn, .fetch-barcode-btn {
+        font-size: 16px;
+        padding: 10px;
+    }
+	/* Ensure form elements scale */
+    body.companion-app #add-product-modal .form-section {
+        width: 100% !important;
+        margin: 10px 0 !important;
+    }
+
+    body.companion-app #add-product-modal .input-field {
+        flex: 1;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Ensure buttons adjust */
+    body.companion-app #add-product-modal .add-row-btn {
+        width: 100%;
+        margin: 10px 0;
+    }
+	/* Styling for Add Category Table */
+	.add-category-container {
+		margin-top: 20px;
+		padding: 10px;
+		max-width: 100%; /* Prevents the table from exceeding the parent width */
+		margin-left: auto;
+		margin-right: auto;
+		display: flex; /* Use flexbox for responsiveness */
+		flex-wrap: wrap; /* Allow wrapping if necessary */
+		align-items: center; /* Align content vertically */
+		gap: 10px; /* Add spacing between input and button */
+	}
+	/* Input Field in Add Category */
+	.add-category-container .input-field {
+		flex: 1; /* Allow the input field to shrink */
+		min-width: 50%; /* Ensure it doesn't shrink too much */
+		max-width: 100%; /* Prevent overflow */
+		box-sizing: border-box;
+		padding: 8px;
+		font-size: 16px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+	}
+	
+	/* Add Category Button */
+	.add-category-container .add-row-btn {
+		padding: 10px 20px;
+		font-size: 16px;
+		background-color: #28a745;
+		color: white;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+		white-space: nowrap; /* Prevents text wrapping for the button */
+		flex-shrink: 0; /* Ensure the button is always fully visible */
+	}
+
+/* Adjustments for Smaller Screens */
+@media (max-width: 768px) {
+    .add-category-container {
+        flex-direction: column; /* Stack input and button vertically */
+        align-items: stretch; /* Ensure full width for each element */
+    }
+
+    .add-category-container .input-field {
+        width: 100%; /* Input takes full width */
+        margin-bottom: 10px; /* Add spacing between input and button */
+    }
+
+    .add-category-container .add-row-btn {
+        width: 100%; /* Button takes full width */
+    }
+}
+
+/* Adjustments for Extra Small Screens */
+@media (max-width: 480px) {
+    .add-category-container .input-field {
+        font-size: 14px; /* Reduce font size for better fit */
+        padding: 6px; /* Reduce padding */
+    }
+
+    .add-category-container .add-row-btn {
+        font-size: 14px; /* Match input font size */
+        padding: 8px 16px; /* Adjust padding for button */
+    }
+}
+
+}
+@media (max-width: 480px) {
+    .modal-content,
+    body.companion-app .modal-content {
+        width: 95%;
+    }
+}
+
+@media (max-width: 768px) and (orientation: portrait) {
+    .modal-content,
+    body.companion-app .modal-content {
+        width: 90%;
+        padding: 10px;
+    }
 }
