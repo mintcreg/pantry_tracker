@@ -6,3 +6,5 @@
 - Fixed Add Product/ Edit Product display modals
 - Companion app specific styling
 
+>[!IMPORTANT]
+>Ensure you reboot HomeAssistant after updating!
