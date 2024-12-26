@@ -11,7 +11,7 @@
 # Description
 The Pantry Tracker add-on is a Home Assistant designed to help you keep track of products in your kitchen, pantry, or any other storage space. With a user-friendly interface and a powerful backend, this add-on simplifies the organization and management of your items by allowing you to create categories, assign products to them, and maintain an up-to-date inventory.
 
-The add-on operates using a Flask API server hosted locally on port 5000 (restricted to the local network for security). All product and category data is stored persistently in a .db file using JSON, ensuring your data is retained across reboots.
+The add-on operates using a Flask API server hosted locally. All product and category data is stored persistently in a .db file using JSON, ensuring your data is retained across reboots.
 
 
 # **Features**
@@ -104,7 +104,7 @@ The ability to save a copy of the database and restore an existing database
 | `/barcode_increase`  | `POST`     | Increase the count of a product by scanning its barcode.                                        | `{"barcode": "1234567890123", "amount": 1}`                                                             | `200`: Updated count. <br> Example: `{"status": "ok", "count": 6}` <br> `400`: Validation errors. <br> `404`: Barcode not found. <br> `500`: Error message.  |
 | `/barcode_decrease`  | `POST`     | Decrease the count of a product by scanning its barcode.                                        | `{"barcode": "1234567890123", "amount": 1}`                                                             | `200`: Updated count. <br> Example: `{"status": "ok", "count": 4}` <br> `400`: Validation errors. <br> `404`: Barcode not found. <br> `500`: Error message.  |
 | `/health`            | `GET`      | Health check endpoint to verify the service is running.                                         | None                                                                                                    | `200`: Health status. <br> Example: `{"status": "healthy"}`                                                                                                 |
-                                                                                         |
+                                                                                        
 
 
 ## Attribution

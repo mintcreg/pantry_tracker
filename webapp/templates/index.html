@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Pantry Manager</title>
+	<script src="static/js/companion-style.js?v=2.0"></script>
     <link rel="stylesheet" href="static/style.css">
     <!-- Include QuaggaJS locally -->
-    <script src="static/js/quagga.min.js"></script>
+    <script src="static/js/quagga.min.js?v=2.0"></script>
 </head>
 <body>
 
@@ -46,6 +47,7 @@
     <div class="attribution">
         <p>
             Powered by data from <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener noreferrer">OpenFoodFacts</a>.
+			<br>
             Built with the assistance of <a href="https://openai.com" target="_blank" rel="noopener noreferrer">ChatGPT by OpenAI</a>.
         </p>
     </div>
@@ -66,7 +68,7 @@
 <div id="edit-product-modal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeEditProductModal()">&times;</span>
-        <h2>Edit Product</h2>
+        <center><h2>Edit Product</h2></center>
         <input type="hidden" id="edit-product-old-name">
 
         <!-- Added Label for Product Name -->
@@ -102,7 +104,7 @@
 <div id="add-product-modal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeAddProductModal()">&times;</span>
-        <h2>Add Product</h2>
+        <center><h2>Add Product</h2></center>
         <div class="form-section">
             <input type="text" id="add-product-name" class="input-field" placeholder="Product Name">
         </div>
