@@ -1,13 +1,13 @@
 # Changelog
 
-## Version 1.0.52
+## [Version 1.0.52](https://www.google.com)
 
 - General styling improvements
 - Fixed Add Product/ Edit Product display modals
 - Companion app specific styling
 
 
-## Version 1.0.51 (Skipped 1.0.5)
+## [Version 1.0.51](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.51) (Skipped 1.0.5)
 
 ### Breaking Changes
 
@@ -52,17 +52,17 @@ sensor:
 - Populate 'Add Product' with barcode data
 - Edit categories/products (retains all data within HA except history)
 
-## Version 1.0.4
+## [Version 1.0.4](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.4)
 - Fixed release for 1.0.3
 
-## Version 1.0.3
+## [Version 1.0.3](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.3)
 - Styling changes
 - Backup & Restore Database Facility added
 
-## Version 1.0.2
+## [Version 1.0.2](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.2)
 - Allow spacing within category and product names
 
-## Version 1.0.1
+## [Version 1.0.1](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.1)
 - Change to update_count to ensure capitalisation doesn't affect updates
 - Categories list updates on load (previously had to load categories page)
 - Alphanumeric verification for category & product names
