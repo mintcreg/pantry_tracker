@@ -64,7 +64,7 @@ The ability to save a copy of the database and restore an existing database
  
 <br>
 
-![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/dev/images/products.PNG)
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/products.PNG)
 
 </details>
 
@@ -73,7 +73,7 @@ The ability to save a copy of the database and restore an existing database
  
 <br>
 
-![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/dev/images/categories.PNG)
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/categories.PNG)
 
 </details>
 
@@ -83,7 +83,7 @@ The ability to save a copy of the database and restore an existing database
  
 <br>
 
-![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/dev/images/demo.gif)
+![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/demo.gif)
 
 </details>
 
