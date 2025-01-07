@@ -1,5 +1,14 @@
 # Changelog
 
+## [Version 1.0.53 (NOT RELEASED)](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.53)
+
+- Changed backup route
+- Fixed propotions for backup button
+- Added light/dark mode filter
+- Settings page created
+- 
+
+  
 ## [Version 1.0.52](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.52)
 
 - General styling improvements
