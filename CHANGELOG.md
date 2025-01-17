@@ -1,6 +1,6 @@
 # Changelog
 
-## [Version 1.0.53 (NOT RELEASED)](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.53)
+## [Version 1.0.53](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.53)
 
 ### Changes
 - Changed backup route
