@@ -1,246 +1,286 @@
+<!--
+  BEGIN: HTML Document
+  This file represents the main Pantry Manager interface,
+  including navigation, tabs (categories, products, backup & restore, settings),
+  modals (edit category, edit product, barcode scanner, add product),
+  and attribution.
+-->
 <!DOCTYPE html>
 <html lang="en">
+
+<!-- BEGIN: HEAD Section -->
 <head>
   <meta charset="UTF-8">
   <title>Pantry Manager</title>
   <script src="static/js/companion-style.js?v=2.0"></script>
   <link rel="stylesheet" href="static/style.css">
   <script src="static/js/quagga.min.js?v=2.0"></script>
+   <script src="static/app.js"></script>
 </head>
+<!-- END: HEAD Section -->
+
 <body>
+  <!-- BEGIN: Main Container -->
+  <div class="container">
 
-<div class="container">
-    <!-- Top-Right Menu -->
+    <!-- BEGIN: Top-Right Menu -->
     <div class="top-right-menu">
-        <!--  Dark/Light Mode Toggle -->
-        <label id="themeLabel" class="theme-label" for="themeToggle">Dark Mode</label>
-        <label class="theme-toggle-switch" title="Toggle Dark Mode">
-            <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
-            <span class="slider round"></span>
-        </label>
+      <!-- Dark/Light Mode Toggle -->
+      <label id="themeLabel" class="theme-label" for="themeToggle">Dark Mode</label>
+      <label class="theme-toggle-switch" title="Toggle Dark Mode">
+        <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+        <span class="slider round"></span>
+      </label>
 
-        <!-- Settings Cog -->
-        <button class="settings-cog" onclick="showTab('settings')" title="Settings">
-			<img src="static/images/cog.svg" alt="Settings" width="24" height="24">
-		</button>
-
+      <!-- Settings Cog -->
+      <button class="settings-cog" onclick="showTab('settings')" title="Settings">
+        <img src="static/images/cog.svg" alt="Settings" width="24" height="24">
+      </button>
     </div>
     <!-- END: Top-Right Menu -->
 
     <h1>Pantry Manager</h1>
-	<!-- Category Buttons -->	
+
+    <!-- BEGIN: Category Buttons -->
     <div class="category-buttons">
-        <button onclick="showTab('products')">Products</button>
-        <button onclick="showTab('categories')">Categories</button>
-        <button onclick="showTab('backup')" class="additional-buttons">Backup & Restore</button>
+      <button onclick="showTab('products')">Products</button>
+      <button onclick="showTab('categories')">Categories</button>
+      <button onclick="showTab('backup')" class="additional-buttons">Backup & Restore</button>
     </div>
-	
-	<!-- END: Category Buttons -->
+    <!-- END: Category Buttons -->
 
-    <!-- Categories Tab -->
+    <!-- BEGIN: Categories Tab -->
     <div id="categories-container">
-        <div id="categories-content"></div>
+      <div id="categories-content"></div>
     </div>
+    <!-- END: Categories Tab -->
 
-    <!-- Products Tab -->
+    <!-- BEGIN: Products Tab -->
     <div id="products-container" class="hidden">
-        <h2>Create Categories and Products</h2>
-        <div class="generate-form">
-            <div class="form-section">
-                <h3>Categories</h3>
-                <div id="category-rows"></div>
-                <button class="add-row-btn green-btn" onclick="addCategory()">Add Category</button>
-            </div>
-            <div class="form-section">
-                <h3>Products</h3>
-                <div id="product-rows"></div>
-                <!-- Add Product Button will be inserted here via app.js -->
-            </div>
+      <h2>Create Categories and Products</h2>
+      <div class="generate-form">
+        <div class="form-section">
+          <h3>Categories</h3>
+          <div id="category-rows"></div>
+          <button class="add-row-btn green-btn" onclick="addCategory()">Add Category</button>
         </div>
-        <button class="generate-btn" onclick="saveEntities()">Save</button>
+        <div class="form-section">
+          <h3>Products</h3>
+          <div id="product-rows"></div>
+        </div>
+      </div>
+      <button class="generate-btn" onclick="saveEntities()">Save</button>
     </div>
+    <!-- END: Products Tab -->
 
-    <!-- BACKUP & RESTORE Tab -->
+    <!-- BEGIN: Backup & Restore Tab -->
     <div id="backup-container" class="hidden backup-tab-container">
-        <div class="generate-form backup-grid">
-            <!-- Download Section -->
-            <div class="form-section backup-left-section">
-                <h2>Download Current Database</h2>
-                <p>You can download the current database to keep a backup:</p>
-                <br>
-                <button onclick="triggerBackup()" class="add-row-btn download-db-btn">Download DB</button>
-            </div>
-
-            <!-- Separator Line -->
-            <div class="line-separator"></div>
-
-            <!-- Upload Section -->
-            <div class="form-section backup-right-section">
-                <h2>Upload a Database Backup</h2>
-                <p>If you have a previously saved backup, you can upload it to restore:</p>
-                <div class="backup-form">
-                    <label for="backupFileInput" class="file-upload-btn">Choose File</label>
-                    <input id="backupFileInput" type="file" accept=".db" required>
-                    <button onclick="uploadBackup()" class="add-row-btn upload-db-btn">Upload</button>
-                </div>
-            </div>
+      <div class="generate-form backup-grid">
+        <!-- Download Section -->
+        <div class="form-section backup-left-section">
+          <h2>Download Current Database</h2>
+          <p>You can download the current database to keep a backup:</p>
+          <br>
+          <button onclick="triggerBackup()" class="add-row-btn download-db-btn">Download DB</button>
         </div>
-    </div>
 
-    <!-- NEW: SETTINGS TAB -->
+        <!-- Separator Line -->
+        <div class="line-separator"></div>
+
+        <!-- Upload Section -->
+        <div class="form-section backup-right-section">
+          <h2>Upload a Database Backup</h2>
+          <p>If you have a previously saved backup, you can upload it to restore:</p>
+          <div class="backup-form">
+            <label for="backupFileInput" class="file-upload-btn">Choose File</label>
+            <input id="backupFileInput" type="file" accept=".db" required>
+            <button onclick="uploadBackup()" class="add-row-btn upload-db-btn">Upload</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- END: Backup & Restore Tab -->
+
+    <!-- BEGIN: Settings Tab -->
     <div id="settings-container" class="hidden">
-			<h1>Settings</h1>
-	
-		<!-- Settings Panel #1 -->
-		<div id="uniform-box">
-		<h2>Category 1</h2>
-		<p>
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec scelerisque tortor eget lorem volutpat consequat. Sed vel neque mi.
-		</p>
-		<label for="cat1-input">Example Label:</label>
-		<input type="text" id="cat1-input" placeholder="Type something here...">
-		</div>
-	
-		<!-- Settings Panel #2 -->
-		<div id="uniform-box">
-		<h2>Category 2</h2>
-		<p>
-			Mauris aliquet, augue a dapibus vehicula, nisi erat faucibus ipsum, a fermentum ante purus sit amet mauris. In hac habitasse platea dictumst.
-		</p>
-		<label for="cat2-input">Another Label:</label>
-		<input type="text" id="cat2-input" placeholder="Another placeholder...">
-		</div>
-	
-		<!-- Settings Panel #3 -->
-		<div id="uniform-box">
-		<h2>Danger Zone</h2>
-		<p>Please ensure you backup your database first - any changes made here are irreversible!</p>
-		<div id="delete-container">
-		<button id="delete-database-btn">Delete Database</button>
-		</div>
-		</div>
+      <h1>Settings</h1>
 
-	</div>
-	
-	<!-- Modal Overlay -->
-	<div id="delete-modal-overlay" style="display: none;">
-	<div id="delete-modal">
-		<h3>Confirm Database Deletion</h3>
-		<p>Please type <strong>DELETE</strong> to confirm:</p>
-		<input type="text" id="delete-input" placeholder="DELETE">
-		<div id="modal-actions">
-		<button id="confirm-delete-btn">Confirm</button>
-		<button id="cancel-delete-btn">Cancel</button>
-		</div>
-	</div>
-	</div>
-	
-	
-    <!-- Attribution Section (main page) -->
-    <div class="attribution">
+      <!-- Settings Panel #1 -->
+      <div id="uniform-box">
+        <h2>Category 1</h2>
         <p>
-            Powered by data from <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener noreferrer">OpenFoodFacts</a>.
-            <br>
-            Built with the assistance of <a href="https://openai.com" target="_blank" rel="noopener noreferrer">ChatGPT by OpenAI</a>.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec scelerisque tortor eget lorem volutpat consequat. Sed vel neque mi.
         </p>
-    </div>	
+        <label for="cat1-input">Example Label:</label>
+        <input type="text" id="cat1-input" placeholder="Type something here...">
+      </div>
 
+      <!-- Settings Panel #2 -->
+      <div id="uniform-box">
+        <h2>Category 2</h2>
+        <p>
+          Mauris aliquet, augue a dapibus vehicula, nisi erat faucibus ipsum, a fermentum ante purus sit amet mauris. In hac habitasse platea dictumst.
+        </p>
+        <label for="cat2-input">Another Label:</label>
+        <input type="text" id="cat2-input" placeholder="Another placeholder...">
+      </div>
 
+      <!-- Settings Panel #3 -->
+      <div id="uniform-box">
+        <h2>Danger Zone</h2>
+        <p>Please ensure you backup your database first - any changes made here are irreversible!</p>
+        <div id="delete-container">
+          <button id="delete-database-btn">Delete Database</button>
+        </div>
+      </div>
     </div>
+    <!-- END: Settings Tab -->
 
-
-
-<!-- Edit Category Modal -->
-<div id="edit-category-modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeEditCategoryModal()">&times;</span>
-        <h2>Edit Category</h2>
-        <input type="hidden" id="edit-category-old-name">
-        <input type="text" id="edit-category-input" class="input-field" placeholder="New Category Name">
-        <button class="save-btn" onclick="saveEditedCategory()">Save Changes</button>
+    <!-- BEGIN: Delete Confirmation Modal -->
+    <div id="delete-modal-overlay" style="display: none;">
+      <div id="delete-modal">
+        <h3>Confirm Database Deletion</h3>
+        <p>Please type <strong>DELETE</strong> to confirm:</p>
+        <input type="text" id="delete-input" placeholder="DELETE">
+        <div id="modal-actions">
+          <button id="confirm-delete-btn">Confirm</button>
+          <button id="cancel-delete-btn">Cancel</button>
+        </div>
+      </div>
     </div>
-</div>
+    <!-- END: Delete Confirmation Modal -->
 
-<!-- Edit Product Modal -->
-<div id="edit-product-modal" class="modal">
+    <!-- BEGIN: Attribution Section -->
+    <div class="attribution">
+      <p>
+        Powered by data from
+        <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener noreferrer">OpenFoodFacts</a>.<br>
+        Built with the assistance of
+        <a href="https://openai.com" target="_blank" rel="noopener noreferrer">ChatGPT by OpenAI</a>.
+      </p>
+    </div>
+    <!-- END: Attribution Section -->
+
+  </div>
+  <!-- END: Main Container -->
+
+  <!-- BEGIN: Edit Category Modal -->
+  <div id="edit-category-modal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeEditProductModal()">&times;</span>
-        <center><h2>Edit Product</h2></center>
-        <input type="hidden" id="edit-product-old-name">
+      <span class="close" onclick="closeEditCategoryModal()">&times;</span>
+      <h2>Edit Category</h2>
+      <input type="hidden" id="edit-category-old-name">
+      <input type="text" id="edit-category-input" class="input-field" placeholder="New Category Name">
+      <button class="save-btn" onclick="saveEditedCategory()">Save Changes</button>
+    </div>
+  </div>
+  <!-- END: Edit Category Modal -->
 
-        <label for="edit-product-name">Name:</label>
-        <input type="text" id="edit-product-name" class="input-field" placeholder="New Product Name">
+  <!-- BEGIN: Edit Product Modal -->
+  <div id="edit-product-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeEditProductModal()">&times;</span>
+      <center><h2>Edit Product</h2></center>
+      <input type="hidden" id="edit-product-old-name">
 
-        <label for="edit-product-category">Category:</label>
-        <select id="edit-product-category" class="input-field">
-            <option value="">Select Category</option>
+      <label for="edit-product-name">Name:</label>
+      <input type="text" id="edit-product-name" class="input-field" placeholder="New Product Name">
+
+      <label for="edit-product-category">Category:</label>
+      <select id="edit-product-category" class="input-field">
+        <option value="">Select Category</option>
+      </select>
+
+      <label for="edit-product-image">Image Address:</label>
+      <input type="text" id="edit-product-url" class="input-field" placeholder="New Image URL">
+
+      <label for="edit-product-barcode">Barcode:</label>
+      <input type="text" id="edit-product-barcode" class="input-field" placeholder="New Barcode (Optional)">
+
+      <button class="save-btn" onclick="saveEditedProduct()">Save Changes</button>
+    </div>
+  </div>
+  <!-- END: Edit Product Modal -->
+
+  <!-- BEGIN: Barcode Scanner Modal -->
+  <div id="barcode-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeBarcodeModal()">&times;</span>
+      <h2>Scan Barcode</h2>
+      <div id="loading-spinner"></div>
+      <div id="barcode-scanner"></div>
+    </div>
+  </div>
+  <!-- END: Barcode Scanner Modal -->
+
+  <!-- BEGIN: Add Product Modal -->
+  <div id="add-product-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeAddProductModal()">&times;</span>
+      <center><h2>Add Product</h2></center>
+      <div class="form-section">
+        <input type="text" id="add-product-name" class="input-field" placeholder="Product Name">
+      </div>
+      <div class="form-section">
+        <select id="add-product-category" class="input-field">
+          <option value="">Select Category</option>
         </select>
-
-        <label for="edit-product-image">Image Address:</label>
-        <input type="text" id="edit-product-url" class="input-field" placeholder="New Image URL">
-
-        <label for="edit-product-barcode">Barcode:</label>
-        <input type="text" id="edit-product-barcode" class="input-field" placeholder="New Barcode (Optional)">
-
-        <button class="save-btn" onclick="saveEditedProduct()">Save Changes</button>
+      </div>
+      <div class="form-section">
+        <input type="text" id="add-product-url" class="input-field" placeholder="Image URL">
+      </div>
+      <div class="form-section">
+        <div class="barcode-container">
+          <input type="text" id="add-product-barcode" class="input-field" placeholder="Barcode (Optional)">
+          <button onclick="fetchBarcode()" class="fetch-barcode-btn">Fetch</button>
+          <button onclick="openBarcodeModal()" class="fetch-barcode-btn">Scan Barcode</button>
+        </div>
+      </div>
+      <div class="form-section">
+        <button class="add-row-btn green-btn" onclick="addProductFromForm()">Add Product</button>
+      </div>
     </div>
-</div>
+  </div>
+  <!-- END: Add Product Modal -->
 
-<!-- Barcode Scanner Modal -->
-<div id="barcode-modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeBarcodeModal()">&times;</span>
-        <h2>Scan Barcode</h2>
-        <div id="loading-spinner"></div>
-        <div id="barcode-scanner"></div>
-    </div>
-</div>
-
-<!-- Add Product Modal -->
-<div id="add-product-modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeAddProductModal()">&times;</span>
-        <center><h2>Add Product</h2></center>
-        <div class="form-section">
-            <input type="text" id="add-product-name" class="input-field" placeholder="Product Name">
-        </div>
-        <div class="form-section">
-            <select id="add-product-category" class="input-field">
-                <option value="">Select Category</option>
-            </select>
-        </div>
-        <div class="form-section">
-            <input type="text" id="add-product-url" class="input-field" placeholder="Image URL">
-        </div>
-        <div class="form-section">
-            <div class="barcode-container">
-                <input type="text" id="add-product-barcode" class="input-field" placeholder="Barcode (Optional)">
-                <button onclick="fetchBarcode()" class="fetch-barcode-btn">Fetch</button>
-                <button onclick="openBarcodeModal()" class="fetch-barcode-btn">Scan Barcode</button>
-            </div>
-        </div>
-        <div class="form-section">
-            <button class="add-row-btn green-btn" onclick="addProductFromForm()">Add Product</button>
-        </div>
-    </div>
-</div>
-
-<!-- Include the script at the end of the body -->
-<script src="static/app.js"></script>
-<script>
-    // Simple Theme Toggling
-    function toggleTheme() {
-      const body = document.body;
-      const label = document.getElementById("themeLabel");
-
-      body.classList.toggle('dark-mode');
-
-      if (body.classList.contains('dark-mode')) {
-        label.textContent = "Light Mode";
-      } else {
-        label.textContent = "Dark Mode";
-      }
-    }
+  <!-- BEGIN: Scripts -->
+  <script>
+	async function toggleTheme() {
+	const body = document.body;
+	const label = document.getElementById("themeLabel");
+	const themeToggle = document.getElementById("themeToggle");
+	
+	body.classList.toggle('dark-mode');
+	
+	let newTheme;
+	if (body.classList.contains('dark-mode')) {
+		label.textContent = "Light Mode";
+		newTheme = "dark";
+	} else {
+		label.textContent = "Dark Mode";
+		newTheme = "light";
+	}
+	
+	// Persist the choice using basePath
+	try {
+		await fetch(`${basePath}theme`, {  // <-- Using basePath now
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ theme: newTheme })
+		});
+	} catch (error) {
+		console.error("Error saving theme:", error);
+	}
+	}
 </script>
+
+
+
+
+
+  <!-- END: Scripts -->
 </body>
+<!-- END: BODY Section -->
+
 </html>
+<!-- END: HTML Document -->

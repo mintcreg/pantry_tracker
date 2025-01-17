@@ -8,7 +8,7 @@ body {
 
 .container {
     position: relative;
-	max-width: 100%;
+    max-width: 100%;
     width: 90%;
     margin: 40px auto;
     background-color: white;
@@ -21,10 +21,10 @@ body {
 }
 
 .attribution {
-    text-align: right; /* Align text to the right */
+    text-align: right;
     font-size: 0.9rem;
     color: #666;
-    margin-top: 20px; /* Adds spacing above the attribution */
+    margin-top: 20px;
 }
 
 .attribution a {
@@ -125,7 +125,8 @@ table {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
-th, td {
+th,
+td {
     border: 1px solid #ddd;
     padding: 12px;
     text-align: center;
@@ -189,28 +190,28 @@ tr:hover td {
 }
 
 .edit-btn {
-    padding: 10px 20px; /* Same padding as the Remove button */
-    font-size: 14px;    /* Same font size */
-    background-color: #ffa500; /* Orange */
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: #ffa500;
     color: white;
     border: none;
     cursor: pointer;
-    border-radius: 5px; /* Same border radius */
+    border-radius: 5px;
     transition: background-color 0.3s ease;
-    box-sizing: border-box; /* Ensures consistent box model */
+    box-sizing: border-box;
 }
 
 .edit-btn:hover {
-    background-color: #e59400; /* Darker orange on hover */
+    background-color: #e59400;
 }
 
 /* Config Page Styles */
 .generate-form {
     display: flex;
-    flex-wrap: nowrap; /* Prevent wrapping to maintain side-by-side layout */
+    flex-wrap: nowrap;
     justify-content: space-between;
-    align-items: stretch; /* Ensures children stretch to the same height */
-    position: relative; /* Added to establish stacking context */
+    align-items: stretch;
+    position: relative;
 }
 
 .form-section {
@@ -223,7 +224,8 @@ tr:hover td {
     text-align: center;
 }
 
-#category-rows, #product-rows {
+#category-rows,
+#product-rows {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -350,32 +352,30 @@ tr:hover td {
     background-color: #0056b3;
 }
 
-
 /* Separator Line for Backup Page */
 .line-separator {
     width: 1px;
     background-color: #ddd;
-    height: 100%; /* Changed from 80% to 100% */
-    margin: 0 20px; /* Added horizontal spacing */
-    position: absolute; /* Position absolutely within generate-form */
+    height: 100%;
+    margin: 0 20px;
+    position: absolute;
     top: 0;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 2; /* Ensures it's above other elements */
+    z-index: 2;
 }
 
 /* Hide the line-separator for companion app or smaller screens */
 @media (max-width: 768px) {
     .line-separator {
-        display: none; /* Hide the separator */
+        display: none;
     }
 }
 
 body.companion-app .line-separator {
-    display: none; /* Hide when on companion app */
+    display: none;
 }
-
 
 /* Hide the default file input */
 #file-upload {
@@ -383,32 +383,30 @@ body.companion-app .line-separator {
 }
 /* Hides the file input by default, as you did for #file-upload */
 #backupFileInput {
-  display: none;
+    display: none;
 }
 
 /* Show the backup container in a flex layout */
 .backup-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 /* Left and Right columns in backup */
 .backup-left-section,
 .backup-right-section {
-  flex: 0 0 41%;
+    flex: 0 0 41%;
 }
 
 /* Removes text-decoration from these buttons/links if needed */
 .download-db-btn {
-  text-decoration: none; /* or none if it's a link */
+    text-decoration: none;
 }
-
 .upload-db-btn {
-  margin-top: 10px;
+    margin-top: 10px;
 }
-
 
 /* Styled "Choose File" Button */
 .file-upload-btn {
@@ -421,7 +419,7 @@ body.companion-app .line-separator {
     border-radius: 5px;
     cursor: pointer;
     text-align: center;
-    margin-right: 10px; /* Add spacing between the file button and upload button */
+    margin-right: 10px;
     transition: background-color 0.3s ease;
 }
 
@@ -431,7 +429,7 @@ body.companion-app .line-separator {
 
 /* Green Buttons (e.g., Add Product, Add Category) */
 .green-btn {
-    background-color: #28a745; 
+    background-color: #28a745;
     color: white;
 }
 
@@ -443,18 +441,16 @@ body.companion-app .line-separator {
    New Styles for Add Product Button
    ============================ */
 
-/* Container for the Add Product button */
 .add-product-button-container {
     display: flex;
     justify-content: center;
     margin-top: 20px;
 }
 
-/* Style for the large Add Product button */
 .add-product-btn {
     padding: 15px 30px;
     font-size: 18px;
-    background-color: #28a745; /* Green background */
+    background-color: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
@@ -463,51 +459,48 @@ body.companion-app .line-separator {
 }
 
 .add-product-btn:hover {
-    background-color: #218838; /* Darker green on hover */
+    background-color: #218838;
 }
 
 /* ============================
    New Styles for Add Product Modal
    ============================ */
 
-/* Add Product Modal */
 #add-product-modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
 }
 
-/* Modal Content */
 #add-product-modal .modal-content {
     background-color: #fefefe;
-    margin: 10% auto; /* 10% from the top and centered */
+    margin: 10% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 60%; /* Default width for larger screens */
-    max-width: 500px; /* Ensures it doesn't get too wide */
+    width: 60%;
+    max-width: 500px;
     border-radius: 5px;
-    box-sizing: border-box; /* Ensures padding is included in the width */
-    position: relative; /* To contain the absolutely positioned close button */
-    max-height: 80vh; /* Prevents the modal from exceeding viewport height */
-    overflow-y: auto; /* Adds scroll if content is too long */
+    box-sizing: border-box;
+    position: relative;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
-/* Close Button */
 #add-product-modal .close {
     color: #aaa;
-    position: absolute; /* Changed from float to absolute positioning */
-    top: 10px; /* Position it near the top */
-    right: 20px; /* Position it towards the right */
+    position: absolute;
+    top: 10px;
+    right: 20px;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
-    z-index: 1001; /* Ensure it stays on top */
+    z-index: 1001;
 }
 
 #add-product-modal .close:hover,
@@ -517,14 +510,12 @@ body.companion-app .line-separator {
     cursor: pointer;
 }
 
-/* Save Button */
 #add-product-modal .add-row-btn {
     background-color: #28a745;
     border: none;
     color: white;
     padding: 10px 20px;
     text-align: center;
-    text-decoration: none;
     display: inline-block;
     font-size: 16px;
     margin-top: 10px;
@@ -536,21 +527,20 @@ body.companion-app .line-separator {
     background-color: #218838;
 }
 
-/* Barcode Container within Add Product Modal */
 #add-product-modal .barcode-container {
     display: flex;
     align-items: center;
-    gap: 10px; /* Space between input and buttons */
+    gap: 10px;
 }
 
 #add-product-modal .barcode-container .input-field {
-    flex: 1; /* Make the input field take up remaining space */
+    flex: 1;
 }
 
 #add-product-modal .fetch-barcode-btn {
     padding: 8px 12px;
     font-size: 14px;
-    background-color: #28a745; /* Green */
+    background-color: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
@@ -559,39 +549,36 @@ body.companion-app .line-separator {
 }
 
 #add-product-modal .fetch-barcode-btn:hover {
-    background-color: #218838; /* Darker green on hover */
+    background-color: #218838;
 }
 
 /* ============================
    Updated Styles for Barcode Modal
    ============================ */
 
-/* Styles for the barcode scanner modal */
 #barcode-modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: hidden; /* Hide overflow */
-    background-color: rgba(0,0,0,0.95); /* Slightly darker black with opacity */
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0,0,0,0.95);
 }
 
-/* Full-Screen Modal Content */
 #barcode-modal .modal-content {
     position: relative;
     width: 100%;
     height: 100%;
-    background-color: #000; /* Black background for better contrast */
+    background-color: #000;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-/* Close Button Styling */
 #barcode-modal .close {
     position: absolute;
     top: 20px;
@@ -610,7 +597,6 @@ body.companion-app .line-separator {
     cursor: pointer;
 }
 
-/* Header Inside Modal */
 #barcode-modal .modal-content h2 {
     position: absolute;
     top: 20px;
@@ -622,16 +608,15 @@ body.companion-app .line-separator {
     z-index: 1001;
 }
 
-/* Loading Spinner Styles */
 #barcode-modal .modal-content #loading-spinner {
-    display: none; /* Hidden by default */
+    display: none;
     border: 8px solid #f3f3f3;
     border-top: 8px solid #3498db;
     border-radius: 50%;
     width: 60px;
     height: 60px;
     animation: spin 2s linear infinite;
-    margin-bottom: 20px; /* Space between spinner and scanner */
+    margin-bottom: 20px;
 }
 
 @keyframes spin {
@@ -639,19 +624,17 @@ body.companion-app .line-separator {
     100% { transform: rotate(360deg); }
 }
 
-/* Barcode Scanner Styling */
 #barcode-modal .modal-content #barcode-scanner {
     width: 100%;
     height: 100%;
-    flex: 1; /* Occupy remaining space */
+    flex: 1;
     position: relative;
 }
 
-/* Ensure the video inside #barcode-scanner fills the container */
 #barcode-modal .modal-content #barcode-scanner video {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensures the video covers the container without distortion */
+    object-fit: cover;
 }
 
 /* ============================
@@ -660,41 +643,40 @@ body.companion-app .line-separator {
 
 /* The Modal (background) */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
 }
 
 /* Modal Content */
 .modal-content {
     background-color: #fefefe;
-    margin: 10% auto; /* 10% from the top and centered */
+    margin: 10% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 40%; /* Could be more or less, depending on screen size */
+    width: 40%;
     border-radius: 5px;
-    box-sizing: border-box; /* Ensure padding is included in the width */
-    position: relative; /* To contain the absolutely positioned close button */
-    max-height: 80vh; /* Prevents the modal from exceeding viewport height */
-    overflow-y: auto; /* Adds scroll if content is too long */
+    box-sizing: border-box;
+    position: relative;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
-/* Close Button */
 .modal-content .close {
     color: #aaa;
-    position: absolute; /* Changed from float to absolute positioning */
-    top: 10px; /* Position it near the top */
-    right: 20px; /* Position it towards the right */
+    position: absolute;
+    top: 10px;
+    right: 20px;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
-    z-index: 1001; /* Ensure it stays on top */
+    z-index: 1001;
 }
 
 .modal-content .close:hover,
@@ -704,14 +686,12 @@ body.companion-app .line-separator {
     cursor: pointer;
 }
 
-/* Save Button */
 .modal-content .save-btn {
     background-color: #4CAF50;
     border: none;
     color: white;
     padding: 10px 20px;
     text-align: center;
-    text-decoration: none;
     display: inline-block;
     font-size: 14px;
     margin-top: 10px;
@@ -723,7 +703,6 @@ body.companion-app .line-separator {
     background-color: #45a049;
 }
 
-/* Input Fields */
 .modal-content .input-field {
     width: 100%;
     padding: 8px 12px;
@@ -734,17 +713,17 @@ body.companion-app .line-separator {
 .modal-content .barcode-container {
     display: flex;
     align-items: center;
-    gap: 10px; /* Space between input and buttons */
+    gap: 10px;
 }
 
 .modal-content .barcode-container .input-field {
-    flex: 1; /* Make the input field take up remaining space */
+    flex: 1;
 }
 
 .modal-content .fetch-barcode-btn {
     padding: 8px 12px;
     font-size: 14px;
-    background-color: #28a745; /* Green */
+    background-color: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
@@ -753,50 +732,48 @@ body.companion-app .line-separator {
 }
 
 .modal-content .fetch-barcode-btn:hover {
-    background-color: #218838; /* Darker green on hover */
+    background-color: #218838;
 }
 
 /* ============================
    New Styles for Edit Product Modal
    ============================ */
 
-/* Edit Product Modal */
 #edit-product-modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1001; /* Sit on top, higher than other modals */
+    display: none;
+    position: fixed;
+    z-index: 1001;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
 }
 
 #edit-product-modal .modal-content {
     background-color: #fefefe;
-    margin: 10% auto; /* 10% from the top and centered */
+    margin: 10% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 60%; /* Could be more or less, depending on screen size */
-    max-width: 500px; /* Ensures it doesn't get too wide */
+    width: 60%;
+    max-width: 500px;
     border-radius: 5px;
-    box-sizing: border-box; /* Ensure padding is included in the width */
-    position: relative; /* To contain the absolutely positioned close button */
-    max-height: 80vh; /* Prevents the modal from exceeding viewport height */
-    overflow-y: auto; /* Adds scroll if content is too long */
+    box-sizing: border-box;
+    position: relative;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
-/* Close Button */
 #edit-product-modal .close {
     color: #aaa;
-    position: absolute; /* Changed from float to absolute positioning */
-    top: 10px; /* Position it near the top */
-    right: 20px; /* Position it towards the right */
+    position: absolute;
+    top: 10px;
+    right: 20px;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
-    z-index: 1001; /* Ensure it stays on top */
+    z-index: 1001;
 }
 
 #edit-product-modal .close:hover,
@@ -806,14 +783,12 @@ body.companion-app .line-separator {
     cursor: pointer;
 }
 
-/* Save Button */
 #edit-product-modal .save-btn {
     background-color: #4CAF50;
     border: none;
     color: white;
     padding: 10px 20px;
     text-align: center;
-    text-decoration: none;
     display: inline-block;
     font-size: 14px;
     margin-top: 10px;
@@ -825,7 +800,6 @@ body.companion-app .line-separator {
     background-color: #45a049;
 }
 
-/* Input Fields */
 #edit-product-modal .input-field {
     width: 100%;
     padding: 8px 12px;
@@ -836,17 +810,17 @@ body.companion-app .line-separator {
 #edit-product-modal .barcode-container {
     display: flex;
     align-items: center;
-    gap: 10px; /* Space between input and buttons */
+    gap: 10px;
 }
 
 #edit-product-modal .barcode-container .input-field {
-    flex: 1; /* Make the input field take up remaining space */
+    flex: 1;
 }
 
 #edit-product-modal .fetch-barcode-btn {
     padding: 8px 12px;
     font-size: 14px;
-    background-color: #28a745; /* Green */
+    background-color: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
@@ -855,12 +829,11 @@ body.companion-app .line-separator {
 }
 
 #edit-product-modal .fetch-barcode-btn:hover {
-    background-color: #218838; /* Darker green on hover */
+    background-color: #218838;
 }
 
 /* Responsive Styles */
 @media (max-width: 768px) {
-    /* General adjustments */
     .container {
         padding: 15px;
     }
@@ -871,7 +844,9 @@ body.companion-app .line-separator {
         margin: 10px 0;
     }
 
-    table, th, td {
+    table,
+    th,
+    td {
         font-size: 14px;
     }
 
@@ -899,14 +874,12 @@ body.companion-app .line-separator {
         padding: 15px;
     }
 
-    /* General modal adjustments */
     .modal-content {
         width: 90%;
         margin: 20% auto;
         padding: 15px;
     }
 
-    /* Adjustments for Add Product Modal */
     #add-product-modal .modal-content,
     body.companion-app #add-product-modal .modal-content {
         width: 100% !important;
@@ -931,7 +904,6 @@ body.companion-app .line-separator {
         width: 100%;
     }
 
-    /* Adjustments for Edit Product Modal */
     #edit-product-modal .modal-content,
     body.companion-app #edit-product-modal .modal-content {
         width: 100% !important;
@@ -941,24 +913,24 @@ body.companion-app .line-separator {
         overflow-x: hidden !important;
     }
 
-    /* Adjustments for Barcode Modal */
     #barcode-modal .modal-content {
         width: 100%;
         height: 100%;
         padding: 10px;
     }
 
-    /* Adjust font sizes */
     .close {
         font-size: 24px;
     }
 
-    /* Ensure buttons are tappable */
-    button, .add-row-btn, .save-btn, .fetch-barcode-btn {
+    button,
+    .add-row-btn,
+    .save-btn,
+    .fetch-barcode-btn {
         font-size: 16px;
         padding: 10px;
     }
-	/* Ensure form elements scale */
+
     body.companion-app #add-product-modal .form-section {
         width: 100% !important;
         margin: 10px 0 !important;
@@ -971,79 +943,78 @@ body.companion-app .line-separator {
         box-sizing: border-box;
     }
 
-    /* Ensure buttons adjust */
     body.companion-app #add-product-modal .add-row-btn {
         width: 100%;
         margin: 10px 0;
     }
-	/* Styling for Add Category Table */
-	.add-category-container {
-		margin-top: 20px;
-		padding: 10px;
-		max-width: 100%; /* Prevents the table from exceeding the parent width */
-		margin-left: auto;
-		margin-right: auto;
-		display: flex; /* Use flexbox for responsiveness */
-		flex-wrap: wrap; /* Allow wrapping if necessary */
-		align-items: center; /* Align content vertically */
-		gap: 10px; /* Add spacing between input and button */
-	}
-	/* Input Field in Add Category */
-	.add-category-container .input-field {
-		flex: 1; /* Allow the input field to shrink */
-		min-width: 50%; /* Ensure it doesn't shrink too much */
-		max-width: 100%; /* Prevent overflow */
-		box-sizing: border-box;
-		padding: 8px;
-		font-size: 16px;
-		border: 1px solid #ccc;
-		border-radius: 5px;
-	}
-	
-	/* Add Category Button */
-	.add-category-container .add-row-btn {
-		padding: 10px 20px;
-		font-size: 16px;
-		background-color: #28a745;
-		color: white;
-		border: none;
-		border-radius: 5px;
-		cursor: pointer;
-		white-space: nowrap; /* Prevents text wrapping for the button */
-		flex-shrink: 0; /* Ensure the button is always fully visible */
-	}
 
-/* Adjustments for Smaller Screens */
-@media (max-width: 768px) {
     .add-category-container {
-        flex-direction: column; /* Stack input and button vertically */
-        align-items: stretch; /* Ensure full width for each element */
+        margin-top: 20px;
+        padding: 10px;
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
     }
 
     .add-category-container .input-field {
-        width: 100%; /* Input takes full width */
-        margin-bottom: 10px; /* Add spacing between input and button */
+        flex: 1;
+        min-width: 50%;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 8px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
     }
 
     .add-category-container .add-row-btn {
-        width: 100%; /* Button takes full width */
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .add-category-container .add-row-btn:hover {
+        background-color: #218838;
     }
 }
 
-/* Adjustments for Extra Small Screens */
-@media (max-width: 480px) {
-    .add-category-container .input-field {
-        font-size: 14px; /* Reduce font size for better fit */
-        padding: 6px; /* Reduce padding */
-    }
+/* On smaller screens or in companion-app mode */
+@media (max-width: 768px), (body.companion-app) {
+  /* Limit the width of the table to its container */
+  .add-category-table {
+    width: 100%;
+    max-width: 100%;
+    display: table; /* Keep default table layout but ensure it doesn't overflow */
+    /* Remove or avoid forcing overflow-x: auto if you don't want scrolling */
+    overflow-x: visible;
+  }
 
-    .add-category-container .add-row-btn {
-        font-size: 14px; /* Match input font size */
-        padding: 8px 16px; /* Adjust padding for button */
-    }
+  /* Make the input field narrower so it doesn't cause horizontal overflow */
+  .add-category-table #new-category-input {
+    width: 80% !important; /* Adjust as needed, e.g., 70%, 90%, etc. */
+    max-width: 100%;       /* Ensure it won't exceed container */
+    box-sizing: border-box;
+  }
+
+  /* You can allow the table cells to wrap text normally if desired */
+  .add-category-table th,
+  .add-category-table td {
+    white-space: normal;
+  }
 }
 
-}
+
+
 @media (max-width: 480px) {
     .modal-content,
     body.companion-app .modal-content {
@@ -1058,29 +1029,62 @@ body.companion-app .line-separator {
         padding: 10px;
     }
 }
+
 /* =========================
    Top-Right Menu Styles
    ========================= */
 
 .top-right-menu {
-    position: absolute; /* or use relative positioning within the .container if preferred */
+    position: absolute;
     top: 20px;
     right: 20px;
     display: flex;
     align-items: center;
     gap: 15px;
 }
+/* 
+   1) For small screens (e.g., max-width 768px)
+   2) For .companion-app (body has the "companion-app" class)
+*/
+@media (max-width: 768px) {
+  .top-right-menu {
+    position: absolute;
+    margin: 10px auto;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  h1 {
+    margin-top: 60px; /* Create spacing under the menu */
+  }
+}
+
+/* Companion app layout */
+body.companion-app .top-right-menu {
+  position: static;
+  margin: 10px auto;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Optional extra space for the heading in companion app */
+body.companion-app h1 {
+  margin-top: 60px;
+}
+
 
 .settings-cog svg {
     width: 24px;
     height: 24px;
-    fill: #666; /* Default fill color */
+    fill: #666;
     cursor: pointer;
     transition: fill 0.3s ease;
 }
 
 .settings-cog svg:hover {
-    fill: #007bff; /* Hover color */
+    fill: #007bff;
 }
 
 /* =========================
@@ -1103,7 +1107,10 @@ body.companion-app .line-separator {
 .theme-toggle-switch .slider {
     position: absolute;
     cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0; 
+    right: 0;
+    bottom: 0;
     background-color: #ccc;
     transition: .4s;
     border-radius: 26px;
@@ -1120,6 +1127,7 @@ body.companion-app .line-separator {
     transition: .4s;
     border-radius: 50%;
 }
+
 .theme-label {
     margin-right: 8px; 
     font-weight: 500;
@@ -1178,149 +1186,261 @@ body.dark-mode tr:hover td {
 body.dark-mode .top-right-menu .settings-cog svg {
     fill: #fff; /* Light icon in dark mode */
 }
-/* Example inline overrides to ensure the icon is always visible and not cut off */
-    .settings-cog {
+
+/* Make the cog lighter in dark mode */
+body.dark-mode .settings-cog svg path {
+    fill: #ccc !important; /* lighter grey in dark mode */
+}
+
+/* Force the label text to white in dark mode */
+body.dark-mode .theme-label {
+    color: #fff;
+}
+
+/* =========================
+   Dark Mode Overrides for Modals
+   ========================= */
+
+/* In dark mode, give each modal a darker background and light text */
+body.dark-mode #add-product-modal .modal-content,
+body.dark-mode #edit-product-modal .modal-content,
+body.dark-mode #edit-category-modal .modal-content,
+body.dark-mode #barcode-modal .modal-content {
+  background-color: #444;  /* Dark background */
+  color: #fff;             /* Light text */
+  border-color: #666;      /* Subtle border in dark mode */
+}
+
+/* Make the close button lighter in dark mode */
+body.dark-mode #add-product-modal .modal-content .close,
+body.dark-mode #edit-product-modal .modal-content .close,
+body.dark-mode #edit-category-modal .modal-content .close,
+body.dark-mode #barcode-modal .modal-content .close {
+  color: #ccc;
+}
+
+/* Dark-mode input fields inside the modals */
+body.dark-mode #add-product-modal .modal-content .input-field,
+body.dark-mode #edit-product-modal .modal-content .input-field,
+body.dark-mode #edit-category-modal .modal-content .input-field,
+body.dark-mode #barcode-modal .modal-content .input-field,
+body.dark-mode #add-product-modal .modal-content select.input-field,
+body.dark-mode #edit-product-modal .modal-content select.input-field,
+body.dark-mode #edit-category-modal .modal-content select.input-field,
+body.dark-mode #barcode-modal .modal-content select.input-field {
+  background-color: #666;
+  color: #fff;
+  border: 1px solid #888;
+}
+
+/* (Optional) Buttons like "Save Changes", "Fetch Barcode", etc. in dark mode */
+body.dark-mode #add-product-modal .modal-content .save-btn,
+body.dark-mode #add-product-modal .modal-content .fetch-barcode-btn,
+body.dark-mode #edit-product-modal .modal-content .save-btn,
+body.dark-mode #edit-product-modal .modal-content .fetch-barcode-btn,
+body.dark-mode #edit-category-modal .modal-content .save-btn,
+body.dark-mode #barcode-modal .modal-content .fetch-barcode-btn {
+  /* You can keep them the same color scheme or slightly darker for dark mode */
+  /* For example: */
+  background-color: #888; 
+  color: #fff;
+  border-color: #666;
+}
+
+/* If you want specific color changes on hover in dark mode... */
+body.dark-mode #add-product-modal .modal-content .save-btn:hover,
+body.dark-mode #add-product-modal .modal-content .fetch-barcode-btn:hover,
+body.dark-mode #edit-product-modal .modal-content .save-btn:hover,
+body.dark-mode #edit-product-modal .modal-content .fetch-barcode-btn:hover,
+body.dark-mode #edit-category-modal .modal-content .save-btn:hover,
+body.dark-mode #barcode-modal .modal-content .fetch-barcode-btn:hover {
+  background-color: #777; 
+}
+
+
+
+
+/* =========================
+   Settings Cog Hover Effects
+   ========================= */
+.settings-cog {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     overflow: visible;
-	background: transparent;
-	border: none;
-    cursor: pointer; 
-    text-decoration: none; 
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
     transition: color 0.2s ease;
 }
 
-	/* Hover effect */
-	.settings-cog:hover {
-		color: #007BFF; /* Change to a hyperlink-like color, e.g., blue */
-		text-decoration: underline; /* Adds underline on hover */
-	}
-	
-	/* Adjust the cog's color on hover */
-	.settings-cog svg path {
-		fill: #666 !important;
-		transition: fill 0.2s ease; /* Smooth transition for hover effect */
-	}
-	
-	.settings-cog:hover svg path {
-		fill: #007BFF !important; /* Change the cog's color to match hover */
-	}
-
-
-    /* Make the cog lighter in dark mode */
-    body.dark-mode .settings-cog svg path {
-      fill: #ccc !important; /* lighter grey in dark mode */
-    }
-
-    /* Label next to toggle */
-    .theme-label {
-      margin-right: 8px;
-      font-weight: 500;
-      font-size: 14px;
-      color: #333; /* default color in light mode */
-    }
-
-    /* Force the label to white in dark mode */
-    body.dark-mode .theme-label {
-      color: #fff;
-    }
-
-    /* Label next to toggle */
-    .theme-label {
-      margin-right: 8px;
-      font-weight: 500;
-      font-size: 14px;
-      color: #333; /* default color in light mode */
-    }
-
-    /* Force the label to white in dark mode */
-    body.dark-mode .theme-label {
-      color: #fff;
-    }
-/* Delete-DB-Settings */
-#uniform-box {
-  border: 1px solid #ccc;
-  padding: 1rem;
-  margin: 1rem 0;
-  border-radius: 6px;
-  background-color: #f9f9f9;
+.settings-cog:hover {
+    color: #007BFF;
+    text-decoration: underline;
 }
 
-/* Style the labels and inputs uniformly */
+.settings-cog svg path {
+    fill: #666 !important;
+    transition: fill 0.2s ease;
+}
+
+.settings-cog:hover svg path {
+    fill: #007BFF !important;
+}
+
+/* Label next to toggle */
+.theme-label {
+    margin-right: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    color: #333; /* default color in light mode */
+}
+
+/* Force label to white in dark mode */
+body.dark-mode .theme-label {
+    color: #fff;
+}
+
+/* =========================
+   Delete-DB-Settings
+   ========================= */
+
+#uniform-box {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+}
+
 #uniform-box label {
-  display: inline-block;
-  width: 150px;
-  font-weight: bold;
+    display: inline-block;
+    width: 150px;
+    font-weight: bold;
 }
 
 #uniform-box input[type="text"] {
-  width: 300px;
-  padding: 0.4rem;
-  margin-bottom: 0.5rem;
-  border: 1px solid #aaa;
-  border-radius: 4px;
+    width: 300px;
+    padding: 0.4rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #aaa;
+    border-radius: 4px;
 }
 
 /* Delete database container */
 #delete-container {
-  margin-top: 2rem;
+    margin-top: 2rem;
 }
 
-/* Modal styling */
 #delete-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
 }
 
 #delete-modal {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 350px;
-  transform: translate(-50%, -50%);
-  background-color: #ffffff;
-  padding: 1.5rem;
-  border-radius: 6px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 350px;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 #delete-modal h3 {
-  margin-top: 0;
+    margin-top: 0;
 }
 
 #delete-input {
-  width: 80%;
-  padding: 0.4rem;
-  margin-bottom: 1rem;
-  border: 1px solid #aaa;
-  border-radius: 4px;
+    width: 80%;
+    padding: 0.4rem;
+    margin-bottom: 1rem;
+    border: 1px solid #aaa;
+    border-radius: 4px;
 }
 
 #modal-actions {
-  text-align: right;
+    text-align: right;
 }
 
 #confirm-delete-btn,
 #cancel-delete-btn {
-  margin-left: 0.5rem;
-  padding: 0.4rem 0.8rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+    margin-left: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 #confirm-delete-btn {
-  background-color: #db4242; /* Red-ish */
-  color: #fff;
+    background-color: #db4242; /* Red-ish */
+    color: #fff;
 }
 
 #cancel-delete-btn {
-  background-color: #ccc;
-  color: #000;
+    background-color: #ccc;
+    color: #000;
+}
+#delete-database-btn {
+	padding: 12px 20px;
+    font-size: 16px;
+    margin: 5px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+/* =====================================
+   Additional Dark Mode Overrides
+   ===================================== */
+
+/* Attribution text color in dark mode */
+body.dark-mode .attribution {
+    color: #bbb; /* Lighter text color for dark background */
+}
+
+body.dark-mode .attribution a {
+    color: #ccc; /* Adjust link color for contrast in dark mode */
+}
+
+/* Uniform box panels (Settings categories) */
+body.dark-mode #uniform-box {
+    background-color: #555;  /* Darker background inside settings panel */
+    border-color: #666;      /* Match darker theme border */
+}
+
+body.dark-mode #uniform-box p,
+body.dark-mode #uniform-box label {
+    color: #fff;
+}
+
+body.dark-mode #uniform-box input[type="text"] {
+    background-color: #666;
+    color: #fff;
+    border-color: #888;
+}
+
+/* Delete Modal in dark mode */
+body.dark-mode #delete-modal {
+    background-color: #555;
+    color: #fff;
+}
+
+body.dark-mode #delete-modal input[type="text"] {
+    background-color: #666;
+    color: #fff;
+    border-color: #888;
 }

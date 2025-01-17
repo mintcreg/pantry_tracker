@@ -665,10 +665,15 @@ const sortCategories = () => {
 // Initialize the page
 //////////////////////////////////////
 document.addEventListener('DOMContentLoaded', async () => {
+  // First, load the saved theme from the server
+  await loadThemeFromServer();
+
+  // Then, proceed with other initializations
   await fetchCategories();
   // Default tab: 'products'
   showTab('products');
 });
+
 
 //////////////////////////////////////
 // Barcode Scanning Functionality
@@ -960,4 +965,86 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 });
+
+//////////////////////////////////////
+// Load Theme from Server
+//////////////////////////////////////
+async function loadThemeFromServer() {
+  console.log("Loading theme from server...");
+  try {
+    // Fetch the current theme from the server endpoint (e.g., /theme)
+    const response = await fetch(`${basePath}theme`, { method: 'GET' });
+    
+    if (!response.ok) {
+      // If the server can't be reached or returns an error, fallback to light mode
+      console.warn("Couldn't fetch theme; defaulting to light mode.");
+      return;
+    }
+
+    const data = await response.json();
+    const currentTheme = data.theme || 'light';
+
+    // If the server-saved theme is 'dark', add dark-mode to <body>
+    if (currentTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+      
+      // If you have a checkbox toggle, set it to checked
+      const toggle = document.getElementById('themeToggle');
+      if (toggle) toggle.checked = true;
+      
+      // If you have a label, rename it to "Light Mode"
+      const label = document.getElementById('themeLabel');
+      if (label) label.textContent = 'Light Mode';
+
+    } else {
+      // It's 'light', ensure dark mode is removed
+      document.body.classList.remove('dark-mode');
+      
+      const toggle = document.getElementById('themeToggle');
+      if (toggle) toggle.checked = false;
+      
+      const label = document.getElementById('themeLabel');
+      if (label) label.textContent = 'Dark Mode';
+    }
+
+  } catch (err) {
+    console.error('Error loading theme from server:', err);
+  }
+}
+
+//////////////////////////////////////
+// Toggle Theme (Light/Dark) & Save to Server
+//////////////////////////////////////
+async function toggleTheme() {
+  const body = document.body;
+  const label = document.getElementById("themeLabel");
+  const toggle = document.getElementById("themeToggle");
+
+  // Flip dark mode on/off
+  body.classList.toggle('dark-mode');
+
+  let newTheme = 'light';
+  if (body.classList.contains('dark-mode')) {
+    newTheme = 'dark';
+    if (label) label.textContent = 'Light Mode';
+  } else {
+    if (label) label.textContent = 'Dark Mode';
+  }
+
+  // POST the updated theme to your server so it's saved in config.ini
+  try {
+    const response = await fetch(`${basePath}theme`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ theme: newTheme })
+    });
+
+    if (!response.ok) {
+      console.warn("Failed to save theme. Server responded with:", response.statusText);
+    }
+  } catch (error) {
+    console.error('Error saving theme:', error);
+  }
+}
+
 

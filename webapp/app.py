@@ -3,6 +3,7 @@
 from flask import Flask, request, jsonify, render_template, send_file, redirect, url_for
 import os
 import logging
+import configparser
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models import Base, Category, Product, Count
@@ -20,6 +21,28 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+CONFIG_FILE = "/config/pantry_data/config.ini"
+config = configparser.ConfigParser()
+
+# If /config/pantry_data/config.ini doesn’t exist, create it with default settings
+if not os.path.exists(CONFIG_FILE):
+    config['Settings'] = {'theme': 'light'}  # default to light
+    with open(CONFIG_FILE, 'w') as f:
+        config.write(f)
+else:
+    # Read the existing config file
+    config.read(CONFIG_FILE)
+    # Ensure 'Settings' section exists
+    if 'Settings' not in config:
+        config['Settings'] = {}
+    # Ensure 'theme' key exists
+    if 'theme' not in config['Settings']:
+        config['Settings']['theme'] = 'light'
+    # Write any missing defaults back to file
+    with open(CONFIG_FILE, 'w') as f:
+        config.write(f)
+
 
 # Define the path to the database within the container
 DB_FILE = "/config/pantry_data/pantry_data.db"
@@ -613,7 +636,9 @@ def fetch_product():
     else:
         return jsonify({"status": "error", "message": "Product not found or failed to fetch data"}), 404
 		
-
+# ------------------------------------------------
+# Delete Database
+# ------------------------------------------------
 @app.route("/delete_database", methods=["DELETE"])
 def delete_database():
     if os.path.exists(DB_FILE):
@@ -629,6 +654,35 @@ def delete_database():
             return jsonify({"status": "error", "message": "Failed to delete database"}), 500
     else:
         return jsonify({"status": "error", "message": "Database file does not exist"}), 404
+
+# ------------------------------------------------
+# Theme Saving
+# ------------------------------------------------
+@app.route("/theme", methods=["GET"])
+def get_theme():
+    """Return the current theme from config.ini"""
+    # Reload config from disk to catch any manual changes
+    config.read(CONFIG_FILE)
+    current_theme = config['Settings'].get('theme', 'light')
+    return jsonify({"theme": current_theme})
+
+@app.route("/theme", methods=["POST"])
+def set_theme():
+    """Save the selected theme (light/dark) to config.ini"""
+    data = request.get_json()
+    new_theme = data.get("theme", "light").lower()
+
+    # Validate that theme is either 'light' or 'dark'
+    if new_theme not in ["light", "dark"]:
+        return jsonify({"status": "error", "message": "Invalid theme."}), 400
+
+    # Update the theme in the config and write to disk
+    config['Settings']['theme'] = new_theme
+    with open(CONFIG_FILE, 'w') as f:
+        config.write(f)
+
+    # Return a success response with the new theme
+    return jsonify({"status": "ok", "theme": new_theme})
 
 
 
