@@ -1413,7 +1413,7 @@ body.dark-mode .attribution {
 }
 
 body.dark-mode .attribution a {
-    color: #ccc; /* Adjust link color for contrast in dark mode */
+    color: #007BFF; /* Adjust link color for contrast in dark mode */
 }
 
 /* Uniform box panels (Settings categories) */
