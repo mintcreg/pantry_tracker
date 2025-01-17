@@ -3,6 +3,7 @@
 from flask import Flask, request, jsonify, render_template, send_file, redirect, url_for
 import os
 import logging
+import configparser
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models import Base, Category, Product, Count
@@ -17,10 +18,31 @@ app = Flask(__name__)
 # Apply ProxyFix middleware to handle Ingress headers correctly
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
 
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+CONFIG_FILE = "/config/pantry_data/config.ini"
+config = configparser.ConfigParser()
+
+# If /config/pantry_data/config.ini doesn’t exist, create it with default settings
+if not os.path.exists(CONFIG_FILE):
+    config['Settings'] = {'theme': 'light'}  # default to light
+    with open(CONFIG_FILE, 'w') as f:
+        config.write(f)
+else:
+    # Read the existing config file
+    config.read(CONFIG_FILE)
+    # Ensure 'Settings' section exists
+    if 'Settings' not in config:
+        config['Settings'] = {}
+    # Ensure 'theme' key exists
+    if 'theme' not in config['Settings']:
+        config['Settings']['theme'] = 'light'
+    # Write any missing defaults back to file
+    with open(CONFIG_FILE, 'w') as f:
+        config.write(f)
+
 
 # Define the path to the database within the container
 DB_FILE = "/config/pantry_data/pantry_data.db"
@@ -29,9 +51,8 @@ DB_FILE = "/config/pantry_data/pantry_data.db"
 DB_DIR = os.path.dirname(DB_FILE)
 os.makedirs(DB_DIR, exist_ok=True)
 
-# Ensure the database schema is valid
-# Removed as initially from 1.0.4 > 1.0.5 (no schema changes 1.0.5 > 1.0.6)
-#migrate_database(DB_FILE)
+# If needed, ensure the database schema is valid
+# migrate_database(DB_FILE)  # (commented if no migrations needed)
 
 # Initialize the database
 engine = create_engine(f'sqlite:///{DB_FILE}', connect_args={'check_same_thread': False}, echo=False)
@@ -50,11 +71,14 @@ def sanitize_entity_id(name: str) -> str:
 def index():
     """Root endpoint to render the HTML UI."""
     return render_template("index.html")
-	
+
 @app.route("/index.html")
 def index_html():
     return render_template("index.html")
 
+# -----------------------------
+# Categories
+# -----------------------------
 @app.route("/categories", methods=["GET", "POST", "DELETE"])
 def categories_route():
     session = Session()
@@ -144,18 +168,14 @@ def categories_route():
         finally:
             Session.remove()
 
-# ==============================
-# New Endpoints for Editing Categories and Products
-# ==============================
-
+# -----------------------------
+# Edit Category
+# -----------------------------
 @app.route("/categories/<old_name>", methods=["PUT"])
 def edit_category(old_name):
     """
     Edit an existing category's name.
-    Payload:
-    {
-        "new_name": "New Category Name"
-    }
+    Payload: {"new_name": "New Category Name"}
     """
     session = Session()
     try:
@@ -195,17 +215,19 @@ def edit_category(old_name):
     finally:
         Session.remove()
 
-
+# -----------------------------
+# Edit Product
+# -----------------------------
 @app.route("/products/<old_name>", methods=["PUT"])
 def edit_product(old_name):
     """
     Edit an existing product's details.
-    Payload can include any of the following fields:
+    Payload can include any fields:
     {
-        "new_name": "New Product Name",
-        "category": "New Category Name",
-        "url": "New Image URL",
-        "barcode": "New Barcode"
+      "new_name": "New Product Name",
+      "category": "New Category Name",
+      "url": "New Image URL",
+      "barcode": "New Barcode"
     }
     """
     session = Session()
@@ -247,12 +269,12 @@ def edit_product(old_name):
                 logger.warning("Invalid category name provided for product edit")
                 return jsonify({"status": "error", "message": "Invalid category name"}), 400
 
-            category = session.query(Category).filter_by(name=category_name).first()
-            if not category:
+            found_category = session.query(Category).filter_by(name=category_name).first()
+            if not found_category:
                 logger.warning("Category '%s' not found for product edit", category_name)
                 return jsonify({"status": "error", "message": "Category does not exist"}), 400
 
-            product.category = category
+            product.category = found_category
             logger.info(f"Product '{product.name}' category updated to '{category_name}'")
 
         # Update URL if provided
@@ -264,13 +286,13 @@ def edit_product(old_name):
             product.url = url
             logger.info(f"Product '{product.name}' URL updated to '{url}'")
 
-        # Update barcode if provided
-        if barcode is not None:  # Allow setting barcode to null
+        # Update barcode if provided (including possibility of null)
+        if barcode is not None:
             if barcode:
                 barcode = barcode.strip()
                 if not barcode.isdigit() or not (8 <= len(barcode) <= 13):
-                    logger.warning("Invalid barcode provided for product edit: '%s'", barcode)
-                    return jsonify({"status": "error", "message": "Barcode must be numeric and between 8 to 13 digits"}), 400
+                    logger.warning("Invalid barcode: '%s'", barcode)
+                    return jsonify({"status": "error", "message": "Barcode must be numeric and 8-13 digits"}), 400
 
                 # Check if barcode already exists
                 existing_barcode = session.query(Product).filter_by(barcode=barcode).first()
@@ -281,7 +303,7 @@ def edit_product(old_name):
                 product.barcode = barcode
                 logger.info(f"Product '{product.name}' barcode updated to '{barcode}'")
             else:
-                # If barcode is set to null or empty, remove it
+                # If barcode is empty, remove it
                 product.barcode = None
                 logger.info(f"Product '{product.name}' barcode removed")
 
@@ -291,7 +313,8 @@ def edit_product(old_name):
         # Return updated list of products
         products = session.query(Product).all()
         product_list = [
-            {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode} for prod in products
+            {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode}
+            for prod in products
         ]
         return jsonify({"status": "ok", "products": product_list})
 
@@ -301,12 +324,15 @@ def edit_product(old_name):
 
     except Exception as e:
         session.rollback()
-        logger.error(f"Error editing product '{old_name}': {e}")
+        logger.error(f"Error editing product '%s': %s", old_name, e)
         return jsonify({"status": "error", "message": "Failed to edit product"}), 500
 
     finally:
         Session.remove()
 
+# -----------------------------
+# Products
+# -----------------------------
 @app.route("/products", methods=["GET", "POST", "DELETE"])
 def products_route():
     session = Session()
@@ -314,7 +340,8 @@ def products_route():
         try:
             products = session.query(Product).all()
             product_list = [
-                {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode} for prod in products
+                {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode}
+                for prod in products
             ]
             logger.info("Fetched products: %s", product_list)
             return jsonify(product_list)
@@ -334,13 +361,13 @@ def products_route():
         name = data.get("name")
         url = data.get("url")
         category_name = data.get("category")
-        barcode = data.get("barcode")  # Optional barcode
-        
+        barcode = data.get("barcode")
+
         try:
             # Check if category exists
-            category = session.query(Category).filter_by(name=category_name).first()
-            if not category:
-                logger.warning("Attempted to add product to non-existent category: %s", category_name)
+            found_category = session.query(Category).filter_by(name=category_name).first()
+            if not found_category:
+                logger.warning("Category not found: %s", category_name)
                 return jsonify({"status": "error", "message": "Category does not exist"}), 400
             
             # Check for duplicate product
@@ -356,7 +383,7 @@ def products_route():
                     logger.warning("Duplicate barcode attempted: %s", barcode)
                     return jsonify({"status": "error", "message": "Barcode already exists"}), 400
             
-            new_product = Product(name=name, url=url, category=category, barcode=barcode)
+            new_product = Product(name=name, url=url, category=found_category, barcode=barcode)
             session.add(new_product)
             
             # Initialize count to 0
@@ -368,7 +395,8 @@ def products_route():
             
             products = session.query(Product).all()
             product_list = [
-                {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode} for prod in products
+                {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode}
+                for prod in products
             ]
             return jsonify({"status": "ok", "products": product_list})
         except Exception as e:
@@ -397,7 +425,8 @@ def products_route():
             
             products = session.query(Product).all()
             product_list = [
-                {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode} for prod in products
+                {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode}
+                for prod in products
             ]
             return jsonify({"status": "ok", "products": product_list})
         except Exception as e:
@@ -407,15 +436,17 @@ def products_route():
         finally:
             Session.remove()
 
+# -----------------------------
+# Update Count
+# -----------------------------
 @app.route("/update_count", methods=["POST"])
 def update_count():
     session = Session()
     data = request.get_json()
-    product_name = data.get("product_name")  # Use product_name directly now
+    product_name = data.get("product_name")
     action = data.get("action")
     amount = data.get("amount", 1)
 
-    # Check that we have the required parameters
     if not all([product_name, action]):
         logger.warning("Missing required parameters in update_count")
         return jsonify({"status": "error", "message": "Missing required parameters"}), 400
@@ -452,6 +483,9 @@ def update_count():
     finally:
         Session.remove()
 
+# -----------------------------
+# Get Counts
+# -----------------------------
 @app.route("/counts", methods=["GET"])
 def get_counts():
     session = Session()
@@ -474,26 +508,17 @@ def health():
     """Health check endpoint."""
     return jsonify({"status": "healthy"}), 200
 
-###################################
-# Backup & Restore Functionality
-###################################
-
-# Display the backup/restore page
+# -----------------------------
+# Backup & Restore
+# -----------------------------
 @app.route("/backup", methods=["GET"], endpoint="backup_page")
 def backup():
-    # The real prefix used by Home Assistant’s Ingress
-    # e.g. "/api/hassio_ingress/1ab2c3d4e5f6abcdef"
+    # Typically not used if in single-page approach, but leaving it
     ingress_prefix = request.headers.get("X-Ingress-Path", "")
     if not ingress_prefix.endswith("/"):
         ingress_prefix += "/"
-
-    # Now, "ingress_prefix" is the real path the user is on
-    # e.g. "/api/hassio_ingress/1ab2c3d4e5f6abcdef/"
-    # So linking to ingress_prefix + "index.html" yields a proper path.
     return render_template("backup.html", base_path=ingress_prefix)
 
-
-# Download the current database file
 @app.route("/download_db", methods=["GET"])
 def download_db():
     if os.path.exists(DB_FILE):
@@ -501,7 +526,6 @@ def download_db():
     else:
         return "Database file not found.", 404
 
-# Upload a new database file
 @app.route("/upload_db", methods=["POST"])
 def upload_db():
     if 'file' not in request.files:
@@ -520,12 +544,12 @@ def upload_db():
         migrate_database(temp_db_path)
     except Exception as e:
         logger.error(f"Error migrating the uploaded database: {e}")
-        os.remove(temp_db_path)  # Cleanup temporary file
+        os.remove(temp_db_path)
         return jsonify({"status": "error", "message": "Failed to migrate the uploaded database."}), 500
 
     # Replace the current database with the uploaded one
     try:
-        os.replace(temp_db_path, DB_FILE)  # Atomically replace the database
+        os.replace(temp_db_path, DB_FILE)
         logger.info("Uploaded database successfully replaced the existing database.")
     except Exception as e:
         logger.error(f"Error replacing the database: {e}")
@@ -539,14 +563,9 @@ def upload_db():
     SessionFactory = sessionmaker(bind=engine)
     Session = scoped_session(SessionFactory)
 
-    #
-    # 1) Use X-Ingress-Path to get the real HA Ingress prefix (with the UUID).
-    # 2) We'll do a client-side JS redirect with "window.location.href" to stay *in the same iframe*.
-    #
     ingress_prefix = request.headers.get("X-Ingress-Path", "")
     if not ingress_prefix.endswith("/"):
         ingress_prefix += "/"
-    # If you prefer the root route, replace with: redirect_url = ingress_prefix
     redirect_url = ingress_prefix
 
     return f"""
@@ -556,7 +575,6 @@ def upload_db():
         <meta charset="UTF-8">
         <title>Redirecting</title>
         <script>
-            // Reload inside the *same* iframe, staying in HA
             window.location.href = "{redirect_url}";
         </script>
     </head>
@@ -566,34 +584,36 @@ def upload_db():
     </html>
     """
 
+# -----------------------------
+# Settings (No Longer Needed if Single-Page)
+# -----------------------------
+# @app.route("/settings", methods=["GET"], endpoint="settings_page")
+# def settings():
+#     # If you still want a separate settings.html route, leave this.
+#     # Otherwise, remove or comment out. We now do a single-page approach.
+#     ingress_prefix = request.headers.get("X-Ingress-Path", "")
+#     if not ingress_prefix.endswith("/"):
+#         ingress_prefix += "/"
+#     return render_template("settings.html", base_path=ingress_prefix)
 
-###################################
+# ------------------------------------------------
 # OpenFoodFacts Integration
-###################################
-
+# ------------------------------------------------
 def fetch_product_from_openfoodfacts(barcode: str):
     """Fetch product data from OpenFoodFacts using the barcode."""
     url = f"https://world.openfoodfacts.org/api/v0/product/{barcode}.json"
-    
-    # Define a custom User-Agent
-    headers = {
-        "User-Agent": "PantryManager/1.0.5 (mint@mintcreg.co.uk)"
-    }
-    
+    headers = { "User-Agent": "PantryManager/1.0.5 (mint@mintcreg.co.uk)" }
     try:
-        # Include the custom headers in the request
         response = requests.get(url, headers=headers, timeout=5)
         response.raise_for_status()
         data = response.json()
         if data.get('status') == 1:
             product_data = data.get('product', {})
-            # Extract desired fields. Modify as needed.
             extracted_data = {
                 "name": product_data.get('product_name', 'Unknown Product'),
                 "barcode": barcode,
                 "category": product_data.get('categories', 'Uncategorized').split(',')[0].strip(),
-                "image_front_small_url": product_data.get('image_front_small_url', None)  # New field
-                # Add more fields as needed
+                "image_front_small_url": product_data.get('image_front_small_url', None)
             }
             return extracted_data
         else:
@@ -603,20 +623,68 @@ def fetch_product_from_openfoodfacts(barcode: str):
         logger.error(f"Error fetching product from OpenFoodFacts: {e}")
         return None
 
-
 @app.route("/fetch_product", methods=["GET"])
 def fetch_product():
-    """Endpoint to fetch product data from OpenFoodFacts using a barcode."""
     barcode = request.args.get('barcode')
     if not barcode:
         logger.warning("Barcode not provided in fetch_product request.")
         return jsonify({"status": "error", "message": "Barcode is required"}), 400
-    
+
     product_data = fetch_product_from_openfoodfacts(barcode)
     if product_data:
         return jsonify({"status": "ok", "product": product_data})
     else:
         return jsonify({"status": "error", "message": "Product not found or failed to fetch data"}), 404
+		
+# ------------------------------------------------
+# Delete Database
+# ------------------------------------------------
+@app.route("/delete_database", methods=["DELETE"])
+def delete_database():
+    if os.path.exists(DB_FILE):
+        try:
+            engine.dispose()        # Release the SQLite file so it can be deleted
+            os.remove(DB_FILE)      # Remove it from disk
+            # (Optionally) re-init an empty DB so your app still functions:
+            Base.metadata.create_all(engine)
+            
+            return jsonify({"status": "ok", "message": "Database deleted and reinitialized."})
+        except Exception as e:
+            logger.error(f"Error deleting the database file: {e}")
+            return jsonify({"status": "error", "message": "Failed to delete database"}), 500
+    else:
+        return jsonify({"status": "error", "message": "Database file does not exist"}), 404
+
+# ------------------------------------------------
+# Theme Saving
+# ------------------------------------------------
+@app.route("/theme", methods=["GET"])
+def get_theme():
+    """Return the current theme from config.ini"""
+    # Reload config from disk to catch any manual changes
+    config.read(CONFIG_FILE)
+    current_theme = config['Settings'].get('theme', 'light')
+    return jsonify({"theme": current_theme})
+
+@app.route("/theme", methods=["POST"])
+def set_theme():
+    """Save the selected theme (light/dark) to config.ini"""
+    data = request.get_json()
+    new_theme = data.get("theme", "light").lower()
+
+    # Validate that theme is either 'light' or 'dark'
+    if new_theme not in ["light", "dark"]:
+        return jsonify({"status": "error", "message": "Invalid theme."}), 400
+
+    # Update the theme in the config and write to disk
+    config['Settings']['theme'] = new_theme
+    with open(CONFIG_FILE, 'w') as f:
+        config.write(f)
+
+    # Return a success response with the new theme
+    return jsonify({"status": "ok", "theme": new_theme})
+
+
 
 if __name__ == "__main__":
     # Do not run app.run() since Gunicorn handles it
