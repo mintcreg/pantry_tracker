@@ -30,7 +30,8 @@ function showTab(tab) {
   document.getElementById('categories-container').style.display = 'none';
   document.getElementById('products-container').style.display = 'none';
   document.getElementById('backup-container').style.display = 'none';
-  // NEW: Also hide the settings container
+
+  // Also hide the settings container (if it exists)
   const settingsContainer = document.getElementById('settings-container');
   if (settingsContainer) {
     settingsContainer.style.display = 'none';
@@ -51,9 +52,7 @@ function showTab(tab) {
   } else if (tab === 'backup') {
     document.getElementById('backup-container').style.display = 'block';
     // Optionally fetch backup status here if needed
-  }
-  // NEW: else if for 'settings'
-  else if (tab === 'settings') {
+  } else if (tab === 'settings') {
     // Only show the settings container if it exists
     if (settingsContainer) {
       settingsContainer.style.display = 'block';
@@ -86,24 +85,30 @@ const fetchCategories = async () => {
 };
 
 //////////////////////////////////////
-// Display categories in a table layout
+// Display categories in a table layout (Corrected)
 //////////////////////////////////////
 const displayCategories = (categories) => {
   const categoriesContainer = document.getElementById('categories-container');
   categoriesContainer.innerHTML = ''; // Clear existing content
 
   if (categories.length > 0) {
+    // Create the table element
     const table = document.createElement('table');
+
+    // Define tableHead
     const tableHead = `
       <thead>
         <tr>
-          <th onclick="sortCategories()">Category Name</th>
+          <th id="categoriesHeader" onclick="sortCategories()">Category Name</th>
           <th>Actions</th>
         </tr>
       </thead>
     `;
+
+    // Create the table body
     const tableBody = document.createElement('tbody');
 
+    // Populate rows
     categories.forEach(category => {
       const row = document.createElement('tr');
       row.innerHTML = `
@@ -116,6 +121,7 @@ const displayCategories = (categories) => {
       tableBody.appendChild(row);
     });
 
+    // Put the table together
     table.innerHTML = tableHead;
     table.appendChild(tableBody);
 
@@ -125,6 +131,7 @@ const displayCategories = (categories) => {
     tableContainer.appendChild(table);
 
     categoriesContainer.appendChild(tableContainer);
+
   } else {
     categoriesContainer.innerHTML = `
       <p style="text-align: center; font-weight: bold; color: red;">
@@ -135,7 +142,7 @@ const displayCategories = (categories) => {
 
   // Add category form below the table
   const addCategoryTable = document.createElement('table');
-  addCategoryTable.classList.add('add-category-table'); // Add a specific class to the table
+  addCategoryTable.classList.add('add-category-table');
   addCategoryTable.innerHTML = `
     <thead>
       <tr>
@@ -154,9 +161,8 @@ const displayCategories = (categories) => {
     </tbody>
   `;
 
-  // Wrap addCategoryTable in a uniquely identifiable container
   const addCategoryTableContainer = document.createElement('div');
-  addCategoryTableContainer.classList.add('add-category-container'); // Add a specific class to the container
+  addCategoryTableContainer.classList.add('add-category-container');
   addCategoryTableContainer.appendChild(addCategoryTable);
 
   categoriesContainer.appendChild(addCategoryTableContainer);
@@ -333,14 +339,19 @@ const displayProducts = (products) => {
     const tableHead = `
       <thead>
         <tr>
-          <th class="sortable" onclick="sortProducts('name')">Product Name</th>
-          <th class="sortable" onclick="sortProducts('category')">Category</th>
+          <th class="sortable" id="productNameHeader" onclick="sortProducts('name')">
+            Product Name
+          </th>
+          <th class="sortable" id="productCategoryHeader" onclick="sortProducts('category')">
+            Category
+          </th>
           <th>Image</th>
           <th>Barcode</th>
           <th>Actions</th>
         </tr>
       </thead>
     `;
+
     const tableBody = document.createElement('tbody');
 
     products.forEach(product => {
@@ -376,6 +387,7 @@ const displayProducts = (products) => {
     tableContainer.appendChild(table);
 
     productsContainer.appendChild(tableContainer);
+
   } else {
     productsContainer.innerHTML = `
       <p style="text-align: center; font-weight: bold; color: red;">
@@ -457,7 +469,7 @@ function openEditProductModal(product) {
   const categoryDropdown = document.getElementById('edit-product-category');
   categoryDropdown.innerHTML = `<option value="">Select Category</option>`;
   categories.forEach(category => {
-    const selected = category === product.category ? 'selected' : '';
+    const selected = (category === product.category) ? 'selected' : '';
     categoryDropdown.innerHTML += `<option value="${category}" ${selected}>${category}</option>`;
   });
 
@@ -498,13 +510,12 @@ const saveEditedProduct = async () => {
     alert('Product name must be alphanumeric');
     return;
   }
-
   if (!isAlphanumeric(newCategory)) {
     alert('Category name must be alphanumeric');
     return;
   }
 
-  // If barcode is provided, ensure it's numeric and of valid length (8-13 digits)
+  // If barcode is provided, ensure it's numeric and 8-13 digits
   if (newBarcode && !/^\d{8,13}$/.test(newBarcode)) {
     alert('Barcode must be numeric and between 8 to 13 digits');
     return;
@@ -559,12 +570,10 @@ const addProductFromForm = async () => {
     alert('Product name must be alphanumeric.');
     return;
   }
-
   if (!isAlphanumeric(category)) {
     alert('Category name must be alphanumeric.');
     return;
   }
-
   if (barcode && !/^\d{8,13}$/.test(barcode)) {
     alert('Barcode must be numeric and between 8 to 13 digits.');
     return;
@@ -638,28 +647,85 @@ const removeProduct = async (productName) => {
 //////////////////////////////////////
 const sortProducts = (field) => {
   const sortOrder = productSortOrder[field];
+
+  // Sort the products array based on the current sort order
   products.sort((a, b) => {
     if (a[field] < b[field]) return sortOrder === 'asc' ? -1 : 1;
     if (a[field] > b[field]) return sortOrder === 'asc' ? 1 : -1;
     return 0;
   });
-  productSortOrder[field] = sortOrder === 'asc' ? 'desc' : 'asc'; // Toggle sort order
+
+  // Toggle the sort order for next click
+  productSortOrder[field] = (sortOrder === 'asc') ? 'desc' : 'asc';
+
+
+  // Re-display the sorted products
   displayProducts(products);
+  
+    // Update the arrow in the table headers
+  updateProductHeaderArrows(field);
 };
+
+/**
+ * Append an up/down arrow in the "Product Name" or "Category" header
+ * based on the new sort order.
+ */
+function updateProductHeaderArrows(sortedField) {
+  // Grab references to each header by ID
+  const nameHeader = document.getElementById('productNameHeader');
+  const categoryHeader = document.getElementById('productCategoryHeader');
+
+  // Reset both headers to default text (removing any arrows)
+  if (nameHeader) nameHeader.textContent = 'Product Name';
+  if (categoryHeader) categoryHeader.textContent = 'Category';
+
+  // Determine which arrow to append
+  const currentOrder = productSortOrder[sortedField]; // "asc" or "desc"
+  const arrow = (currentOrder === 'asc') ? ' \u25B2' : ' \u25BC';
+  
+
+  // Add the arrow to the sorted column
+  if (sortedField === 'name' && nameHeader) {
+    nameHeader.textContent += arrow; 
+  } else if (sortedField === 'category' && categoryHeader) {
+    categoryHeader.textContent += arrow; 
+  }
+}
 
 //////////////////////////////////////
 // Sort categories by name
 //////////////////////////////////////
 const sortCategories = () => {
-  const sortOrder = productSortOrder.name;
+  const sortOrder = productSortOrder.name; // You're using productSortOrder.name for category sorting
   categories.sort((a, b) => {
     if (a < b) return sortOrder === 'asc' ? -1 : 1;
     if (a > b) return sortOrder === 'asc' ? 1 : -1;
     return 0;
   });
-  productSortOrder.name = sortOrder === 'asc' ? 'desc' : 'asc'; // Toggle sort order
+  productSortOrder.name = (sortOrder === 'asc') ? 'desc' : 'asc';
+
+  
+  
   displayCategories(categories);
+  // Update arrow
+  updateCategoriesHeaderArrow();
 };
+
+function updateCategoriesHeaderArrow() {
+  const header = document.getElementById('categoriesHeader');
+  if (!header) return;
+
+  // Reset text
+  header.textContent = 'Category Name';
+
+  // Decide arrow
+  const currentOrder = productSortOrder.name; // "asc" or "desc"
+  const arrow = (currentOrder === 'asc') ? ' \u25B2' : ' \u25BC';
+
+  // Append arrow
+  header.textContent += arrow;
+}
+
 
 //////////////////////////////////////
 // Initialize the page
@@ -673,7 +739,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Default tab: 'products'
   showTab('products');
 });
-
 
 //////////////////////////////////////
 // Barcode Scanning Functionality
@@ -910,7 +975,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ==========================
   // DELETE DATABASE LOGIC
   // ==========================
-
   const deleteBtn = document.getElementById('delete-database-btn');
   const overlay = document.getElementById('delete-modal-overlay');
   const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
@@ -938,7 +1002,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Must type DELETE in all caps
       if (deleteInput.value.trim().toUpperCase() === 'DELETE') {
         try {
-          // Use the same basePath you use for all other requests
           const response = await fetch(`${basePath}delete_database`, {
             method: 'DELETE',
           });
@@ -948,10 +1011,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert('Database has been deleted.');
             overlay.style.display = 'none';
             deleteInput.value = '';
-
             // Optionally reload page or redirect
             // location.reload();
-
           } else {
             alert('Error deleting database: ' + data.message);
           }
@@ -974,7 +1035,7 @@ async function loadThemeFromServer() {
   try {
     // Fetch the current theme from the server endpoint (e.g., /theme)
     const response = await fetch(`${basePath}theme`, { method: 'GET' });
-    
+
     if (!response.ok) {
       // If the server can't be reached or returns an error, fallback to light mode
       console.warn("Couldn't fetch theme; defaulting to light mode.");
@@ -987,26 +1048,24 @@ async function loadThemeFromServer() {
     // If the server-saved theme is 'dark', add dark-mode to <body>
     if (currentTheme === 'dark') {
       document.body.classList.add('dark-mode');
-      
+
       // If you have a checkbox toggle, set it to checked
       const toggle = document.getElementById('themeToggle');
       if (toggle) toggle.checked = true;
-      
+
       // If you have a label, rename it to "Light Mode"
       const label = document.getElementById('themeLabel');
       if (label) label.textContent = 'Light Mode';
-
     } else {
       // It's 'light', ensure dark mode is removed
       document.body.classList.remove('dark-mode');
-      
+
       const toggle = document.getElementById('themeToggle');
       if (toggle) toggle.checked = false;
-      
+
       const label = document.getElementById('themeLabel');
       if (label) label.textContent = 'Dark Mode';
     }
-
   } catch (err) {
     console.error('Error loading theme from server:', err);
   }
@@ -1046,5 +1105,3 @@ async function toggleTheme() {
     console.error('Error saving theme:', error);
   }
 }
-
-
