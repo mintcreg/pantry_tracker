@@ -7,7 +7,8 @@ body {
 }
 
 .container {
-    max-width: 100%;
+    position: relative;
+	max-width: 100%;
     width: 90%;
     margin: 40px auto;
     background-color: white;
@@ -380,6 +381,34 @@ body.companion-app .line-separator {
 #file-upload {
     display: none;
 }
+/* Hides the file input by default, as you did for #file-upload */
+#backupFileInput {
+  display: none;
+}
+
+/* Show the backup container in a flex layout */
+.backup-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* Left and Right columns in backup */
+.backup-left-section,
+.backup-right-section {
+  flex: 0 0 41%;
+}
+
+/* Removes text-decoration from these buttons/links if needed */
+.download-db-btn {
+  text-decoration: none; /* or none if it's a link */
+}
+
+.upload-db-btn {
+  margin-top: 10px;
+}
+
 
 /* Styled "Choose File" Button */
 .file-upload-btn {
@@ -1028,4 +1057,270 @@ body.companion-app .line-separator {
         width: 90%;
         padding: 10px;
     }
+}
+/* =========================
+   Top-Right Menu Styles
+   ========================= */
+
+.top-right-menu {
+    position: absolute; /* or use relative positioning within the .container if preferred */
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.settings-cog svg {
+    width: 24px;
+    height: 24px;
+    fill: #666; /* Default fill color */
+    cursor: pointer;
+    transition: fill 0.3s ease;
+}
+
+.settings-cog svg:hover {
+    fill: #007bff; /* Hover color */
+}
+
+/* =========================
+   Theme Toggle Switch
+   ========================= */
+
+.theme-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.theme-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-toggle-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 26px;
+}
+
+.theme-toggle-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+.theme-label {
+    margin-right: 8px; 
+    font-weight: 500;
+    font-size: 14px;
+    color: #333; /* or #666 */
+}
+
+.theme-toggle-switch input:checked + .slider {
+    background-color: #007bff;
+}
+
+.theme-toggle-switch input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+/* =========================
+   Dark Mode Overrides
+   ========================= */
+
+body.dark-mode {
+    background-color: #333;
+    color: #fff;
+}
+
+body.dark-mode .container {
+    background-color: #444;
+    box-shadow: none; /* Optionally remove the shadow for dark mode */
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3 {
+    color: #fff;
+}
+
+body.dark-mode table,
+body.dark-mode th,
+body.dark-mode td {
+    background-color: #555;
+    color: #fff;
+    border-color: #777;
+}
+
+body.dark-mode th {
+    background-color: #666;
+}
+
+body.dark-mode tr:hover td {
+    background-color: #444;
+}
+
+body.dark-mode .top-right-menu .settings-cog svg {
+    fill: #fff; /* Light icon in dark mode */
+}
+/* Example inline overrides to ensure the icon is always visible and not cut off */
+    .settings-cog {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+	background: transparent;
+	border: none;
+    cursor: pointer; 
+    text-decoration: none; 
+    transition: color 0.2s ease;
+}
+
+	/* Hover effect */
+	.settings-cog:hover {
+		color: #007BFF; /* Change to a hyperlink-like color, e.g., blue */
+		text-decoration: underline; /* Adds underline on hover */
+	}
+	
+	/* Adjust the cog's color on hover */
+	.settings-cog svg path {
+		fill: #666 !important;
+		transition: fill 0.2s ease; /* Smooth transition for hover effect */
+	}
+	
+	.settings-cog:hover svg path {
+		fill: #007BFF !important; /* Change the cog's color to match hover */
+	}
+
+
+    /* Make the cog lighter in dark mode */
+    body.dark-mode .settings-cog svg path {
+      fill: #ccc !important; /* lighter grey in dark mode */
+    }
+
+    /* Label next to toggle */
+    .theme-label {
+      margin-right: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      color: #333; /* default color in light mode */
+    }
+
+    /* Force the label to white in dark mode */
+    body.dark-mode .theme-label {
+      color: #fff;
+    }
+
+    /* Label next to toggle */
+    .theme-label {
+      margin-right: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      color: #333; /* default color in light mode */
+    }
+
+    /* Force the label to white in dark mode */
+    body.dark-mode .theme-label {
+      color: #fff;
+    }
+/* Delete-DB-Settings */
+#uniform-box {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+}
+
+/* Style the labels and inputs uniformly */
+#uniform-box label {
+  display: inline-block;
+  width: 150px;
+  font-weight: bold;
+}
+
+#uniform-box input[type="text"] {
+  width: 300px;
+  padding: 0.4rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+/* Delete database container */
+#delete-container {
+  margin-top: 2rem;
+}
+
+/* Modal styling */
+#delete-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+#delete-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 350px;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+#delete-modal h3 {
+  margin-top: 0;
+}
+
+#delete-input {
+  width: 80%;
+  padding: 0.4rem;
+  margin-bottom: 1rem;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+#modal-actions {
+  text-align: right;
+}
+
+#confirm-delete-btn,
+#cancel-delete-btn {
+  margin-left: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#confirm-delete-btn {
+  background-color: #db4242; /* Red-ish */
+  color: #fff;
+}
+
+#cancel-delete-btn {
+  background-color: #ccc;
+  color: #000;
 }

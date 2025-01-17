@@ -1,24 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Pantry Manager</title>
-	<script src="static/js/companion-style.js?v=2.0"></script>
-    <link rel="stylesheet" href="static/style.css">
-    <!-- Include QuaggaJS locally -->
-    <script src="static/js/quagga.min.js?v=2.0"></script>
+  <meta charset="UTF-8">
+  <title>Pantry Manager</title>
+  <script src="static/js/companion-style.js?v=2.0"></script>
+  <link rel="stylesheet" href="static/style.css">
+  <script src="static/js/quagga.min.js?v=2.0"></script>
 </head>
 <body>
 
 <div class="container">
-    <h1>Pantry Manager</h1>
+    <!-- Top-Right Menu -->
+    <div class="top-right-menu">
+        <!--  Dark/Light Mode Toggle -->
+        <label id="themeLabel" class="theme-label" for="themeToggle">Dark Mode</label>
+        <label class="theme-toggle-switch" title="Toggle Dark Mode">
+            <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+            <span class="slider round"></span>
+        </label>
 
+        <!-- Settings Cog -->
+        <button class="settings-cog" onclick="showTab('settings')" title="Settings">
+			<img src="static/images/cog.svg" alt="Settings" width="24" height="24">
+		</button>
+
+    </div>
+    <!-- END: Top-Right Menu -->
+
+    <h1>Pantry Manager</h1>
+	<!-- Category Buttons -->	
     <div class="category-buttons">
         <button onclick="showTab('products')">Products</button>
         <button onclick="showTab('categories')">Categories</button>
-        <!-- Changed this from an anchor link to a styled button-like link -->
-        <a href="backup" class="additional-buttons">Backup & Restore</a>
+        <button onclick="showTab('backup')" class="additional-buttons">Backup & Restore</button>
     </div>
+	
+	<!-- END: Category Buttons -->
 
     <!-- Categories Tab -->
     <div id="categories-container">
@@ -43,15 +60,95 @@
         <button class="generate-btn" onclick="saveEntities()">Save</button>
     </div>
 
-    <!-- Attribution Section -->
+    <!-- BACKUP & RESTORE Tab -->
+    <div id="backup-container" class="hidden backup-tab-container">
+        <div class="generate-form backup-grid">
+            <!-- Download Section -->
+            <div class="form-section backup-left-section">
+                <h2>Download Current Database</h2>
+                <p>You can download the current database to keep a backup:</p>
+                <br>
+                <button onclick="triggerBackup()" class="add-row-btn download-db-btn">Download DB</button>
+            </div>
+
+            <!-- Separator Line -->
+            <div class="line-separator"></div>
+
+            <!-- Upload Section -->
+            <div class="form-section backup-right-section">
+                <h2>Upload a Database Backup</h2>
+                <p>If you have a previously saved backup, you can upload it to restore:</p>
+                <div class="backup-form">
+                    <label for="backupFileInput" class="file-upload-btn">Choose File</label>
+                    <input id="backupFileInput" type="file" accept=".db" required>
+                    <button onclick="uploadBackup()" class="add-row-btn upload-db-btn">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: SETTINGS TAB -->
+    <div id="settings-container" class="hidden">
+			<h1>Settings</h1>
+	
+		<!-- Settings Panel #1 -->
+		<div id="uniform-box">
+		<h2>Category 1</h2>
+		<p>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec scelerisque tortor eget lorem volutpat consequat. Sed vel neque mi.
+		</p>
+		<label for="cat1-input">Example Label:</label>
+		<input type="text" id="cat1-input" placeholder="Type something here...">
+		</div>
+	
+		<!-- Settings Panel #2 -->
+		<div id="uniform-box">
+		<h2>Category 2</h2>
+		<p>
+			Mauris aliquet, augue a dapibus vehicula, nisi erat faucibus ipsum, a fermentum ante purus sit amet mauris. In hac habitasse platea dictumst.
+		</p>
+		<label for="cat2-input">Another Label:</label>
+		<input type="text" id="cat2-input" placeholder="Another placeholder...">
+		</div>
+	
+		<!-- Settings Panel #3 -->
+		<div id="uniform-box">
+		<h2>Danger Zone</h2>
+		<p>Please ensure you backup your database first - any changes made here are irreversible!</p>
+		<div id="delete-container">
+		<button id="delete-database-btn">Delete Database</button>
+		</div>
+		</div>
+
+	</div>
+	
+	<!-- Modal Overlay -->
+	<div id="delete-modal-overlay" style="display: none;">
+	<div id="delete-modal">
+		<h3>Confirm Database Deletion</h3>
+		<p>Please type <strong>DELETE</strong> to confirm:</p>
+		<input type="text" id="delete-input" placeholder="DELETE">
+		<div id="modal-actions">
+		<button id="confirm-delete-btn">Confirm</button>
+		<button id="cancel-delete-btn">Cancel</button>
+		</div>
+	</div>
+	</div>
+	
+	
+    <!-- Attribution Section (main page) -->
     <div class="attribution">
         <p>
             Powered by data from <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener noreferrer">OpenFoodFacts</a>.
-			<br>
+            <br>
             Built with the assistance of <a href="https://openai.com" target="_blank" rel="noopener noreferrer">ChatGPT by OpenAI</a>.
         </p>
+    </div>	
+
+
     </div>
-</div>
+
+
 
 <!-- Edit Category Modal -->
 <div id="edit-category-modal" class="modal">
@@ -71,21 +168,20 @@
         <center><h2>Edit Product</h2></center>
         <input type="hidden" id="edit-product-old-name">
 
-        <!-- Added Label for Product Name -->
         <label for="edit-product-name">Name:</label>
         <input type="text" id="edit-product-name" class="input-field" placeholder="New Product Name">
 
         <label for="edit-product-category">Category:</label>
         <select id="edit-product-category" class="input-field">
             <option value="">Select Category</option>
-            <!-- Dynamically populate categories -->
-            <!-- Example: -->
-            <!-- <option value="Fruits">Fruits</option> -->
         </select>
+
         <label for="edit-product-image">Image Address:</label>
         <input type="text" id="edit-product-url" class="input-field" placeholder="New Image URL">
+
         <label for="edit-product-barcode">Barcode:</label>
         <input type="text" id="edit-product-barcode" class="input-field" placeholder="New Barcode (Optional)">
+
         <button class="save-btn" onclick="saveEditedProduct()">Save Changes</button>
     </div>
 </div>
@@ -111,7 +207,6 @@
         <div class="form-section">
             <select id="add-product-category" class="input-field">
                 <option value="">Select Category</option>
-                <!-- Categories will be populated dynamically via JavaScript -->
             </select>
         </div>
         <div class="form-section">
@@ -132,5 +227,20 @@
 
 <!-- Include the script at the end of the body -->
 <script src="static/app.js"></script>
+<script>
+    // Simple Theme Toggling
+    function toggleTheme() {
+      const body = document.body;
+      const label = document.getElementById("themeLabel");
+
+      body.classList.toggle('dark-mode');
+
+      if (body.classList.contains('dark-mode')) {
+        label.textContent = "Light Mode";
+      } else {
+        label.textContent = "Dark Mode";
+      }
+    }
+</script>
 </body>
 </html>

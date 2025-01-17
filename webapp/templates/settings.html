@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pantry Manager - Settings</title>
+  <!-- Existing scripts and styles -->
+  <script src="static/js/companion-style.js?v=2.0"></script>
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Settings</h1>
+    <p>Here you can configure your Pantry Manager settings.</p>
+
+    <!-- Example setting -->
+    <div>
+      <h2>General Options</h2>
+      <label for="sample-option">Sample Option:</label>
+      <input type="checkbox" id="sample-option">
+    </div>
+
+    <!-- Category 1 -->
+    <div id="uniform-box">
+      <h2>Category 1</h2>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec scelerisque tortor eget lorem volutpat consequat. Sed vel neque mi.
+      </p>
+      <label for="cat1-input">Example Label:</label>
+      <input type="text" id="cat1-input" placeholder="Type something here...">
+    </div>
+
+    <!-- Category 2 -->
+    <div id="uniform-box">
+      <h2>Category 2</h2>
+      <p>
+        Mauris aliquet, augue a dapibus vehicula, nisi erat faucibus ipsum, a fermentum ante purus sit amet mauris. In hac habitasse platea dictumst.
+      </p>
+      <label for="cat2-input">Another Label:</label>
+      <input type="text" id="cat2-input" placeholder="Another placeholder...">
+    </div>
+
+    <!-- Category 3 -->
+    <div id="uniform-box">
+      <h2>Category 3</h2>
+      <p>
+        Quisque congue lacus ac massa ullamcorper malesuada. Nam a ante lacus. Aliquam erat volutpat. Vestibulum ullamcorper eleifend consequat.
+      </p>
+      <label for="cat3-input">Yet Another Label:</label>
+      <input type="text" id="cat3-input" placeholder="Yet another placeholder...">
+    </div>
+
+    <!-- Delete Database Button -->
+    <div id="delete-container">
+      <button id="delete-database-btn">Delete Database</button>
+    </div>
+</div>
+
+<!-- Modal Overlay -->
+<div id="delete-modal-overlay" style="display: none;">
+  <div id="delete-modal">
+    <h3>Confirm Database Deletion</h3>
+    <p>Please type <strong>DELETE</strong> to confirm:</p>
+    <input type="text" id="delete-input" placeholder="DELETE">
+    <div id="modal-actions">
+      <button id="confirm-delete-btn">Confirm</button>
+      <button id="cancel-delete-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Load the external JavaScript for Delete DB logic -->
+<script src="static/js/delete-db.js"></script>
+
+</body>
+</html>
