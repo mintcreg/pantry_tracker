@@ -1,9 +1,9 @@
 # <p align="center"> Pantry Tracker - HomeAssistant </p>
 
 <p align="center">
-  <img alt="Last Commit" src="https://img.shields.io/github/last-commit/mintcreg/pantry_tracker?style=plasticr"/>
-  <img alt="Commit activity" src="https://img.shields.io/github/commit-activity/m/mintcreg/pantry_tracker"/>
+  <img alt="Release" src="https://img.shields.io/github/v/release/mintcreg/pantry_tracker?&cacheBust=true"/>
   <img alt="Maintenance" src="https://img.shields.io/maintenance/yes/2025"/>
+  
 </p>
 
 <p align="center">
