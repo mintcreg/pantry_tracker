@@ -6,8 +6,9 @@ const basePath = window.location.pathname.endsWith('/')
   : window.location.pathname + '/';
 
 //////////////////////////////////////
-// Global arrays for categories and products
+// Global variables for API Key, categories, and products
 //////////////////////////////////////
+let API_KEY = '';
 let categories = [];
 let products = [];
 let productSortOrder = {
@@ -23,6 +24,114 @@ function isAlphanumeric(str) {
 }
 
 //////////////////////////////////////
+// Function to fetch the API key from the backend
+//////////////////////////////////////
+const fetchApiKey = async () => {
+  try {
+    const response = await fetch(`${basePath}get_api_key`, {
+      method: 'GET',
+      credentials: 'same-origin' // Ensure cookies are sent if needed
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch API key: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    API_KEY = data.api_key;
+    console.log('API Key retrieved successfully.');
+
+    // After fetching the API key, display it in the settings page
+    displayApiKey();
+  } catch (error) {
+    console.error('Error fetching API key:', error);
+    alert('Failed to retrieve API key. Please try reloading the page.');
+  }
+};
+
+//////////////////////////////////////
+// Function to display the API key in the settings page
+//////////////////////////////////////
+const displayApiKey = () => {
+  const apiKeyInput = document.getElementById('display-api-key');
+  const toggleButton = document.getElementById('toggle-api-key');
+
+  if (apiKeyInput) {
+    apiKeyInput.value = API_KEY;
+  }
+
+  if (toggleButton) {
+    toggleButton.addEventListener('click', () => {
+      if (apiKeyInput.type === 'password') {
+        apiKeyInput.type = 'text';
+        toggleButton.textContent = 'Hide';
+      } else {
+        apiKeyInput.type = 'password';
+        toggleButton.textContent = 'Show';
+      }
+    });
+  }
+
+  const regenButton = document.getElementById('regen-api');
+  if (regenButton) {
+    regenButton.addEventListener('click', regenerateApiKey);
+  }
+};
+
+//////////////////////////////////////
+// Function to regenerate the API key
+//////////////////////////////////////
+const regenerateApiKey = async () => {
+  if (!confirm('Are you sure you want to regenerate the API key? This will invalidate the current key.')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${basePath}regenerate_api_key`, {
+      method: 'POST',
+      credentials: 'same-origin' // Ensure cookies are sent if needed
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== 'ok') {
+      throw new Error(data.message || `Failed to regenerate API key: ${response.statusText}`);
+    }
+
+    API_KEY = data.api_key;
+    alert('API key regenerated successfully.');
+
+    // Update the displayed API key
+    const apiKeyInput = document.getElementById('display-api-key');
+    if (apiKeyInput) {
+      apiKeyInput.value = API_KEY;
+      // Ensure it's masked after regeneration
+      if (apiKeyInput.type !== 'password') {
+        apiKeyInput.type = 'password';
+        const toggleButton = document.getElementById('toggle-api-key');
+        if (toggleButton) toggleButton.textContent = 'Show';
+      }
+    }
+
+    // Optionally, refresh other parts of the app that rely on the API key
+    // For example, you can reload the page:
+    // window.location.reload();
+  } catch (error) {
+    console.error('Error regenerating API key:', error);
+    alert(error.message);
+  }
+};
+
+//////////////////////////////////////
+// Function to include API Key in query parameters
+//////////////////////////////////////
+const appendApiKey = (url) => {
+  const urlObj = new URL(url, window.location.origin);
+  urlObj.searchParams.append('api_key', API_KEY);
+  return urlObj.toString();
+};
+
+//////////////////////////////////////
 // Show the selected tab
 //////////////////////////////////////
 function showTab(tab) {
@@ -30,12 +139,7 @@ function showTab(tab) {
   document.getElementById('categories-container').style.display = 'none';
   document.getElementById('products-container').style.display = 'none';
   document.getElementById('backup-container').style.display = 'none';
-
-  // Also hide the settings container (if it exists)
-  const settingsContainer = document.getElementById('settings-container');
-  if (settingsContainer) {
-    settingsContainer.style.display = 'none';
-  }
+  document.getElementById('settings-container').style.display = 'none'; // Ensure settings is hidden initially
 
   // Always show the attribution (in case it got hidden by bad nesting)
   const attribution = document.querySelector('.attribution');
@@ -53,11 +157,10 @@ function showTab(tab) {
     document.getElementById('backup-container').style.display = 'block';
     // Optionally fetch backup status here if needed
   } else if (tab === 'settings') {
-    // Only show the settings container if it exists
-    if (settingsContainer) {
-      settingsContainer.style.display = 'block';
-    }
-    // Optionally fetch or refresh any settings
+    // Show the settings container
+    document.getElementById('settings-container').style.display = 'block';
+    // Ensure the API key is displayed
+    displayApiKey();
   }
 }
 
@@ -66,7 +169,7 @@ function showTab(tab) {
 //////////////////////////////////////
 const fetchCategories = async () => {
   try {
-    const response = await fetch(`${basePath}categories`, {
+    const response = await fetch(appendApiKey(`${basePath}categories`), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -85,7 +188,7 @@ const fetchCategories = async () => {
 };
 
 //////////////////////////////////////
-// Display categories in a table layout (Corrected)
+// Display categories in a table layout
 //////////////////////////////////////
 const displayCategories = (categories) => {
   const categoriesContainer = document.getElementById('categories-container');
@@ -185,7 +288,7 @@ const addCategory = async () => {
   }
 
   try {
-    const response = await fetch(`${basePath}categories`, {
+    const response = await fetch(appendApiKey(`${basePath}categories`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -218,7 +321,7 @@ const removeCategory = async (categoryName) => {
   }
 
   try {
-    const response = await fetch(`${basePath}categories`, {
+    const response = await fetch(appendApiKey(`${basePath}categories`), {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -281,7 +384,7 @@ const saveEditedCategory = async () => {
   }
 
   try {
-    const response = await fetch(`${basePath}categories/${encodeURIComponent(oldName)}`, {
+    const response = await fetch(appendApiKey(`${basePath}categories/${encodeURIComponent(oldName)}`), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -309,7 +412,7 @@ const saveEditedCategory = async () => {
 //////////////////////////////////////
 const fetchProducts = async () => {
   try {
-    const response = await fetch(`${basePath}products`, {
+    const response = await fetch(appendApiKey(`${basePath}products`), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -355,8 +458,8 @@ const displayProducts = (products) => {
     const tableBody = document.createElement('tbody');
 
     products.forEach(product => {
-      const imageUrl = product.image_front_small_url ? product.image_front_small_url : product.url;
-      const imageAlt = product.image_front_small_url ? `${product.name} Image` : `${product.name} Image (Manual)`;
+      const imageUrl = product.url; // Assuming 'url' contains the image URL
+      const imageAlt = `${product.name} Image`;
 
       const barcodeLink = product.barcode
         ? `<a href="https://world.openfoodfacts.org/product/${product.barcode}" target="_blank" rel="noopener noreferrer">${product.barcode}</a>`
@@ -418,7 +521,7 @@ const initEditProductModal = async (encodedProductName) => {
   const productName = decodeURIComponent(encodedProductName);
   try {
     // Fetch products
-    const productResponse = await fetch(`${basePath}products`, {
+    const productResponse = await fetch(appendApiKey(`${basePath}products`), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -436,7 +539,7 @@ const initEditProductModal = async (encodedProductName) => {
     }
 
     // Fetch categories
-    const categoryResponse = await fetch(`${basePath}categories`, {
+    const categoryResponse = await fetch(appendApiKey(`${basePath}categories`), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -529,7 +632,7 @@ const saveEditedProduct = async () => {
       barcode: newBarcode || null
     };
 
-    const response = await fetch(`${basePath}products/${encodeURIComponent(oldName)}`, {
+    const response = await fetch(appendApiKey(`${basePath}products/${encodeURIComponent(oldName)}`), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -587,7 +690,7 @@ const addProductFromForm = async () => {
       barcode: barcode || null
     };
 
-    const response = await fetch(`${basePath}products`, {
+    const response = await fetch(appendApiKey(`${basePath}products`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -621,7 +724,7 @@ const removeProduct = async (productName) => {
   }
 
   try {
-    const response = await fetch(`${basePath}products`, {
+    const response = await fetch(appendApiKey(`${basePath}products`), {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -658,11 +761,10 @@ const sortProducts = (field) => {
   // Toggle the sort order for next click
   productSortOrder[field] = (sortOrder === 'asc') ? 'desc' : 'asc';
 
-
   // Re-display the sorted products
   displayProducts(products);
   
-    // Update the arrow in the table headers
+  // Update the arrow in the table headers
   updateProductHeaderArrows(field);
 };
 
@@ -694,7 +796,7 @@ function updateProductHeaderArrows(sortedField) {
 
 //////////////////////////////////////
 // Sort categories by name
-//////////////////////////////////////
+////////////////////////////////////
 const sortCategories = () => {
   const sortOrder = productSortOrder.name; // You're using productSortOrder.name for category sorting
   categories.sort((a, b) => {
@@ -705,7 +807,7 @@ const sortCategories = () => {
   productSortOrder.name = (sortOrder === 'asc') ? 'desc' : 'asc';
 
   
-  
+
   displayCategories(categories);
   // Update arrow
   updateCategoriesHeaderArrow();
@@ -729,15 +831,77 @@ function updateCategoriesHeaderArrow() {
 
 //////////////////////////////////////
 // Initialize the page
-//////////////////////////////////////
+////////////////////////////////////
 document.addEventListener('DOMContentLoaded', async () => {
-  // First, load the saved theme from the server
+  // First, fetch the API key from the server
+  await fetchApiKey();
+
+  if (!API_KEY) {
+    console.error('API key is not available. Further requests will fail.');
+    return;
+  }
+
+  // Then, load the saved theme from the server
   await loadThemeFromServer();
 
-  // Then, proceed with other initializations
+  // Proceed with other initializations
   await fetchCategories();
   // Default tab: 'products'
   showTab('products');
+
+  // ==========================
+  // DELETE DATABASE LOGIC
+  // ==========================
+  const deleteBtn = document.getElementById('delete-database-btn');
+  const overlay = document.getElementById('delete-modal-overlay');
+  const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+  const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+  const deleteInput = document.getElementById('delete-input');
+
+  // 1) Open modal when "Delete Database" is clicked
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', () => {
+      overlay.style.display = 'block';
+    });
+  }
+
+  // 2) Cancel button to close modal
+  if (cancelDeleteBtn) {
+    cancelDeleteBtn.addEventListener('click', () => {
+      overlay.style.display = 'none';
+      deleteInput.value = '';
+    });
+  }
+
+  // 3) Confirm delete action
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', async () => {
+      // Must type DELETE in all caps
+      if (deleteInput.value.trim().toUpperCase() === 'DELETE') {
+        try {
+          const response = await fetch(appendApiKey(`${basePath}delete_database`), {
+            method: 'DELETE'
+          });
+          const data = await response.json();
+
+          if (response.ok && data.status === 'ok') {
+            alert('Database has been deleted.');
+            overlay.style.display = 'none';
+            deleteInput.value = '';
+            // Optionally reload page or redirect
+            // location.reload();
+          } else {
+            alert('Error deleting database: ' + data.message);
+          }
+        } catch (error) {
+          console.error('Error deleting DB:', error);
+          alert('An error occurred while deleting the database.');
+        }
+      } else {
+        alert('You must type DELETE exactly to proceed.');
+      }
+    });
+  }
 });
 
 //////////////////////////////////////
@@ -825,11 +989,8 @@ function onBarcodeDetected(result) {
 // Fetch product data from API based on the scanned barcode
 const fetchProductData = async (barcode) => {
   try {
-    const response = await fetch(`${basePath}fetch_product?barcode=${barcode}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+    const response = await fetch(appendApiKey(`${basePath}fetch_product?barcode=${barcode}`), {
+      method: 'GET'
     });
 
     const result = await response.json();
@@ -932,7 +1093,7 @@ window.onclick = function(event) {
 // Trigger a backup download of the database
 function triggerBackup() {
   // This calls your /download_db endpoint, which returns the .db file
-  window.location.href = `${basePath}download_db`;
+  window.location.href = appendApiKey(`${basePath}download_db`);
 }
 
 // Upload a database file to restore
@@ -947,7 +1108,7 @@ async function uploadBackup() {
   formData.append('file', fileInput.files[0]);
 
   try {
-    const response = await fetch(`${basePath}upload_db`, {
+    const response = await fetch(appendApiKey(`${basePath}upload_db`), {
       method: 'POST',
       body: formData
     });
@@ -966,10 +1127,24 @@ async function uploadBackup() {
   }
 }
 
+//////////////////////////////////////
+// Initialize the page
+////////////////////////////////////
 document.addEventListener('DOMContentLoaded', async () => {
-  // ... existing initialization code ...
-  // For example:
+  // First, fetch the API key from the server
+  await fetchApiKey();
+
+  if (!API_KEY) {
+    console.error('API key is not available. Further requests will fail.');
+    return;
+  }
+
+  // Then, load the saved theme from the server
+  await loadThemeFromServer();
+
+  // Proceed with other initializations
   await fetchCategories();
+  // Default tab: 'products'
   showTab('products');
 
   // ==========================
@@ -1002,8 +1177,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Must type DELETE in all caps
       if (deleteInput.value.trim().toUpperCase() === 'DELETE') {
         try {
-          const response = await fetch(`${basePath}delete_database`, {
-            method: 'DELETE',
+          const response = await fetch(appendApiKey(`${basePath}delete_database`), {
+            method: 'DELETE'
           });
           const data = await response.json();
 
@@ -1034,7 +1209,9 @@ async function loadThemeFromServer() {
   console.log("Loading theme from server...");
   try {
     // Fetch the current theme from the server endpoint (e.g., /theme)
-    const response = await fetch(`${basePath}theme`, { method: 'GET' });
+    const response = await fetch(appendApiKey(`${basePath}theme`), { 
+      method: 'GET'
+    });
 
     if (!response.ok) {
       // If the server can't be reached or returns an error, fallback to light mode
@@ -1092,9 +1269,11 @@ async function toggleTheme() {
 
   // POST the updated theme to your server so it's saved in config.ini
   try {
-    const response = await fetch(`${basePath}theme`, {
+    const response = await fetch(appendApiKey(`${basePath}theme`), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ theme: newTheme })
     });
 

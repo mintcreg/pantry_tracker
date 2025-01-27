@@ -12,6 +12,8 @@ from marshmallow import ValidationError
 import requests  # For interacting with OpenFoodFacts
 from migrate import migrate_database
 from werkzeug.middleware.proxy_fix import ProxyFix
+from functools import wraps
+import secrets  # For generating a secure API key
 
 app = Flask(__name__)
 
@@ -19,30 +21,73 @@ app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)  # Set to DEBUG for detailed logs
 logger = logging.getLogger(__name__)
 
 CONFIG_FILE = "/config/pantry_data/config.ini"
 config = configparser.ConfigParser()
 
-# If /config/pantry_data/config.ini doesn’t exist, create it with default settings
-if not os.path.exists(CONFIG_FILE):
-    config['Settings'] = {'theme': 'light'}  # default to light
-    with open(CONFIG_FILE, 'w') as f:
-        config.write(f)
-else:
-    # Read the existing config file
-    config.read(CONFIG_FILE)
-    # Ensure 'Settings' section exists
-    if 'Settings' not in config:
-        config['Settings'] = {}
-    # Ensure 'theme' key exists
-    if 'theme' not in config['Settings']:
-        config['Settings']['theme'] = 'light'
-    # Write any missing defaults back to file
-    with open(CONFIG_FILE, 'w') as f:
-        config.write(f)
+# Function to generate a secure API key
+def generate_api_key(length=32):
+    api_key = secrets.token_urlsafe(length)
+    logger.debug("Generated new API key.")
+    return api_key
 
+# Initialize config
+def initialize_config():
+    try:
+        logger.debug(f"Checking existence of config file at: {CONFIG_FILE}")
+        if not os.path.exists(CONFIG_FILE):
+            logger.debug("Config file does not exist. Creating a new one with default settings and API key.")
+            config['Settings'] = {
+                'theme': 'light',
+                'api_key': generate_api_key()
+            }
+            os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)  # Ensure directory exists
+            with open(CONFIG_FILE, 'w') as f:
+                config.write(f)
+            logger.info("Created config.ini with a new API key.")
+        else:
+            # Read the existing config file
+            config.read(CONFIG_FILE)
+            logger.debug("Config file found. Reading existing settings.")
+
+            # Ensure 'Settings' section exists
+            if 'Settings' not in config:
+                logger.debug("'Settings' section missing. Adding with default theme and API key.")
+                config['Settings'] = {
+                    'theme': 'light',
+                    'api_key': generate_api_key()
+                }
+                with open(CONFIG_FILE, 'w') as f:
+                    config.write(f)
+                logger.info("Added 'Settings' section with a new API key.")
+            else:
+                # Ensure 'theme' key exists
+                if 'theme' not in config['Settings']:
+                    logger.debug("'theme' key missing. Setting default to 'light'.")
+                    config['Settings']['theme'] = 'light'
+
+                # Check if 'api_key' exists and is non-empty
+                api_key_exists = config.has_option('Settings', 'api_key')
+                api_key_value = config.get('Settings', 'api_key') if api_key_exists else ''
+
+                if not api_key_exists or not api_key_value.strip():
+                    logger.debug("'api_key' missing or empty. Generating a new API key.")
+                    config['Settings']['api_key'] = generate_api_key()
+                    logger.info("Generated a new API key and added it to config.ini.")
+                else:
+                    logger.debug("'api_key' already exists and is valid.")
+
+                # Write any missing defaults or new API key back to file
+                with open(CONFIG_FILE, 'w') as f:
+                    config.write(f)
+                logger.debug("Written updated settings to config.ini.")
+    except Exception as e:
+        logger.exception(f"Failed to initialize configuration: {e}")
+        raise  # Re-raise exception after logging
+
+initialize_config()
 
 # Define the path to the database within the container
 DB_FILE = "/config/pantry_data/pantry_data.db"
@@ -55,8 +100,14 @@ os.makedirs(DB_DIR, exist_ok=True)
 # migrate_database(DB_FILE)  # (commented if no migrations needed)
 
 # Initialize the database
-engine = create_engine(f'sqlite:///{DB_FILE}', connect_args={'check_same_thread': False}, echo=False)
-Base.metadata.create_all(engine)
+try:
+    logger.debug(f"Initializing database at: sqlite:///{DB_FILE}")
+    engine = create_engine(f'sqlite:///{DB_FILE}', connect_args={'check_same_thread': False}, echo=False)
+    Base.metadata.create_all(engine)
+    logger.info("Database initialized successfully.")
+except Exception as e:
+    logger.exception(f"Failed to initialize the database: {e}")
+    raise
 
 # Create a configured "Session" class
 SessionFactory = sessionmaker(bind=engine)
@@ -67,14 +118,69 @@ def sanitize_entity_id(name: str) -> str:
     """Sanitize the product name to create a unique entity ID without category."""
     return f"sensor.product_{name.lower().replace(' ', '_').replace('-', '_')}"
 
+# -----------------------------
+# Global API Key Authentication
+# -----------------------------
+
+@app.before_request
+def before_request_func():
+    """
+    Enforce API key authentication for external requests.
+    Skip authentication for requests coming through Home Assistant's Ingress and exempted routes.
+    """
+    try:
+        # Exempted routes that do not require API key
+        exempt_paths = ['/health', '/regenerate_api_key']
+
+        # If the request path is exempted, skip authentication
+        if request.path in exempt_paths:
+            logger.debug(f"Exempt path accessed: {request.path}. Skipping API key authentication.")
+            return  # Proceed to the requested route
+
+        # Detect if the request is coming via Ingress by checking for 'X-Ingress-Path' header
+        if 'X-Ingress-Path' in request.headers:
+            logger.debug("Request via Ingress detected. Skipping API key authentication.")
+            return  # Proceed to the requested route
+
+        # Retrieve the API key from config
+        api_key = config['Settings'].get('api_key')
+        if not api_key:
+            logger.error("API key not found in config.ini.")
+            return jsonify({"status": "error", "message": "Server configuration error."}), 500
+
+        # Retrieve the API key from request headers or query parameters
+        request_api_key = request.headers.get('X-API-KEY') or request.args.get('api_key')
+
+        if not request_api_key:
+            logger.warning("API key missing in request.")
+            return jsonify({"status": "error", "message": "API key is missing."}), 401
+
+        if request_api_key != api_key:
+            logger.warning("Invalid API key attempt: %s", request_api_key)
+            return jsonify({"status": "error", "message": "Invalid API key."}), 403
+
+        logger.debug("API key authentication successful for request.")
+    except Exception as e:
+        logger.exception(f"Error during API key authentication: {e}")
+        return jsonify({"status": "error", "message": "Authentication failed."}), 500
+
+# -----------------------------
+# Routes
+# -----------------------------
+
 @app.route("/")
 def index():
-    """Root endpoint to render the HTML UI."""
-    return render_template("index.html")
+    """Root endpoint to render the HTML UI with the current API key."""
+    api_key = config['Settings'].get('api_key', '')
+    logger.debug("Rendering index.html with API key")
+    return render_template("index.html", api_key=api_key)
 
 @app.route("/index.html")
 def index_html():
-    return render_template("index.html")
+    """Route to render index.html with the current API key."""
+    api_key = config['Settings'].get('api_key', '')
+    logger.debug("Rendering index.html via /index.html with API key")
+    return render_template("index.html", api_key=api_key)
 
 # -----------------------------
 # Categories
@@ -93,26 +199,26 @@ def categories_route():
             return jsonify({"status": "error", "message": "Failed to fetch categories"}), 500
         finally:
             Session.remove()
-    
+
     if request.method == "POST":
         try:
             data = CategorySchema().load(request.get_json())
         except ValidationError as err:
             logger.warning("Validation error on adding category: %s", err.messages)
             return jsonify({"status": "error", "errors": err.messages}), 400
-        
+
         cat_name = data.get("name")
         try:
             existing_cat = session.query(Category).filter_by(name=cat_name).first()
             if existing_cat:
                 logger.warning("Duplicate category attempted: %s", cat_name)
                 return jsonify({"status": "error", "message": "Duplicate category"}), 400
-            
+
             new_category = Category(name=cat_name)
             session.add(new_category)
             session.commit()
             logger.info(f"Added new category: {cat_name}")
-            
+
             category_names = [cat.name for cat in session.query(Category).all()]
             return jsonify({"status": "ok", "categories": category_names})
         except Exception as e:
@@ -121,44 +227,44 @@ def categories_route():
             return jsonify({"status": "error", "message": "Failed to add category"}), 500
         finally:
             Session.remove()
-    
+
     if request.method == "DELETE":
         data = request.get_json()
         category_name = data.get("name")
         if not category_name:
             logger.warning("Category name missing in delete request")
             return jsonify({"status": "error", "message": "Category name is required for deletion"}), 400
-        
+
         try:
             category = session.query(Category).filter_by(name=category_name).first()
             if not category:
                 logger.warning("Attempted to delete non-existent category: %s", category_name)
                 return jsonify({"status": "error", "message": "Category not found"}), 404
-            
+
             # Define the default category name
             default_category_name = "Uncategorized"
             default_category = session.query(Category).filter_by(name=default_category_name).first()
-            
+
             # If default category doesn't exist, create it
             if not default_category:
                 default_category = Category(name=default_category_name)
                 session.add(default_category)
                 session.commit()
                 logger.info(f"Created default category: {default_category_name}")
-            
+
             # Reassign all products under the target category to the default category
             associated_products = session.query(Product).filter_by(category_id=category.id).all()
             for product in associated_products:
                 product.category = default_category
                 logger.info(f"Reassigned product '{product.name}' to category '{default_category_name}'")
-            
+
             session.commit()
-            
+
             # Proceed to delete the original category
             session.delete(category)
             session.commit()
             logger.info(f"Deleted category: {category_name}")
-            
+
             category_names = [cat.name for cat in session.query(Category).all()]
             return jsonify({"status": "ok", "categories": category_names})
         except Exception as e:
@@ -181,7 +287,7 @@ def edit_category(old_name):
     try:
         data = UpdateCategorySchema().load(request.get_json())
         new_name = data.get("new_name")
-        
+
         # Check if new_name already exists
         existing_cat = session.query(Category).filter_by(name=new_name).first()
         if existing_cat:
@@ -202,7 +308,7 @@ def edit_category(old_name):
         # Return updated list of categories
         category_names = [cat.name for cat in session.query(Category).all()]
         return jsonify({"status": "ok", "categories": category_names})
-    
+
     except ValidationError as err:
         logger.warning("Validation error on editing category: %s", err.messages)
         return jsonify({"status": "error", "errors": err.messages}), 400
@@ -233,7 +339,7 @@ def edit_product(old_name):
     session = Session()
     try:
         data = UpdateProductSchema().load(request.get_json())
-        
+
         # Extract fields
         new_name = data.get("new_name")
         category_name = data.get("category")
@@ -324,7 +430,7 @@ def edit_product(old_name):
 
     except Exception as e:
         session.rollback()
-        logger.error(f"Error editing product '%s': %s", old_name, e)
+        logger.error(f"Error editing product '{old_name}': {e}")
         return jsonify({"status": "error", "message": "Failed to edit product"}), 500
 
     finally:
@@ -350,14 +456,14 @@ def products_route():
             return jsonify({"status": "error", "message": "Failed to fetch products"}), 500
         finally:
             Session.remove()
-    
+
     elif request.method == "POST":
         try:
             data = ProductSchema().load(request.get_json())
         except ValidationError as err:
             logger.warning("Validation error on adding product: %s", err.messages)
             return jsonify({"status": "error", "errors": err.messages}), 400
-        
+
         name = data.get("name")
         url = data.get("url")
         category_name = data.get("category")
@@ -369,30 +475,30 @@ def products_route():
             if not found_category:
                 logger.warning("Category not found: %s", category_name)
                 return jsonify({"status": "error", "message": "Category does not exist"}), 400
-            
+
             # Check for duplicate product
             existing_product = session.query(Product).filter_by(name=name).first()
             if existing_product:
                 logger.warning("Duplicate product attempted: %s", name)
                 return jsonify({"status": "error", "message": "Duplicate product"}), 400
-            
+
             # If barcode is provided, ensure it's unique
             if barcode:
                 existing_barcode = session.query(Product).filter_by(barcode=barcode).first()
                 if existing_barcode:
                     logger.warning("Duplicate barcode attempted: %s", barcode)
                     return jsonify({"status": "error", "message": "Barcode already exists"}), 400
-            
+
             new_product = Product(name=name, url=url, category=found_category, barcode=barcode)
             session.add(new_product)
-            
+
             # Initialize count to 0
             new_count = Count(product=new_product, count=0)
             session.add(new_count)
-            
+
             session.commit()
             logger.info(f"Added new product: {name}")
-            
+
             products = session.query(Product).all()
             product_list = [
                 {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode}
@@ -405,24 +511,24 @@ def products_route():
             return jsonify({"status": "error", "message": "Failed to add product"}), 500
         finally:
             Session.remove()
-    
+
     elif request.method == "DELETE":
         data = request.get_json()
         product_name = data.get("name")
         if not product_name:
             logger.warning("Product name missing in delete request")
             return jsonify({"status": "error", "message": "Product name is required for deletion"}), 400
-        
+
         try:
             product = session.query(Product).filter_by(name=product_name).first()
             if not product:
                 logger.warning("Attempted to delete non-existent product: %s", product_name)
                 return jsonify({"status": "error", "message": "Product not found"}), 404
-            
+
             session.delete(product)
             session.commit()
             logger.info(f"Deleted product: {product_name}")
-            
+
             products = session.query(Product).all()
             product_list = [
                 {"name": prod.name, "url": prod.url, "category": prod.category.name, "barcode": prod.barcode}
@@ -506,6 +612,7 @@ def get_counts():
 @app.route("/health", methods=["GET"])
 def health():
     """Health check endpoint."""
+    logger.debug("Health check accessed.")
     return jsonify({"status": "healthy"}), 200
 
 # -----------------------------
@@ -517,31 +624,38 @@ def backup():
     ingress_prefix = request.headers.get("X-Ingress-Path", "")
     if not ingress_prefix.endswith("/"):
         ingress_prefix += "/"
+    logger.debug("Rendering backup.html")
     return render_template("backup.html", base_path=ingress_prefix)
 
 @app.route("/download_db", methods=["GET"])
 def download_db():
     if os.path.exists(DB_FILE):
+        logger.info("Database file requested for download.")
         return send_file(DB_FILE, as_attachment=True, download_name="pantry_data.db")
     else:
+        logger.warning("Database file not found for download.")
         return "Database file not found.", 404
 
 @app.route("/upload_db", methods=["POST"])
 def upload_db():
     if 'file' not in request.files:
+        logger.warning("No file part in the upload_db request.")
         return jsonify({"status": "error", "message": "No file part in the request."}), 400
 
     file = request.files['file']
     if file.filename == '':
+        logger.warning("No file selected in the upload_db request.")
         return jsonify({"status": "error", "message": "No file selected."}), 400
 
     # Save the uploaded database file
     temp_db_path = os.path.join(DB_DIR, "uploaded_temp.db")
     file.save(temp_db_path)
+    logger.debug(f"Uploaded database saved temporarily at: {temp_db_path}")
 
     # Validate and migrate the uploaded database
     try:
         migrate_database(temp_db_path)
+        logger.info("Uploaded database migrated successfully.")
     except Exception as e:
         logger.error(f"Error migrating the uploaded database: {e}")
         os.remove(temp_db_path)
@@ -556,18 +670,22 @@ def upload_db():
         return jsonify({"status": "error", "message": "Failed to replace the database."}), 500
 
     # Reinitialize the database session
-    global engine
-    global Session
-    engine.dispose()
-    engine = create_engine(f'sqlite:///{DB_FILE}', connect_args={'check_same_thread': False}, echo=False)
-    SessionFactory = sessionmaker(bind=engine)
-    Session = scoped_session(SessionFactory)
+    try:
+        engine.dispose()
+        engine = create_engine(f'sqlite:///{DB_FILE}', connect_args={'check_same_thread': False}, echo=False)
+        SessionFactory = sessionmaker(bind=engine)
+        Session = scoped_session(SessionFactory)
+        logger.info("Database session reinitialized after upload.")
+    except Exception as e:
+        logger.error(f"Error reinitializing the database session: {e}")
+        return jsonify({"status": "error", "message": "Failed to reinitialize the database."}), 500
 
     ingress_prefix = request.headers.get("X-Ingress-Path", "")
     if not ingress_prefix.endswith("/"):
         ingress_prefix += "/"
     redirect_url = ingress_prefix
 
+    logger.debug(f"Redirecting to {redirect_url} after successful upload.")
     return f"""
     <!DOCTYPE html>
     <html>
@@ -583,18 +701,6 @@ def upload_db():
     </body>
     </html>
     """
-
-# -----------------------------
-# Settings (No Longer Needed if Single-Page)
-# -----------------------------
-# @app.route("/settings", methods=["GET"], endpoint="settings_page")
-# def settings():
-#     # If you still want a separate settings.html route, leave this.
-#     # Otherwise, remove or comment out. We now do a single-page approach.
-#     ingress_prefix = request.headers.get("X-Ingress-Path", "")
-#     if not ingress_prefix.endswith("/"):
-#         ingress_prefix += "/"
-#     return render_template("settings.html", base_path=ingress_prefix)
 
 # ------------------------------------------------
 # OpenFoodFacts Integration
@@ -615,6 +721,7 @@ def fetch_product_from_openfoodfacts(barcode: str):
                 "category": product_data.get('categories', 'Uncategorized').split(',')[0].strip(),
                 "image_front_small_url": product_data.get('image_front_small_url', None)
             }
+            logger.info(f"Product fetched from OpenFoodFacts: {extracted_data}")
             return extracted_data
         else:
             logger.warning(f"Product with barcode {barcode} not found in OpenFoodFacts.")
@@ -635,7 +742,7 @@ def fetch_product():
         return jsonify({"status": "ok", "product": product_data})
     else:
         return jsonify({"status": "error", "message": "Product not found or failed to fetch data"}), 404
-		
+
 # ------------------------------------------------
 # Delete Database
 # ------------------------------------------------
@@ -645,14 +752,18 @@ def delete_database():
         try:
             engine.dispose()        # Release the SQLite file so it can be deleted
             os.remove(DB_FILE)      # Remove it from disk
+            logger.info("Database file deleted successfully.")
+
             # (Optionally) re-init an empty DB so your app still functions:
             Base.metadata.create_all(engine)
-            
+            logger.info("Database reinitialized after deletion.")
+
             return jsonify({"status": "ok", "message": "Database deleted and reinitialized."})
         except Exception as e:
             logger.error(f"Error deleting the database file: {e}")
             return jsonify({"status": "error", "message": "Failed to delete database"}), 500
     else:
+        logger.warning("Attempted to delete a non-existent database file.")
         return jsonify({"status": "error", "message": "Database file does not exist"}), 404
 
 # ------------------------------------------------
@@ -661,10 +772,15 @@ def delete_database():
 @app.route("/theme", methods=["GET"])
 def get_theme():
     """Return the current theme from config.ini"""
-    # Reload config from disk to catch any manual changes
-    config.read(CONFIG_FILE)
-    current_theme = config['Settings'].get('theme', 'light')
-    return jsonify({"theme": current_theme})
+    try:
+        # Reload config from disk to catch any manual changes
+        config.read(CONFIG_FILE)
+        current_theme = config['Settings'].get('theme', 'light')
+        logger.debug(f"Current theme retrieved: {current_theme}")
+        return jsonify({"theme": current_theme})
+    except Exception as e:
+        logger.error(f"Error retrieving theme: {e}")
+        return jsonify({"status": "error", "message": "Failed to retrieve theme"}), 500
 
 @app.route("/theme", methods=["POST"])
 def set_theme():
@@ -674,17 +790,83 @@ def set_theme():
 
     # Validate that theme is either 'light' or 'dark'
     if new_theme not in ["light", "dark"]:
+        logger.warning("Invalid theme attempted: %s", new_theme)
         return jsonify({"status": "error", "message": "Invalid theme."}), 400
 
     # Update the theme in the config and write to disk
-    config['Settings']['theme'] = new_theme
-    with open(CONFIG_FILE, 'w') as f:
-        config.write(f)
+    try:
+        config.read(CONFIG_FILE)  # Ensure we're reading the latest config
+        config['Settings']['theme'] = new_theme
+        with open(CONFIG_FILE, 'w') as f:
+            config.write(f)
+        logger.info(f"Theme updated to: {new_theme}")
+        # Return a success response with the new theme
+        return jsonify({"status": "ok", "theme": new_theme})
+    except Exception as e:
+        logger.error(f"Error setting theme: {e}")
+        return jsonify({"status": "error", "message": "Failed to set theme."}), 500
 
-    # Return a success response with the new theme
-    return jsonify({"status": "ok", "theme": new_theme})
+
+# -----------------------------
+# Route to Retrieve API Key
+# -----------------------------
+
+@app.route("/get_api_key", methods=["GET"])
+def get_api_key():
+    """
+    Securely provide the API key to the frontend.
+    Ensure this route is protected and only accessible from the frontend.
+    """
+    try:
+        # Retrieve the API key from config
+        api_key = config['Settings'].get('api_key', '')
+        if not api_key:
+            logger.error("API key not found in config.ini.")
+            return jsonify({"status": "error", "message": "API key not configured."}), 500
+
+        logger.debug("API key provided to frontend.")
+        return jsonify({"api_key": api_key}), 200
+    except Exception as e:
+        logger.exception(f"Error retrieving API key: {e}")
+        return jsonify({"status": "error", "message": "Failed to retrieve API key."}), 500
 
 
+
+# ------------------------------------------------
+# Regenerate API Key
+# ------------------------------------------------
+
+@app.route("/regenerate_api_key", methods=["POST"])
+def regenerate_api_key():
+    """
+    Regenerate the API key.
+    WARNING: This route is fully insecure. Exposing API key regeneration can lead to unauthorized access.
+    Use cautiously and consider securing it in a production environment.
+    """
+    try:
+        # Generate a new API key
+        new_api_key = generate_api_key()
+        logger.debug("Generated a new API key for regeneration.")
+
+        # Update the config object
+        config['Settings']['api_key'] = new_api_key
+
+        # Write the updated config back to the file
+        with open(CONFIG_FILE, 'w') as f:
+            config.write(f)
+        logger.info("API key regenerated and updated in config.ini.")
+
+        # Return the new API key as JSON
+        return jsonify({"status": "ok", "api_key": new_api_key}), 200
+
+    except Exception as e:
+        logger.exception(f"Failed to regenerate API key: {e}")
+        return jsonify({"status": "error", "message": "Failed to regenerate API key."}), 500
+
+
+# -----------------------------
+# Run the Application
+# -----------------------------
 
 if __name__ == "__main__":
     # Do not run app.run() since Gunicorn handles it

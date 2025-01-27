@@ -1444,3 +1444,46 @@ body.dark-mode #delete-modal input[type="text"] {
     color: #fff;
     border-color: #888;
 }
+/* =====================================
+   Temp API Key
+   ===================================== */
+.toggle-btn, .regen-btn {
+  margin-left: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+#display-api-key {
+  width: 18%;
+  padding: 5px;
+}
+
+.toggle-btn {
+  background-color: #007BFF;
+  padding: 12px 20px;
+  font-size: 16px;
+  margin: 5px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+
+
+.regen-btn {
+    padding: 12px 20px;
+    font-size: 16px;
+    margin: 5px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
