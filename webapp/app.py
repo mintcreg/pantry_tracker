@@ -13,7 +13,10 @@ import requests  # For interacting with OpenFoodFacts
 from migrate import migrate_database
 from werkzeug.middleware.proxy_fix import ProxyFix
 from functools import wraps
-import secrets  # For generating a secure API key
+import secrets 
+from filelock import FileLock, Timeout
+import shutil
+import datetime
 
 app = Flask(__name__)
 
@@ -638,6 +641,8 @@ def download_db():
 
 @app.route("/upload_db", methods=["POST"])
 def upload_db():
+    global engine, Session  # Declare as global to modify the global variables
+
     if 'file' not in request.files:
         logger.warning("No file part in the upload_db request.")
         return jsonify({"status": "error", "message": "No file part in the request."}), 400
@@ -746,25 +751,90 @@ def fetch_product():
 # ------------------------------------------------
 # Delete Database
 # ------------------------------------------------
+# Import FileLock and Timeout at the top if not already done
+# from filelock import FileLock, Timeout  # Already imported above
+
+# Define the path for the lock file
+LOCK_FILE_PATH = os.path.join(DB_DIR, "delete_database.lock")
+
+# Initialize the file-based lock
+delete_lock = FileLock(LOCK_FILE_PATH, timeout=0)  # timeout=0 for non-blocking
+
 @app.route("/delete_database", methods=["DELETE"])
 def delete_database():
-    if os.path.exists(DB_FILE):
-        try:
-            engine.dispose()        # Release the SQLite file so it can be deleted
-            os.remove(DB_FILE)      # Remove it from disk
-            logger.info("Database file deleted successfully.")
+    global engine, Session
 
-            # (Optionally) re-init an empty DB so your app still functions:
-            Base.metadata.create_all(engine)
-            logger.info("Database reinitialized after deletion.")
+    logger.debug("Received request to delete the database.")
 
-            return jsonify({"status": "ok", "message": "Database deleted and reinitialized."})
-        except Exception as e:
-            logger.error(f"Error deleting the database file: {e}")
-            return jsonify({"status": "error", "message": "Failed to delete database"}), 500
-    else:
-        logger.warning("Attempted to delete a non-existent database file.")
-        return jsonify({"status": "error", "message": "Database file does not exist"}), 404
+    try:
+        # Attempt to acquire the file-based lock without blocking
+        delete_lock.acquire(timeout=0)
+        logger.debug("File lock acquired successfully.")
+    except Timeout:
+        logger.warning("Delete operation is already in progress.")
+        return jsonify({
+            "status": "error",
+            "message": "Delete operation is already in progress."
+        }), 429  # 429 Too Many Requests
+
+    try:
+        if os.path.exists(DB_FILE):
+            logger.info("Database file exists. Proceeding to delete.")
+
+            try:
+                # Create a backup before deletion
+                backup_dir = os.path.join(DB_DIR, "backups")
+                os.makedirs(backup_dir, exist_ok=True)
+                timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+                backup_file = os.path.join(backup_dir, f"pantry_data_backup_{timestamp}.db")
+                shutil.copy(DB_FILE, backup_file)
+                logger.info(f"Backup created at {backup_file}")
+
+                # Dispose the existing engine to release the database file
+                engine.dispose()
+                logger.debug("Engine disposed successfully.")
+
+                # Remove the database file
+                os.remove(DB_FILE)
+                logger.info("Database file deleted successfully.")
+
+                # Recreate the engine and session for a fresh database
+                engine = create_engine(
+                    f'sqlite:///{DB_FILE}',
+                    connect_args={'check_same_thread': False},
+                    echo=False
+                )
+                Base.metadata.create_all(engine)
+                logger.info("Database schema created successfully after deletion.")
+
+                # Reconfigure Session
+                SessionFactory = sessionmaker(bind=engine)
+                Session = scoped_session(SessionFactory)
+                logger.info("Database session reinitialized after deletion.")
+
+                return jsonify({
+                    "status": "ok",
+                    "message": "Database deleted and reinitialized."
+                }), 200
+
+            except Exception as e:
+                logger.exception(f"Error during database deletion and reinitialization: {e}")
+                return jsonify({
+                    "status": "error",
+                    "message": "Failed to delete and reinitialize the database."
+                }), 500
+        else:
+            logger.warning("Attempted to delete a non-existent database file.")
+            # To make the operation idempotent, return success even if the DB doesn't exist
+            return jsonify({
+                "status": "ok",
+                "message": "Database already deleted."
+            }), 200
+
+    finally:
+        # Ensure the file-based lock is always released
+        delete_lock.release()
+        logger.debug("File lock released.")
 
 # ------------------------------------------------
 # Theme Saving
@@ -829,8 +899,6 @@ def get_api_key():
     except Exception as e:
         logger.exception(f"Error retrieving API key: {e}")
         return jsonify({"status": "error", "message": "Failed to retrieve API key."}), 500
-
-
 
 # ------------------------------------------------
 # Regenerate API Key
