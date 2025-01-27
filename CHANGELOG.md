@@ -1,5 +1,17 @@
 # Changelog
 
+## [Version 1.0.54-dev](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.54)
+
+### New Features
+- **API Key**: - Added API key for additional security in all calls except health (can be viewed and reset in settings)
+
+### TODO
+
+- Secure /regenerate_api_key endpoint
+- Fix lock on delete .db
+
+
+
 ## [Version 1.0.53](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.53)
 
 ### Changes
