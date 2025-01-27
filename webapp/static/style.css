@@ -40,6 +40,16 @@ h1 {
     text-align: center;
     color: #333;
 }
+a {
+    color: #007BFF;
+    text-decoration: none; /* Optional: Remove underline by default */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+a:hover,
+a:focus {
+    color: #1e80e9; /* Darker shade on hover/focus */
+    text-decoration: underline; /* Optional: Underline on hover/focus */
+}
 
 .category-buttons {
     text-align: center;
@@ -1242,7 +1252,7 @@ body.dark-mode #edit-category-modal .modal-content .save-btn,
 body.dark-mode #barcode-modal .modal-content .fetch-barcode-btn {
   /* You can keep them the same color scheme or slightly darker for dark mode */
   /* For example: */
-  background-color: #888; 
+  background-color: #28a745; 
   color: #fff;
   border-color: #666;
 }
