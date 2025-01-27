@@ -5,6 +5,9 @@
 ### New Features
 - **API Key**: - Added API key for additional security in all calls except health (can be viewed and reset in settings)
 
+### Changes
+- Styling improvements (link colors/buttons in dark mode not reflecting light mode colors)
+
 ### TODO
 
 - Secure /regenerate_api_key endpoint
