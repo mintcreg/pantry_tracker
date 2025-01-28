@@ -1535,6 +1535,9 @@ body.dark-mode #delete-modal input[type="text"] {
     direction: ltr; /* Makes content align right-to-left */
     display: flex;
     justify-content: flex-end; /* Pushes content to the right */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 
