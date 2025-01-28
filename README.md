@@ -51,15 +51,8 @@ The ability to save a copy of the database and restore an existing database
 
 2: Install Addon from the addon store
 
-3: Install [Pantry Tracker - Custom Components](https://github.com/mintcreg/pantry_tracker_components) (*Note; this needs to be installed after the pantry_tracker addon*)
-
-4: Restart Home Assistant
-
-5: Navigate to [http://homeassistant.local:5000/](http://homeassistant.local:5000/) and add products/categories 
-
-
 > [!TIP]
-> (Optional) Install [Pantry Tracker Card](https://github.com/mintcreg/pantry_tracker_card) to display the data within lovelace.
+> Visit the [Setup Guide](https://mintcreg.github.io/pantry_tracker/setup.html) for full installation instructions 
 
 
 
