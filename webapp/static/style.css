@@ -1497,3 +1497,85 @@ body.dark-mode #delete-modal input[type="text"] {
     text-decoration: none;
     display: inline-block;
 }
+/* =====================================
+   Column Filter
+   ===================================== */
+.column-settings-form {
+  display: flex; /* Use flexbox for horizontal alignment */
+  padding-top: 1px;
+  flex-wrap: wrap; /* Allow wrapping if the content overflows */
+  align-items: center; /* Vertically align the items */
+  gap: 15px; /* Add horizontal spacing between items */
+}
+
+.column-settings-form label {
+  display: flex; /* Flex layout for label and input alignment */
+  align-items: center; /* Vertically align the checkbox and text */
+  gap: 5px; /* Space between the checkbox and its label text */
+}
+
+.column-settings-form button {
+  margin-left: auto; /* Push the button to the far right */
+  padding: 5px 10px;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#settings-bar {
+  display: flex;
+  justify-content: flex-end; /* Align the cog button to the right */
+  align-items: center;
+  position: relative; /* For positioning the settings container */
+  gap: 10px; /* Space between the cog button and the settings */
+  margin-bottom: 20px; /* Ensure space below the bar for the settings */
+}
+
+#column-settings-container {
+  display: none; /* Hidden by default */
+  position: absolute; /* Position relative to #settings-bar */
+  top: 50%; /* Vertically align with the cog button */
+  transform: translateY(-50%); /* Center it vertically */
+  right: 50px; /* Adjust spacing to the left of the cog button */
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000; /* Ensure it appears above other elements */
+  flex-direction: row; /* Ensure horizontal layout if needed */
+  gap: 8px;
+  width: max-content; /* Fit content width */
+}
+
+
+#products-container {
+  margin-top: 20px; /* Add spacing to avoid overlap */
+}
+
+/* =========================
+   Filter Cog Hover Effects
+   ========================= */
+.filter-cog {
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.filter-cog:hover {
+    color: #007BFF;
+    text-decoration: underline;
+}
+
+.filter-cog svg path {
+    fill: #666 !important;
+    transition: fill 0.2s ease;
+}
+
+.filter-cog:hover svg path {
+    fill: #007BFF !important;
+}

@@ -931,6 +931,64 @@ def regenerate_api_key():
         logger.exception(f"Failed to regenerate API key: {e}")
         return jsonify({"status": "error", "message": "Failed to regenerate API key."}), 500
 
+# ------------------------------------------------
+# Column Filtering Persistent Storage
+# ------------------------------------------------
+@app.route("/save_column_visibility", methods=["POST"])
+def save_column_visibility():
+    """
+    Save column visibility settings to the config.ini file.
+    """
+    try:
+        data = request.get_json()
+        column_settings = data.get("settings", {})
+
+        if not column_settings:
+            return jsonify({"status": "error", "message": "No settings provided"}), 400
+
+        # Save settings in config.ini
+        if "ColumnVisibility" not in config:
+            config.add_section("ColumnVisibility")
+
+        for column, visible in column_settings.items():
+            config.set("ColumnVisibility", column, str(visible).lower())
+
+        with open(CONFIG_FILE, "w") as f:
+            config.write(f)
+
+        return jsonify({"status": "ok", "message": "Column visibility settings saved successfully."}), 200
+    except Exception as e:
+        logger.error(f"Error saving column visibility settings: {e}")
+        return jsonify({"status": "error", "message": "Failed to save settings."}), 500
+
+
+@app.route("/get_column_visibility", methods=["GET"])
+def get_column_visibility():
+    """
+    Retrieve column visibility settings from the config.ini file.
+    """
+    try:
+        if "ColumnVisibility" in config:
+            settings = {
+                key: config.getboolean("ColumnVisibility", key)
+                for key in config["ColumnVisibility"]
+            }
+        else:
+            # Default visibility settings if none exist
+            settings = {
+                "name": True,
+                "category": True,
+                "image": True,
+                "barcode": True,
+                "actions": True,
+            }
+
+        return jsonify({"status": "ok", "settings": settings}), 200
+    except Exception as e:
+        logger.error(f"Error retrieving column visibility settings: {e}")
+        return jsonify({"status": "error", "message": "Failed to retrieve settings."}), 500
+
+
 
 # -----------------------------
 # Run the Application

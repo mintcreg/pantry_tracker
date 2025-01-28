@@ -56,7 +56,16 @@
     <!-- END: Categories Tab -->
 
     <!-- BEGIN: Products Tab -->
-    <div id="products-container" class="hidden">
+<div id="settings-bar">
+  <button class="filter-cog" onclick="toggleColumnSettings()" title="Settings" style="display: none;">
+  <img src="static/images/cog.svg" alt="Settings" width="24" height="24">
+</button>
+  <div id="column-settings-container">
+    <!-- The checkboxes and save button will be dynamically added here -->
+  </div>
+</div>
+	<div id="products-container" class="hidden">
+	
       <h2>Create Categories and Products</h2>
       <div class="generate-form">
         <div class="form-section">

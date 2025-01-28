@@ -51,8 +51,15 @@ The ability to save a copy of the database and restore an existing database
 
 2: Install Addon from the addon store
 
+3: Install [Pantry Tracker - Custom Components](https://github.com/mintcreg/pantry_tracker_components) (*Note; this needs to be installed after the pantry_tracker addon*)
+
+4: Restart Home Assistant
+
+5: Navigate to [http://homeassistant.local:5000/](http://homeassistant.local:5000/) and add products/categories 
+
+
 > [!TIP]
-> Visit [Pantry Tracker Wiki](https://mintcreg.github.io/pantry_tracker/) for full installation instructions and guides
+> (Optional) Install [Pantry Tracker Card](https://github.com/mintcreg/pantry_tracker_card) to display the data within lovelace.
 
 
 
@@ -112,7 +119,7 @@ The ability to save a copy of the database and restore an existing database
 | `/theme`                    | `GET`      | Return the current theme from `config.ini`.                                                        | **Headers:** `X-API-KEY` required                                                                                                                                             | **200:** `{"theme": "light"}` or `{"theme": "dark"}`. <br> **500:** Error message if retrieval fails.                                                                                                                                                                      |
 | `/theme`                    | `POST`     | Save the selected theme (light/dark) to `config.ini`.                                            | **Headers:** `X-API-KEY` required <br> **Body:** `{"theme": "light/dark"}`                                                                                                   | **200:** `{"status": "ok", "theme": "light/dark"}`. <br> **400:** Invalid theme. <br> **500:** Error message if setting theme fails.                                                                                                                                        |
 | `/get_api_key`              | `GET`      | Securely provide the API key to the frontend.                                                     | **Headers:** None (This endpoint is exempt from API key authentication.)                                                                                                       | **200:** `{"api_key": "the_api_key"}`. <br> **500:** Error message if retrieval fails.                                                                                                                                                                                       |
-| `/regenerate_api_key` | `POST` | Regenerate the API key. **⚠️ Warning:** This route is sensitive and should be protected to prevent unauthorized access.                                                | **Required:** `X-API-KEY: your_current_api_key` | **200:** `{"status": "ok", "api_key": "new_api_key"}` <br> **401/403:** Unauthorized or Forbidden if `X-API-KEY` is missing or invalid. <br> **500:** Error message if regeneration fails.           |
+| `/regenerate_api_key`       | `POST`     | Regenerate the API key. **⚠️ Warning:** This route is insecure and will be secured in production. | **Headers:** None (This endpoint is exempt from API key authentication.)                                                                                                       | **200:** `{"status": "ok", "api_key": "new_api_key"}`. <br> **500:** Error message if regeneration fails.                                                                                                                                                                   |
 
                                                                                         
 

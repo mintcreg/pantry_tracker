@@ -134,6 +134,16 @@ const appendApiKey = (url) => {
   return urlObj.toString();
 };
 
+// Add toggleColumnSettings here:
+const toggleColumnSettings = () => {
+  const settingsContainer = document.getElementById('column-settings-container');
+  if (settingsContainer.style.display === 'none' || !settingsContainer.style.display) {
+    settingsContainer.style.display = 'flex'; // Show the settings
+  } else {
+    settingsContainer.style.display = 'none'; // Hide the settings
+  }
+};
+
 //////////////////////////////////////
 // Show the selected tab
 ////////////////////////////////////
@@ -164,6 +174,12 @@ function showTab(tab) {
     document.getElementById('settings-container').style.display = 'block';
     // Ensure the API key is displayed
     displayApiKey();
+  }
+  
+  // Show or hide the cog button only on the products page
+  const cogButton = document.querySelector('.filter-cog');
+  if (cogButton) {
+    cogButton.style.display = tab === 'products' ? 'block' : 'none';
   }
 }
 
@@ -434,8 +450,83 @@ const fetchProducts = async () => {
 };
 
 //////////////////////////////////////
-// Display products in a table
-////////////////////////////////////
+// Global variable for column visibility
+//////////////////////////////////////
+let columnVisibility = {
+  name: true,
+  category: true,
+  image: true,
+  barcode: true,
+  actions: true,
+};
+
+//////////////////////////////////////
+// Save column visibility settings
+//////////////////////////////////////
+const saveColumnVisibility = async () => {
+  const checkboxes = document.querySelectorAll('.column-visibility-checkbox');
+  checkboxes.forEach((checkbox) => {
+    columnVisibility[checkbox.name] = checkbox.checked;
+  });
+
+  try {
+    const response = await fetch(appendApiKey(`${basePath}save_column_visibility`), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ settings: columnVisibility }),
+    });
+
+    const result = await response.json();
+    if (response.ok && result.status === "ok") {
+      alert("Column visibility settings saved successfully!");
+    } else {
+      throw new Error(result.message || "Failed to save settings.");
+    }
+
+    // Refresh the product table
+    displayProducts(products);
+  } catch (error) {
+    console.error("Error saving column visibility settings:", error);
+    alert("Failed to save settings. Please try again.");
+  }
+};
+
+
+//////////////////////////////////////
+// Display column visibility settings
+//////////////////////////////////////
+const displayColumnSettings = () => {
+  const settingsContainer = document.getElementById('column-settings-container');
+  settingsContainer.innerHTML = ''; // Clear existing content
+
+  const form = document.createElement('form');
+  form.classList.add('column-settings-form');
+
+  Object.keys(columnVisibility).forEach((column) => {
+    const label = document.createElement('label');
+    label.innerHTML = `
+      <input type="checkbox" class="column-visibility-checkbox" name="${column}" ${
+      columnVisibility[column] ? 'checked' : ''
+    }>
+      ${column.charAt(0).toUpperCase() + column.slice(1)}
+    `;
+    form.appendChild(label);
+  });
+
+  const saveButton = document.createElement('button');
+  saveButton.textContent = 'Save Settings';
+  saveButton.type = 'button';
+  saveButton.addEventListener('click', saveColumnVisibility);
+
+  form.appendChild(saveButton);
+  settingsContainer.appendChild(form);
+};
+
+//////////////////////////////////////
+// Display products in a table with column visibility
+//////////////////////////////////////
 const displayProducts = (products) => {
   const productsContainer = document.getElementById('products-container');
   productsContainer.innerHTML = ''; // Clear existing content
@@ -445,22 +536,18 @@ const displayProducts = (products) => {
     const tableHead = `
       <thead>
         <tr>
-          <th class="sortable" id="productNameHeader" onclick="sortProducts('name')">
-            Product Name
-          </th>
-          <th class="sortable" id="productCategoryHeader" onclick="sortProducts('category')">
-            Category
-          </th>
-          <th>Image</th>
-          <th>Barcode</th>
-          <th>Actions</th>
+          ${columnVisibility.name ? '<th>Product Name</th>' : ''}
+          ${columnVisibility.category ? '<th>Category</th>' : ''}
+          ${columnVisibility.image ? '<th>Image</th>' : ''}
+          ${columnVisibility.barcode ? '<th>Barcode</th>' : ''}
+          ${columnVisibility.actions ? '<th>Actions</th>' : ''}
         </tr>
       </thead>
     `;
 
     const tableBody = document.createElement('tbody');
 
-    products.forEach(product => {
+    products.forEach((product) => {
       const imageUrl = product.url; // Assuming 'url' contains the image URL
       const imageAlt = `${product.name} Image`;
 
@@ -470,16 +557,24 @@ const displayProducts = (products) => {
 
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${product.name}</td>
-        <td>${product.category}</td>
-        <td>
-          ${imageUrl ? `<img src="${imageUrl}" alt="${imageAlt}" class="product-image">` : 'No Image'}
-        </td>
-        <td>${barcodeLink}</td>
-        <td>
-          <button class="edit-btn" onclick="initEditProductModal('${encodeURIComponent(product.name)}')">Edit</button>
-          <button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
-        </td>
+        ${columnVisibility.name ? `<td>${product.name}</td>` : ''}
+        ${columnVisibility.category ? `<td>${product.category}</td>` : ''}
+        ${
+          columnVisibility.image
+            ? `<td>${imageUrl ? `<img src="${imageUrl}" alt="${imageAlt}" class="product-image">` : 'No Image'}</td>`
+            : ''
+        }
+        ${columnVisibility.barcode ? `<td>${barcodeLink}</td>` : ''}
+        ${
+          columnVisibility.actions
+            ? `
+          <td>
+            <button class="edit-btn" onclick="initEditProductModal('${encodeURIComponent(product.name)}')">Edit</button>
+            <button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
+          </td>
+        `
+            : ''
+        }
       `;
       tableBody.appendChild(row);
     });
@@ -493,7 +588,6 @@ const displayProducts = (products) => {
     tableContainer.appendChild(table);
 
     productsContainer.appendChild(tableContainer);
-
   } else {
     productsContainer.innerHTML = `
       <p style="text-align: center; font-weight: bold; color: red;">
@@ -501,21 +595,14 @@ const displayProducts = (products) => {
       </p>
     `;
   }
-
-  // Add the large "Add Product" button
-  const addProductButtonContainer = document.createElement('div');
-  addProductButtonContainer.classList.add('add-product-button-container');
-
-  const addProductButton = document.createElement('button');
-  addProductButton.classList.add('add-product-btn');
-  addProductButton.textContent = 'Add Product';
-  addProductButton.onclick = () => {
-    openAddProductModal();
-  };
-
-  addProductButtonContainer.appendChild(addProductButton);
-  productsContainer.appendChild(addProductButtonContainer);
 };
+
+// Initialize column settings on page load
+document.addEventListener('DOMContentLoaded', () => {
+  displayColumnSettings();
+});
+
+
 
 //////////////////////////////////////
 // Initialize edit product modal with product data
@@ -835,13 +922,45 @@ function updateCategoriesHeaderArrow() {
 //////////////////////////////////////
 // Initialize the page
 ////////////////////////////////////
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // First, fetch the API key from the server
   await fetchApiKey();
 
   if (!API_KEY) {
-    console.error('API key is not available. Further requests will fail.');
+    console.error("API key is not available. Further requests will fail.");
     return;
+  }
+
+  // Load saved theme from the server
+  await loadThemeFromServer();
+
+  // Fetch saved column visibility settings from the backend
+  try {
+    const response = await fetch(appendApiKey(`${basePath}get_column_visibility`), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await response.json();
+    if (response.ok && result.status === "ok") {
+      columnVisibility = result.settings || columnVisibility;
+
+      // Update the checkboxes in the UI
+      const checkboxes = document.querySelectorAll(".column-visibility-checkbox");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = columnVisibility[checkbox.name] || false;
+      });
+
+      // Refresh the product table to reflect the settings
+      displayProducts(products);
+    } else {
+      throw new Error(result.message || "Failed to load column visibility settings.");
+    }
+  } catch (error) {
+    console.error("Error loading column visibility settings:", error);
+    alert("Failed to load settings. Default settings will be used.");
   }
 
   // Then, load the saved theme from the server
@@ -851,6 +970,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await fetchCategories();
   // Default tab: 'products'
   showTab('products');
+  
+  displayColumnSettings();
 
   // ==========================
   // DELETE DATABASE LOGIC
