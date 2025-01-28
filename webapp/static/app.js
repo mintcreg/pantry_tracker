@@ -595,7 +595,21 @@ const displayProducts = (products) => {
       </p>
     `;
   }
+
+  // Add the styled "Add Product" button
+  const buttonContainer = document.createElement('div');
+  buttonContainer.classList.add('add-product-button-container'); // Add the container class
+  const addProductButton = document.createElement('button');
+  addProductButton.classList.add('add-product-btn'); // Add the button class
+  addProductButton.textContent = 'Add Product';
+  addProductButton.onclick = openAddProductModal; // Attach the modal-opening functionality
+
+  // Append the button to the container and then the container to the products container
+  buttonContainer.appendChild(addProductButton);
+  productsContainer.appendChild(buttonContainer);
 };
+
+
 
 // Initialize column settings on page load
 document.addEventListener('DOMContentLoaded', () => {

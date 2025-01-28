@@ -1531,20 +1531,37 @@ body.dark-mode #delete-modal input[type="text"] {
   gap: 10px; /* Space between the cog button and the settings */
   margin-bottom: 20px; /* Ensure space below the bar for the settings */
 }
+/* Responsive styling for #column-settings-container on mobile and companion app */
+@media (max-width: 768px), body.companion-app {
+    /* Ensure the parent settings bar is positioned relative */
+    #settings-bar {
+        position: relative; /* Reference point for absolute positioning */
+        padding-bottom: 55px;
+    }
 
-#column-settings-container {
-  display: none; /* Hidden by default */
-  position: absolute; /* Position relative to #settings-bar */
-  top: 50%; /* Vertically align with the cog button */
-  transform: translateY(-50%); /* Center it vertically */
-  right: 50px; /* Adjust spacing to the left of the cog button */
-  border-radius: 8px;
-  padding: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 1000; /* Ensure it appears above other elements */
-  flex-direction: row; /* Ensure horizontal layout if needed */
-  gap: 8px;
-  width: max-content; /* Fit content width */
+    #column-settings-container {
+        /* Existing Styles */
+        width: 90%; /* Adjust width as necessary */
+        max-width: 100%;
+        left: 5%; /* Center horizontally within the parent */
+
+        /* Vertical Positioning */
+        top: 365px; /* Adjust this value to move the container down */
+        /* Example adjustments:
+           top: 50px; for less downward movement
+           top: 70px; for more downward movement
+        */
+
+        /* Other Styles */
+        transform: none; /* Remove any existing transforms */
+        flex-direction: column; /* Stack items vertically */
+        padding: 15px; /* Add padding for spacing */
+        position: absolute; /* Position relative to #settings-bar */
+        box-sizing: border-box; /* Include padding within width */
+        z-index: 1001; /* Ensure it appears above other elements */
+        border-radius: 8px; /* Rounded corners */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    }
 }
 
 
