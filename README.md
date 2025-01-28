@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-<img src="images/logo.webp" alt="Alt Text" width="400" height="400">
+<img src="https://raw.githubusercontent.com/mintcreg/pantry_tracker/refs/heads/dev/images/logo.webp" alt="Alt Text" width="400" height="400">
 </p>
 
 > [!CAUTION]
