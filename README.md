@@ -52,7 +52,7 @@ The ability to save a copy of the database and restore an existing database
 2: Install Addon from the addon store
 
 > [!TIP]
-> Visit [Pantry Tracker Wiki](https://mintcreg.github.io/pantry_tracker/) for full installation instructions
+> Visit [Pantry Tracker Wiki](https://mintcreg.github.io/pantry_tracker/) for full installation instructions and guides
 
 
 
