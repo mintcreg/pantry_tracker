@@ -89,7 +89,10 @@ const regenerateApiKey = async () => {
   try {
     const response = await fetch(`${basePath}regenerate_api_key`, {
       method: 'POST',
-      credentials: 'same-origin' // Ensure cookies are sent if needed
+      credentials: 'same-origin', // Ensure cookies are sent if needed
+      headers: {
+        'X-API-KEY': API_KEY // Pass the API key in the header
+      }
     });
 
     const data = await response.json();
@@ -124,7 +127,7 @@ const regenerateApiKey = async () => {
 
 //////////////////////////////////////
 // Function to include API Key in query parameters
-//////////////////////////////////////
+////////////////////////////////////
 const appendApiKey = (url) => {
   const urlObj = new URL(url, window.location.origin);
   urlObj.searchParams.append('api_key', API_KEY);
@@ -133,7 +136,7 @@ const appendApiKey = (url) => {
 
 //////////////////////////////////////
 // Show the selected tab
-//////////////////////////////////////
+////////////////////////////////////
 function showTab(tab) {
   // Hide all tab containers
   document.getElementById('categories-container').style.display = 'none';
@@ -166,7 +169,7 @@ function showTab(tab) {
 
 //////////////////////////////////////
 // Fetch categories from the backend
-//////////////////////////////////////
+////////////////////////////////////
 const fetchCategories = async () => {
   try {
     const response = await fetch(appendApiKey(`${basePath}categories`), {
@@ -189,7 +192,7 @@ const fetchCategories = async () => {
 
 //////////////////////////////////////
 // Display categories in a table layout
-//////////////////////////////////////
+////////////////////////////////////
 const displayCategories = (categories) => {
   const categoriesContainer = document.getElementById('categories-container');
   categoriesContainer.innerHTML = ''; // Clear existing content
@@ -273,7 +276,7 @@ const displayCategories = (categories) => {
 
 //////////////////////////////////////
 // Add a new category via API
-//////////////////////////////////////
+////////////////////////////////////
 const addCategory = async () => {
   const categoryName = document.getElementById('new-category-input').value.trim();
   if (!categoryName) {
@@ -314,7 +317,7 @@ const addCategory = async () => {
 
 //////////////////////////////////////
 // Remove a category via API
-//////////////////////////////////////
+////////////////////////////////////
 const removeCategory = async (categoryName) => {
   if (!confirm(`Are you sure you want to remove the category "${categoryName}"? All associated products will be moved to "Uncategorized".`)) {
     return;
@@ -344,7 +347,7 @@ const removeCategory = async (categoryName) => {
 
 //////////////////////////////////////
 // Open the edit category modal
-//////////////////////////////////////
+////////////////////////////////////
 function openEditCategoryModal(categoryName) {
   // Populate the input with the current category name
   document.getElementById('edit-category-input').value = categoryName;
@@ -356,7 +359,7 @@ function openEditCategoryModal(categoryName) {
 
 //////////////////////////////////////
 // Close the edit category modal
-//////////////////////////////////////
+////////////////////////////////////
 function closeEditCategoryModal() {
   // Clear the form fields
   document.getElementById('edit-category-input').value = '';
@@ -367,7 +370,7 @@ function closeEditCategoryModal() {
 
 //////////////////////////////////////
 // Save the edited category
-//////////////////////////////////////
+////////////////////////////////////
 const saveEditedCategory = async () => {
   const newName = document.getElementById('edit-category-input').value.trim();
   const oldName = document.getElementById('edit-category-old-name').value.trim();
@@ -409,7 +412,7 @@ const saveEditedCategory = async () => {
 
 //////////////////////////////////////
 // Fetch products from the backend
-//////////////////////////////////////
+////////////////////////////////////
 const fetchProducts = async () => {
   try {
     const response = await fetch(appendApiKey(`${basePath}products`), {
@@ -432,7 +435,7 @@ const fetchProducts = async () => {
 
 //////////////////////////////////////
 // Display products in a table
-//////////////////////////////////////
+////////////////////////////////////
 const displayProducts = (products) => {
   const productsContainer = document.getElementById('products-container');
   productsContainer.innerHTML = ''; // Clear existing content
@@ -516,7 +519,7 @@ const displayProducts = (products) => {
 
 //////////////////////////////////////
 // Initialize edit product modal with product data
-//////////////////////////////////////
+////////////////////////////////////
 const initEditProductModal = async (encodedProductName) => {
   const productName = decodeURIComponent(encodedProductName);
   try {
@@ -560,7 +563,7 @@ const initEditProductModal = async (encodedProductName) => {
 
 //////////////////////////////////////
 // Open the edit product modal
-//////////////////////////////////////
+////////////////////////////////////
 function openEditProductModal(product) {
   // Populate the input fields with the current product details
   document.getElementById('edit-product-name').value = product.name;
@@ -582,7 +585,7 @@ function openEditProductModal(product) {
 
 //////////////////////////////////////
 // Close the edit product modal
-//////////////////////////////////////
+////////////////////////////////////
 function closeEditProductModal() {
   // Clear the form fields
   document.getElementById('edit-product-name').value = '';
@@ -595,7 +598,7 @@ function closeEditProductModal() {
 
 //////////////////////////////////////
 // Save the edited product
-//////////////////////////////////////
+////////////////////////////////////
 const saveEditedProduct = async () => {
   const newName = document.getElementById('edit-product-name').value.trim();
   const newCategory = document.getElementById('edit-product-category').value;
@@ -657,7 +660,7 @@ const saveEditedProduct = async () => {
 
 //////////////////////////////////////
 // Define the addProductFromForm function
-//////////////////////////////////////
+////////////////////////////////////
 const addProductFromForm = async () => {
   const name = document.getElementById('add-product-name').value.trim();
   const category = document.getElementById('add-product-category').value;
@@ -717,7 +720,7 @@ window.addProductFromForm = addProductFromForm;
 
 //////////////////////////////////////
 // Remove a product via API
-//////////////////////////////////////
+////////////////////////////////////
 const removeProduct = async (productName) => {
   if (!confirm(`Are you sure you want to remove the product "${productName}"?`)) {
     return;
@@ -747,7 +750,7 @@ const removeProduct = async (productName) => {
 
 //////////////////////////////////////
 // Sort products by name or category
-//////////////////////////////////////
+////////////////////////////////////
 const sortProducts = (field) => {
   const sortOrder = productSortOrder[field];
 
@@ -806,7 +809,7 @@ const sortCategories = () => {
   });
   productSortOrder.name = (sortOrder === 'asc') ? 'desc' : 'asc';
 
-  
+
 
   displayCategories(categories);
   // Update arrow
@@ -906,7 +909,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 //////////////////////////////////////
 // Barcode Scanning Functionality
-//////////////////////////////////////
+////////////////////////////////////
 function hideAddProductModal() {
   document.getElementById('add-product-modal').style.display = 'none';
 }
@@ -1023,7 +1026,7 @@ const fetchProductData = async (barcode) => {
 
 //////////////////////////////////////
 // Fetch product data based on manually entered barcode via the "Fetch" button
-//////////////////////////////////////
+////////////////////////////////////
 const fetchBarcode = () => {
   const barcode = document.getElementById('add-product-barcode').value.trim();
   if (barcode) {
@@ -1035,7 +1038,7 @@ const fetchBarcode = () => {
 
 //////////////////////////////////////
 // Open the Add Product Modal
-//////////////////////////////////////
+////////////////////////////////////
 function openAddProductModal() {
   // Populate the category dropdown in the modal
   const categoryDropdown = document.getElementById('add-product-category');
@@ -1050,7 +1053,7 @@ function openAddProductModal() {
 
 //////////////////////////////////////
 // Close the Add Product Modal (clears the form)
-//////////////////////////////////////
+////////////////////////////////////
 function closeAddProductModal() {
   // Clear the form fields
   document.getElementById('add-product-name').value = '';
@@ -1063,7 +1066,7 @@ function closeAddProductModal() {
 
 //////////////////////////////////////
 // Ensure the modals close when clicking outside of them
-//////////////////////////////////////
+////////////////////////////////////
 window.onclick = function(event) {
   const addProductModal = document.getElementById('add-product-modal');
   if (event.target === addProductModal) {
@@ -1204,7 +1207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 //////////////////////////////////////
 // Load Theme from Server
-//////////////////////////////////////
+////////////////////////////////////
 async function loadThemeFromServer() {
   console.log("Loading theme from server...");
   try {
@@ -1250,7 +1253,7 @@ async function loadThemeFromServer() {
 
 //////////////////////////////////////
 // Toggle Theme (Light/Dark) & Save to Server
-//////////////////////////////////////
+////////////////////////////////////
 async function toggleTheme() {
   const body = document.body;
   const label = document.getElementById("themeLabel");

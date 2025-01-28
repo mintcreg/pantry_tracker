@@ -133,7 +133,7 @@ def before_request_func():
     """
     try:
         # Exempted routes that do not require API key
-        exempt_paths = ['/health', '/regenerate_api_key']
+        exempt_paths = ['/health']
 
         # If the request path is exempted, skip authentication
         if request.path in exempt_paths:
