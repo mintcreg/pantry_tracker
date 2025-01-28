@@ -1596,14 +1596,3 @@ body.dark-mode #delete-modal input[type="text"] {
 .filter-cog:hover svg path {
     fill: #007BFF !important;
 }
-.filter-link {
-    text-decoration: underline; /* Add underline to resemble a link */
-    cursor: pointer; /* Pointer cursor on hover */
-    display: inline; /* Ensure it appears as inline text */
-    transition: color 0.3s ease; /* Smooth hover effect */
-}
-
-.filter-link:hover {
-    color: #0056b3; /* Darker color on hover */
-    text-decoration: none; /* Optional: Remove underline on hover */
-}
