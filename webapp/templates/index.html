@@ -58,13 +58,16 @@
 
         <!-- BEGIN: Products Tab -->
 
-        <div id="column-settings-container">
+        <div id="column-settings-container" style="display: none;">
 
         </div>
         <div id="settings-bar">
-            <button class="filter-cog" onclick="toggleColumnSettings()" title="Settings" style="display: none;">
-  <img src="static/images/cog.svg" alt="Settings" width="24" height="24">
-</button>
+		<p onclick="toggleColumnSettings()" class="filter-link">Filter</p>
+            <button class="filter-cog" onclick="toggleColumnSettings()" title="Product Filter" style="display: none;">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+			<path d="M21 11.5l-7.5 7.5a2 2 0 0 1-2.8 0L2 10.3V4h6.3l8.8 8.8a2 2 0 0 1 0 2.7zM5 6v3.6l7.5 7.5 2.8-2.8L7.7 6H5z"></path>
+		</svg>
+		</button>
         </div>
 
         <div id="products-container" class="hidden">
