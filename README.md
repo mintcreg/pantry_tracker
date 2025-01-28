@@ -1,9 +1,10 @@
+
 # <p align="center"> Pantry Tracker - HomeAssistant </p>
 
 <p align="center">
   <img alt="Release" src="https://img.shields.io/github/v/release/mintcreg/pantry_tracker?&cacheBust=true"/>
   <img alt="Maintenance" src="https://img.shields.io/maintenance/yes/2025"/>
-  
+
 </p>
 
 <p align="center">
@@ -12,7 +13,6 @@
 
 > [!CAUTION]
 > This is a work in progress and made using GPT and basic knowledge.
-
 
 # Description
 The Pantry Tracker add-on is a Home Assistant designed to help you keep track of products in your kitchen, pantry, or any other storage space. With a user-friendly interface and a powerful backend, this add-on simplifies the organization and management of your items by allowing you to create categories, assign products to them, and maintain an up-to-date inventory.
@@ -51,23 +51,15 @@ The ability to save a copy of the database and restore an existing database
 
 2: Install Addon from the addon store
 
-3: Install [Pantry Tracker - Custom Components](https://github.com/mintcreg/pantry_tracker_components) (*Note; this needs to be installed after the pantry_tracker addon*)
-
-4: Restart Home Assistant
-
-5: Navigate to [http://homeassistant.local:5000/](http://homeassistant.local:5000/) and add products/categories 
-
-
 > [!TIP]
-> (Optional) Install [Pantry Tracker Card](https://github.com/mintcreg/pantry_tracker_card) to display the data within lovelace.
-
+> Visit the [Setup Guide](https://mintcreg.github.io/pantry_tracker/setup.html) for full installation instructions 
 
 
 ## Screenshots & Video
 
 <details>
 <summary>Products</summary>
- 
+
 <br>
 
 ![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/products.PNG)
@@ -76,7 +68,7 @@ The ability to save a copy of the database and restore an existing database
 
 <details>
 <summary>Categories</summary>
- 
+
 <br>
 
 ![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/categories.PNG)
@@ -86,7 +78,7 @@ The ability to save a copy of the database and restore an existing database
 
 <details>
 <summary>Demo</summary>
- 
+
 <br>
 
 ![Categories](https://raw.githubusercontent.com/mintcreg/pantry_tracker/main/images/demo.gif)
@@ -119,7 +111,7 @@ The ability to save a copy of the database and restore an existing database
 | `/theme`                    | `GET`      | Return the current theme from `config.ini`.                                                        | **Headers:** `X-API-KEY` required                                                                                                                                             | **200:** `{"theme": "light"}` or `{"theme": "dark"}`. <br> **500:** Error message if retrieval fails.                                                                                                                                                                      |
 | `/theme`                    | `POST`     | Save the selected theme (light/dark) to `config.ini`.                                            | **Headers:** `X-API-KEY` required <br> **Body:** `{"theme": "light/dark"}`                                                                                                   | **200:** `{"status": "ok", "theme": "light/dark"}`. <br> **400:** Invalid theme. <br> **500:** Error message if setting theme fails.                                                                                                                                        |
 | `/get_api_key`              | `GET`      | Securely provide the API key to the frontend.                                                     | **Headers:** None (This endpoint is exempt from API key authentication.)                                                                                                       | **200:** `{"api_key": "the_api_key"}`. <br> **500:** Error message if retrieval fails.                                                                                                                                                                                       |
-| `/regenerate_api_key`       | `POST`     | Regenerate the API key. **⚠️ Warning:** This route is insecure and will be secured in production. | **Headers:** None (This endpoint is exempt from API key authentication.)                                                                                                       | **200:** `{"status": "ok", "api_key": "new_api_key"}`. <br> **500:** Error message if regeneration fails.                                                                                                                                                                   |
+| `/regenerate_api_key` | `POST` | Regenerate the API key. **⚠️ Warning:** This route is sensitive and should be protected to prevent unauthorized access.                                                | **Required:** `X-API-KEY: your_current_api_key` | **200:** `{"status": "ok", "api_key": "new_api_key"}` <br> **401/403:** Unauthorized or Forbidden if `X-API-KEY` is missing or invalid. <br> **500:** Error message if regeneration fails.           |
 
                                                                                         
 
@@ -134,5 +126,6 @@ This project uses data and images provided by [OpenFoodFacts](https://world.open
 - You are encouraged to contribute to OpenFoodFacts by adding missing products and improving data accuracy.
 
 Visit [OpenFoodFacts](https://world.openfoodfacts.org/) to learn more.
+
 
 
