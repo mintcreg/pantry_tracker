@@ -1538,6 +1538,8 @@ body.dark-mode #delete-modal input[type="text"] {
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    width: max-content;
+    margin-left: auto;
 }
 
 
