@@ -1531,6 +1531,13 @@ body.dark-mode #delete-modal input[type="text"] {
   gap: 10px; /* Space between the cog button and the settings */
   margin-bottom: 20px; /* Ensure space below the bar for the settings */
 }
+#column-settings-container {
+    direction: ltr; /* Makes content align right-to-left */
+    display: flex;
+    justify-content: flex-end; /* Pushes content to the right */
+}
+
+
 /* Responsive styling for #column-settings-container on mobile and companion app */
 @media (max-width: 768px), body.companion-app {
     /* Ensure the parent settings bar is positioned relative */
