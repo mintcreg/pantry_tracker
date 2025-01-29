@@ -6,8 +6,9 @@ const basePath = window.location.pathname.endsWith('/')
   : window.location.pathname + '/';
 
 //////////////////////////////////////
-// Global arrays for categories and products
+// Global variables for API Key, categories, and products
 //////////////////////////////////////
+let API_KEY = '';
 let categories = [];
 let products = [];
 let productSortOrder = {
@@ -23,19 +24,135 @@ function isAlphanumeric(str) {
 }
 
 //////////////////////////////////////
-// Show the selected tab
+// Function to fetch the API key from the backend
 //////////////////////////////////////
+const fetchApiKey = async () => {
+  try {
+    const response = await fetch(`${basePath}get_api_key`, {
+      method: 'GET',
+      credentials: 'same-origin' // Ensure cookies are sent if needed
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch API key: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    API_KEY = data.api_key;
+    console.log('API Key retrieved successfully.');
+
+    // After fetching the API key, display it in the settings page
+    displayApiKey();
+  } catch (error) {
+    console.error('Error fetching API key:', error);
+    alert('Failed to retrieve API key. Please try reloading the page.');
+  }
+};
+
+//////////////////////////////////////
+// Function to display the API key in the settings page
+//////////////////////////////////////
+const displayApiKey = () => {
+  const apiKeyInput = document.getElementById('display-api-key');
+  const toggleButton = document.getElementById('toggle-api-key');
+
+  if (apiKeyInput) {
+    apiKeyInput.value = API_KEY;
+  }
+
+  if (toggleButton) {
+    toggleButton.addEventListener('click', () => {
+      if (apiKeyInput.type === 'password') {
+        apiKeyInput.type = 'text';
+        toggleButton.textContent = 'Hide';
+      } else {
+        apiKeyInput.type = 'password';
+        toggleButton.textContent = 'Show';
+      }
+    });
+  }
+
+  const regenButton = document.getElementById('regen-api');
+  if (regenButton) {
+    regenButton.addEventListener('click', regenerateApiKey);
+  }
+};
+
+//////////////////////////////////////
+// Function to regenerate the API key
+//////////////////////////////////////
+const regenerateApiKey = async () => {
+  if (!confirm('Are you sure you want to regenerate the API key? This will invalidate the current key.')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${basePath}regenerate_api_key`, {
+      method: 'POST',
+      credentials: 'same-origin', // Ensure cookies are sent if needed
+      headers: {
+        'X-API-KEY': API_KEY // Pass the API key in the header
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== 'ok') {
+      throw new Error(data.message || `Failed to regenerate API key: ${response.statusText}`);
+    }
+
+    API_KEY = data.api_key;
+    alert('API key regenerated successfully.');
+
+    // Update the displayed API key
+    const apiKeyInput = document.getElementById('display-api-key');
+    if (apiKeyInput) {
+      apiKeyInput.value = API_KEY;
+      // Ensure it's masked after regeneration
+      if (apiKeyInput.type !== 'password') {
+        apiKeyInput.type = 'password';
+        const toggleButton = document.getElementById('toggle-api-key');
+        if (toggleButton) toggleButton.textContent = 'Show';
+      }
+    }
+
+    // Optionally, refresh other parts of the app that rely on the API key
+    // For example, you can reload the page:
+    // window.location.reload();
+  } catch (error) {
+    console.error('Error regenerating API key:', error);
+    alert(error.message);
+  }
+};
+
+//////////////////////////////////////
+// Function to include API Key in query parameters
+////////////////////////////////////
+const appendApiKey = (url) => {
+  const urlObj = new URL(url, window.location.origin);
+  urlObj.searchParams.append('api_key', API_KEY);
+  return urlObj.toString();
+};
+
+// Add toggleColumnSettings here:
+const toggleColumnSettings = () => {
+  const settingsContainer = document.getElementById('column-settings-container');
+  if (settingsContainer.style.display === 'none' || !settingsContainer.style.display) {
+    settingsContainer.style.display = 'flex'; // Show the settings
+  } else {
+    settingsContainer.style.display = 'none'; // Hide the settings
+  }
+};
+
+//////////////////////////////////////
+// Show the selected tab
+////////////////////////////////////
 function showTab(tab) {
   // Hide all tab containers
   document.getElementById('categories-container').style.display = 'none';
   document.getElementById('products-container').style.display = 'none';
   document.getElementById('backup-container').style.display = 'none';
-
-  // Also hide the settings container (if it exists)
-  const settingsContainer = document.getElementById('settings-container');
-  if (settingsContainer) {
-    settingsContainer.style.display = 'none';
-  }
+  document.getElementById('settings-container').style.display = 'none'; // Ensure settings is hidden initially
 
   // Always show the attribution (in case it got hidden by bad nesting)
   const attribution = document.querySelector('.attribution');
@@ -53,20 +170,25 @@ function showTab(tab) {
     document.getElementById('backup-container').style.display = 'block';
     // Optionally fetch backup status here if needed
   } else if (tab === 'settings') {
-    // Only show the settings container if it exists
-    if (settingsContainer) {
-      settingsContainer.style.display = 'block';
-    }
-    // Optionally fetch or refresh any settings
+    // Show the settings container
+    document.getElementById('settings-container').style.display = 'block';
+    // Ensure the API key is displayed
+    displayApiKey();
+  }
+  
+  // Show or hide the cog button only on the products page
+  const cogButton = document.querySelector('.filter-cog');
+  if (cogButton) {
+    cogButton.style.display = tab === 'products' ? 'block' : 'none';
   }
 }
 
 //////////////////////////////////////
 // Fetch categories from the backend
-//////////////////////////////////////
+////////////////////////////////////
 const fetchCategories = async () => {
   try {
-    const response = await fetch(`${basePath}categories`, {
+    const response = await fetch(appendApiKey(`${basePath}categories`), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -85,8 +207,8 @@ const fetchCategories = async () => {
 };
 
 //////////////////////////////////////
-// Display categories in a table layout (Corrected)
-//////////////////////////////////////
+// Display categories in a table layout
+////////////////////////////////////
 const displayCategories = (categories) => {
   const categoriesContainer = document.getElementById('categories-container');
   categoriesContainer.innerHTML = ''; // Clear existing content
@@ -170,7 +292,7 @@ const displayCategories = (categories) => {
 
 //////////////////////////////////////
 // Add a new category via API
-//////////////////////////////////////
+////////////////////////////////////
 const addCategory = async () => {
   const categoryName = document.getElementById('new-category-input').value.trim();
   if (!categoryName) {
@@ -185,7 +307,7 @@ const addCategory = async () => {
   }
 
   try {
-    const response = await fetch(`${basePath}categories`, {
+    const response = await fetch(appendApiKey(`${basePath}categories`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -211,14 +333,14 @@ const addCategory = async () => {
 
 //////////////////////////////////////
 // Remove a category via API
-//////////////////////////////////////
+////////////////////////////////////
 const removeCategory = async (categoryName) => {
   if (!confirm(`Are you sure you want to remove the category "${categoryName}"? All associated products will be moved to "Uncategorized".`)) {
     return;
   }
 
   try {
-    const response = await fetch(`${basePath}categories`, {
+    const response = await fetch(appendApiKey(`${basePath}categories`), {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -241,7 +363,7 @@ const removeCategory = async (categoryName) => {
 
 //////////////////////////////////////
 // Open the edit category modal
-//////////////////////////////////////
+////////////////////////////////////
 function openEditCategoryModal(categoryName) {
   // Populate the input with the current category name
   document.getElementById('edit-category-input').value = categoryName;
@@ -253,7 +375,7 @@ function openEditCategoryModal(categoryName) {
 
 //////////////////////////////////////
 // Close the edit category modal
-//////////////////////////////////////
+////////////////////////////////////
 function closeEditCategoryModal() {
   // Clear the form fields
   document.getElementById('edit-category-input').value = '';
@@ -264,7 +386,7 @@ function closeEditCategoryModal() {
 
 //////////////////////////////////////
 // Save the edited category
-//////////////////////////////////////
+////////////////////////////////////
 const saveEditedCategory = async () => {
   const newName = document.getElementById('edit-category-input').value.trim();
   const oldName = document.getElementById('edit-category-old-name').value.trim();
@@ -281,7 +403,7 @@ const saveEditedCategory = async () => {
   }
 
   try {
-    const response = await fetch(`${basePath}categories/${encodeURIComponent(oldName)}`, {
+    const response = await fetch(appendApiKey(`${basePath}categories/${encodeURIComponent(oldName)}`), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -306,10 +428,10 @@ const saveEditedCategory = async () => {
 
 //////////////////////////////////////
 // Fetch products from the backend
-//////////////////////////////////////
+////////////////////////////////////
 const fetchProducts = async () => {
   try {
-    const response = await fetch(`${basePath}products`, {
+    const response = await fetch(appendApiKey(`${basePath}products`), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -328,7 +450,82 @@ const fetchProducts = async () => {
 };
 
 //////////////////////////////////////
-// Display products in a table
+// Global variable for column visibility
+//////////////////////////////////////
+let columnVisibility = {
+  name: true,
+  category: true,
+  image: true,
+  barcode: true,
+  actions: true,
+};
+
+//////////////////////////////////////
+// Save column visibility settings
+//////////////////////////////////////
+const saveColumnVisibility = async () => {
+  const checkboxes = document.querySelectorAll('.column-visibility-checkbox');
+  checkboxes.forEach((checkbox) => {
+    columnVisibility[checkbox.name] = checkbox.checked;
+  });
+
+  try {
+    const response = await fetch(appendApiKey(`${basePath}save_column_visibility`), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ settings: columnVisibility }),
+    });
+
+    const result = await response.json();
+    if (response.ok && result.status === "ok") {
+      alert("Column visibility settings saved successfully!");
+    } else {
+      throw new Error(result.message || "Failed to save settings.");
+    }
+
+    // Refresh the product table
+    displayProducts(products);
+  } catch (error) {
+    console.error("Error saving column visibility settings:", error);
+    alert("Failed to save settings. Please try again.");
+  }
+};
+
+
+//////////////////////////////////////
+// Display column visibility settings
+//////////////////////////////////////
+const displayColumnSettings = () => {
+  const settingsContainer = document.getElementById('column-settings-container');
+  settingsContainer.innerHTML = ''; // Clear existing content
+
+  const form = document.createElement('form');
+  form.classList.add('column-settings-form');
+
+  Object.keys(columnVisibility).forEach((column) => {
+    const label = document.createElement('label');
+    label.innerHTML = `
+      <input type="checkbox" class="column-visibility-checkbox" name="${column}" ${
+      columnVisibility[column] ? 'checked' : ''
+    }>
+      ${column.charAt(0).toUpperCase() + column.slice(1)}
+    `;
+    form.appendChild(label);
+  });
+
+  const saveButton = document.createElement('button');
+  saveButton.textContent = 'Save Settings';
+  saveButton.type = 'button';
+  saveButton.addEventListener('click', saveColumnVisibility);
+
+  form.appendChild(saveButton);
+  settingsContainer.appendChild(form);
+};
+
+//////////////////////////////////////
+// Display products in a table with column visibility
 //////////////////////////////////////
 const displayProducts = (products) => {
   const productsContainer = document.getElementById('products-container');
@@ -339,24 +536,20 @@ const displayProducts = (products) => {
     const tableHead = `
       <thead>
         <tr>
-          <th class="sortable" id="productNameHeader" onclick="sortProducts('name')">
-            Product Name
-          </th>
-          <th class="sortable" id="productCategoryHeader" onclick="sortProducts('category')">
-            Category
-          </th>
-          <th>Image</th>
-          <th>Barcode</th>
-          <th>Actions</th>
+          ${columnVisibility.name ? '<th>Product Name</th>' : ''}
+          ${columnVisibility.category ? '<th>Category</th>' : ''}
+          ${columnVisibility.image ? '<th>Image</th>' : ''}
+          ${columnVisibility.barcode ? '<th>Barcode</th>' : ''}
+          ${columnVisibility.actions ? '<th>Actions</th>' : ''}
         </tr>
       </thead>
     `;
 
     const tableBody = document.createElement('tbody');
 
-    products.forEach(product => {
-      const imageUrl = product.image_front_small_url ? product.image_front_small_url : product.url;
-      const imageAlt = product.image_front_small_url ? `${product.name} Image` : `${product.name} Image (Manual)`;
+    products.forEach((product) => {
+      const imageUrl = product.url; // Assuming 'url' contains the image URL
+      const imageAlt = `${product.name} Image`;
 
       const barcodeLink = product.barcode
         ? `<a href="https://world.openfoodfacts.org/product/${product.barcode}" target="_blank" rel="noopener noreferrer">${product.barcode}</a>`
@@ -364,16 +557,24 @@ const displayProducts = (products) => {
 
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${product.name}</td>
-        <td>${product.category}</td>
-        <td>
-          ${imageUrl ? `<img src="${imageUrl}" alt="${imageAlt}" class="product-image">` : 'No Image'}
-        </td>
-        <td>${barcodeLink}</td>
-        <td>
-          <button class="edit-btn" onclick="initEditProductModal('${encodeURIComponent(product.name)}')">Edit</button>
-          <button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
-        </td>
+        ${columnVisibility.name ? `<td>${product.name}</td>` : ''}
+        ${columnVisibility.category ? `<td>${product.category}</td>` : ''}
+        ${
+          columnVisibility.image
+            ? `<td>${imageUrl ? `<img src="${imageUrl}" alt="${imageAlt}" class="product-image">` : 'No Image'}</td>`
+            : ''
+        }
+        ${columnVisibility.barcode ? `<td>${barcodeLink}</td>` : ''}
+        ${
+          columnVisibility.actions
+            ? `
+          <td>
+            <button class="edit-btn" onclick="initEditProductModal('${encodeURIComponent(product.name)}')">Edit</button>
+            <button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
+          </td>
+        `
+            : ''
+        }
       `;
       tableBody.appendChild(row);
     });
@@ -387,7 +588,6 @@ const displayProducts = (products) => {
     tableContainer.appendChild(table);
 
     productsContainer.appendChild(tableContainer);
-
   } else {
     productsContainer.innerHTML = `
       <p style="text-align: center; font-weight: bold; color: red;">
@@ -396,29 +596,36 @@ const displayProducts = (products) => {
     `;
   }
 
-  // Add the large "Add Product" button
-  const addProductButtonContainer = document.createElement('div');
-  addProductButtonContainer.classList.add('add-product-button-container');
-
+  // Add the styled "Add Product" button
+  const buttonContainer = document.createElement('div');
+  buttonContainer.classList.add('add-product-button-container'); // Add the container class
   const addProductButton = document.createElement('button');
-  addProductButton.classList.add('add-product-btn');
+  addProductButton.classList.add('add-product-btn'); // Add the button class
   addProductButton.textContent = 'Add Product';
-  addProductButton.onclick = () => {
-    openAddProductModal();
-  };
+  addProductButton.onclick = openAddProductModal; // Attach the modal-opening functionality
 
-  addProductButtonContainer.appendChild(addProductButton);
-  productsContainer.appendChild(addProductButtonContainer);
+  // Append the button to the container and then the container to the products container
+  buttonContainer.appendChild(addProductButton);
+  productsContainer.appendChild(buttonContainer);
 };
+
+
+
+// Initialize column settings on page load
+document.addEventListener('DOMContentLoaded', () => {
+  displayColumnSettings();
+});
+
+
 
 //////////////////////////////////////
 // Initialize edit product modal with product data
-//////////////////////////////////////
+////////////////////////////////////
 const initEditProductModal = async (encodedProductName) => {
   const productName = decodeURIComponent(encodedProductName);
   try {
     // Fetch products
-    const productResponse = await fetch(`${basePath}products`, {
+    const productResponse = await fetch(appendApiKey(`${basePath}products`), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -436,7 +643,7 @@ const initEditProductModal = async (encodedProductName) => {
     }
 
     // Fetch categories
-    const categoryResponse = await fetch(`${basePath}categories`, {
+    const categoryResponse = await fetch(appendApiKey(`${basePath}categories`), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -457,7 +664,7 @@ const initEditProductModal = async (encodedProductName) => {
 
 //////////////////////////////////////
 // Open the edit product modal
-//////////////////////////////////////
+////////////////////////////////////
 function openEditProductModal(product) {
   // Populate the input fields with the current product details
   document.getElementById('edit-product-name').value = product.name;
@@ -479,7 +686,7 @@ function openEditProductModal(product) {
 
 //////////////////////////////////////
 // Close the edit product modal
-//////////////////////////////////////
+////////////////////////////////////
 function closeEditProductModal() {
   // Clear the form fields
   document.getElementById('edit-product-name').value = '';
@@ -492,7 +699,7 @@ function closeEditProductModal() {
 
 //////////////////////////////////////
 // Save the edited product
-//////////////////////////////////////
+////////////////////////////////////
 const saveEditedProduct = async () => {
   const newName = document.getElementById('edit-product-name').value.trim();
   const newCategory = document.getElementById('edit-product-category').value;
@@ -529,7 +736,7 @@ const saveEditedProduct = async () => {
       barcode: newBarcode || null
     };
 
-    const response = await fetch(`${basePath}products/${encodeURIComponent(oldName)}`, {
+    const response = await fetch(appendApiKey(`${basePath}products/${encodeURIComponent(oldName)}`), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -554,7 +761,7 @@ const saveEditedProduct = async () => {
 
 //////////////////////////////////////
 // Define the addProductFromForm function
-//////////////////////////////////////
+////////////////////////////////////
 const addProductFromForm = async () => {
   const name = document.getElementById('add-product-name').value.trim();
   const category = document.getElementById('add-product-category').value;
@@ -587,7 +794,7 @@ const addProductFromForm = async () => {
       barcode: barcode || null
     };
 
-    const response = await fetch(`${basePath}products`, {
+    const response = await fetch(appendApiKey(`${basePath}products`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -614,14 +821,14 @@ window.addProductFromForm = addProductFromForm;
 
 //////////////////////////////////////
 // Remove a product via API
-//////////////////////////////////////
+////////////////////////////////////
 const removeProduct = async (productName) => {
   if (!confirm(`Are you sure you want to remove the product "${productName}"?`)) {
     return;
   }
 
   try {
-    const response = await fetch(`${basePath}products`, {
+    const response = await fetch(appendApiKey(`${basePath}products`), {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -644,7 +851,7 @@ const removeProduct = async (productName) => {
 
 //////////////////////////////////////
 // Sort products by name or category
-//////////////////////////////////////
+////////////////////////////////////
 const sortProducts = (field) => {
   const sortOrder = productSortOrder[field];
 
@@ -658,11 +865,10 @@ const sortProducts = (field) => {
   // Toggle the sort order for next click
   productSortOrder[field] = (sortOrder === 'asc') ? 'desc' : 'asc';
 
-
   // Re-display the sorted products
   displayProducts(products);
   
-    // Update the arrow in the table headers
+  // Update the arrow in the table headers
   updateProductHeaderArrows(field);
 };
 
@@ -694,7 +900,7 @@ function updateProductHeaderArrows(sortedField) {
 
 //////////////////////////////////////
 // Sort categories by name
-//////////////////////////////////////
+////////////////////////////////////
 const sortCategories = () => {
   const sortOrder = productSortOrder.name; // You're using productSortOrder.name for category sorting
   categories.sort((a, b) => {
@@ -704,8 +910,8 @@ const sortCategories = () => {
   });
   productSortOrder.name = (sortOrder === 'asc') ? 'desc' : 'asc';
 
-  
-  
+
+
   displayCategories(categories);
   // Update arrow
   updateCategoriesHeaderArrow();
@@ -729,20 +935,116 @@ function updateCategoriesHeaderArrow() {
 
 //////////////////////////////////////
 // Initialize the page
-//////////////////////////////////////
-document.addEventListener('DOMContentLoaded', async () => {
-  // First, load the saved theme from the server
+////////////////////////////////////
+document.addEventListener("DOMContentLoaded", async () => {
+  // First, fetch the API key from the server
+  await fetchApiKey();
+
+  if (!API_KEY) {
+    console.error("API key is not available. Further requests will fail.");
+    return;
+  }
+
+  // Load saved theme from the server
   await loadThemeFromServer();
 
-  // Then, proceed with other initializations
+  // Fetch saved column visibility settings from the backend
+  try {
+    const response = await fetch(appendApiKey(`${basePath}get_column_visibility`), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await response.json();
+    if (response.ok && result.status === "ok") {
+      columnVisibility = result.settings || columnVisibility;
+
+      // Update the checkboxes in the UI
+      const checkboxes = document.querySelectorAll(".column-visibility-checkbox");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = columnVisibility[checkbox.name] || false;
+      });
+
+      // Refresh the product table to reflect the settings
+      displayProducts(products);
+    } else {
+      throw new Error(result.message || "Failed to load column visibility settings.");
+    }
+  } catch (error) {
+    console.error("Error loading column visibility settings:", error);
+    alert("Failed to load settings. Default settings will be used.");
+  }
+
+  // Then, load the saved theme from the server
+  await loadThemeFromServer();
+
+  // Proceed with other initializations
   await fetchCategories();
   // Default tab: 'products'
   showTab('products');
+  
+  displayColumnSettings();
+
+  // ==========================
+  // DELETE DATABASE LOGIC
+  // ==========================
+  const deleteBtn = document.getElementById('delete-database-btn');
+  const overlay = document.getElementById('delete-modal-overlay');
+  const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+  const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+  const deleteInput = document.getElementById('delete-input');
+
+  // 1) Open modal when "Delete Database" is clicked
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', () => {
+      overlay.style.display = 'block';
+    });
+  }
+
+  // 2) Cancel button to close modal
+  if (cancelDeleteBtn) {
+    cancelDeleteBtn.addEventListener('click', () => {
+      overlay.style.display = 'none';
+      deleteInput.value = '';
+    });
+  }
+
+  // 3) Confirm delete action
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', async () => {
+      // Must type DELETE in all caps
+      if (deleteInput.value.trim().toUpperCase() === 'DELETE') {
+        try {
+          const response = await fetch(appendApiKey(`${basePath}delete_database`), {
+            method: 'DELETE'
+          });
+          const data = await response.json();
+
+          if (response.ok && data.status === 'ok') {
+            alert('Database has been deleted.');
+            overlay.style.display = 'none';
+            deleteInput.value = '';
+            // Optionally reload page or redirect
+            // location.reload();
+          } else {
+            alert('Error deleting database: ' + data.message);
+          }
+        } catch (error) {
+          console.error('Error deleting DB:', error);
+          alert('An error occurred while deleting the database.');
+        }
+      } else {
+        alert('You must type DELETE exactly to proceed.');
+      }
+    });
+  }
 });
 
 //////////////////////////////////////
 // Barcode Scanning Functionality
-//////////////////////////////////////
+////////////////////////////////////
 function hideAddProductModal() {
   document.getElementById('add-product-modal').style.display = 'none';
 }
@@ -825,11 +1127,8 @@ function onBarcodeDetected(result) {
 // Fetch product data from API based on the scanned barcode
 const fetchProductData = async (barcode) => {
   try {
-    const response = await fetch(`${basePath}fetch_product?barcode=${barcode}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+    const response = await fetch(appendApiKey(`${basePath}fetch_product?barcode=${barcode}`), {
+      method: 'GET'
     });
 
     const result = await response.json();
@@ -862,7 +1161,7 @@ const fetchProductData = async (barcode) => {
 
 //////////////////////////////////////
 // Fetch product data based on manually entered barcode via the "Fetch" button
-//////////////////////////////////////
+////////////////////////////////////
 const fetchBarcode = () => {
   const barcode = document.getElementById('add-product-barcode').value.trim();
   if (barcode) {
@@ -874,7 +1173,7 @@ const fetchBarcode = () => {
 
 //////////////////////////////////////
 // Open the Add Product Modal
-//////////////////////////////////////
+////////////////////////////////////
 function openAddProductModal() {
   // Populate the category dropdown in the modal
   const categoryDropdown = document.getElementById('add-product-category');
@@ -889,7 +1188,7 @@ function openAddProductModal() {
 
 //////////////////////////////////////
 // Close the Add Product Modal (clears the form)
-//////////////////////////////////////
+////////////////////////////////////
 function closeAddProductModal() {
   // Clear the form fields
   document.getElementById('add-product-name').value = '';
@@ -902,7 +1201,7 @@ function closeAddProductModal() {
 
 //////////////////////////////////////
 // Ensure the modals close when clicking outside of them
-//////////////////////////////////////
+////////////////////////////////////
 window.onclick = function(event) {
   const addProductModal = document.getElementById('add-product-modal');
   if (event.target === addProductModal) {
@@ -932,7 +1231,7 @@ window.onclick = function(event) {
 // Trigger a backup download of the database
 function triggerBackup() {
   // This calls your /download_db endpoint, which returns the .db file
-  window.location.href = `${basePath}download_db`;
+  window.location.href = appendApiKey(`${basePath}download_db`);
 }
 
 // Upload a database file to restore
@@ -947,7 +1246,7 @@ async function uploadBackup() {
   formData.append('file', fileInput.files[0]);
 
   try {
-    const response = await fetch(`${basePath}upload_db`, {
+    const response = await fetch(appendApiKey(`${basePath}upload_db`), {
       method: 'POST',
       body: formData
     });
@@ -966,10 +1265,24 @@ async function uploadBackup() {
   }
 }
 
+//////////////////////////////////////
+// Initialize the page
+////////////////////////////////////
 document.addEventListener('DOMContentLoaded', async () => {
-  // ... existing initialization code ...
-  // For example:
+  // First, fetch the API key from the server
+  await fetchApiKey();
+
+  if (!API_KEY) {
+    console.error('API key is not available. Further requests will fail.');
+    return;
+  }
+
+  // Then, load the saved theme from the server
+  await loadThemeFromServer();
+
+  // Proceed with other initializations
   await fetchCategories();
+  // Default tab: 'products'
   showTab('products');
 
   // ==========================
@@ -1002,8 +1315,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Must type DELETE in all caps
       if (deleteInput.value.trim().toUpperCase() === 'DELETE') {
         try {
-          const response = await fetch(`${basePath}delete_database`, {
-            method: 'DELETE',
+          const response = await fetch(appendApiKey(`${basePath}delete_database`), {
+            method: 'DELETE'
           });
           const data = await response.json();
 
@@ -1029,12 +1342,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 //////////////////////////////////////
 // Load Theme from Server
-//////////////////////////////////////
+////////////////////////////////////
 async function loadThemeFromServer() {
   console.log("Loading theme from server...");
   try {
     // Fetch the current theme from the server endpoint (e.g., /theme)
-    const response = await fetch(`${basePath}theme`, { method: 'GET' });
+    const response = await fetch(appendApiKey(`${basePath}theme`), { 
+      method: 'GET'
+    });
 
     if (!response.ok) {
       // If the server can't be reached or returns an error, fallback to light mode
@@ -1073,7 +1388,7 @@ async function loadThemeFromServer() {
 
 //////////////////////////////////////
 // Toggle Theme (Light/Dark) & Save to Server
-//////////////////////////////////////
+////////////////////////////////////
 async function toggleTheme() {
   const body = document.body;
   const label = document.getElementById("themeLabel");
@@ -1092,9 +1407,11 @@ async function toggleTheme() {
 
   // POST the updated theme to your server so it's saved in config.ini
   try {
-    const response = await fetch(`${basePath}theme`, {
+    const response = await fetch(appendApiKey(`${basePath}theme`), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ theme: newTheme })
     });
 

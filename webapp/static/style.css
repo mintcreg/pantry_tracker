@@ -40,6 +40,16 @@ h1 {
     text-align: center;
     color: #333;
 }
+a {
+    color: #007BFF;
+    text-decoration: none; /* Optional: Remove underline by default */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+a:hover,
+a:focus {
+    color: #1e80e9; /* Darker shade on hover/focus */
+    text-decoration: underline; /* Optional: Underline on hover/focus */
+}
 
 .category-buttons {
     text-align: center;
@@ -1242,7 +1252,7 @@ body.dark-mode #edit-category-modal .modal-content .save-btn,
 body.dark-mode #barcode-modal .modal-content .fetch-barcode-btn {
   /* You can keep them the same color scheme or slightly darker for dark mode */
   /* For example: */
-  background-color: #888; 
+  background-color: #28a745; 
   color: #fff;
   border-color: #666;
 }
@@ -1443,4 +1453,158 @@ body.dark-mode #delete-modal input[type="text"] {
     background-color: #666;
     color: #fff;
     border-color: #888;
+}
+/* =====================================
+   Temp API Key
+   ===================================== */
+.toggle-btn, .regen-btn {
+  margin-left: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+#display-api-key {
+  width: 18%;
+  padding: 5px;
+}
+
+.toggle-btn {
+  background-color: #007BFF;
+  padding: 12px 20px;
+  font-size: 16px;
+  margin: 5px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+
+
+.regen-btn {
+    padding: 12px 20px;
+    font-size: 16px;
+    margin: 5px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+/* =====================================
+   Column Filter
+   ===================================== */
+.column-settings-form {
+  display: flex; /* Use flexbox for horizontal alignment */
+  padding-top: 1px;
+  flex-wrap: wrap; /* Allow wrapping if the content overflows */
+  align-items: center; /* Vertically align the items */
+  gap: 15px; /* Add horizontal spacing between items */
+}
+
+.column-settings-form label {
+  display: flex; /* Flex layout for label and input alignment */
+  align-items: center; /* Vertically align the checkbox and text */
+  gap: 5px; /* Space between the checkbox and its label text */
+}
+
+.column-settings-form button {
+  margin-left: auto; /* Push the button to the far right */
+  padding: 5px 10px;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#settings-bar {
+  display: flex;
+  justify-content: flex-end; /* Align the cog button to the right */
+  align-items: center;
+  position: relative; /* For positioning the settings container */
+  gap: 10px; /* Space between the cog button and the settings */
+  margin-bottom: 20px; /* Ensure space below the bar for the settings */
+}
+#column-settings-container {
+    direction: ltr; /* Makes content align right-to-left */
+    display: flex;
+    justify-content: flex-end; /* Pushes content to the right */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    width: max-content;
+    margin-left: auto;
+}
+
+
+/* Responsive styling for #column-settings-container on mobile and companion app */
+@media (max-width: 768px), body.companion-app {
+    /* Ensure the parent settings bar is positioned relative */
+    #settings-bar {
+        position: relative; /* Reference point for absolute positioning */
+        padding-bottom: 55px;
+    }
+
+    #column-settings-container {
+        /* Existing Styles */
+        width: 90%; /* Adjust width as necessary */
+        max-width: 100%;
+        left: 5%; /* Center horizontally within the parent */
+
+        /* Vertical Positioning */
+        top: 365px; /* Adjust this value to move the container down */
+        /* Example adjustments:
+           top: 50px; for less downward movement
+           top: 70px; for more downward movement
+        */
+
+        /* Other Styles */
+        transform: none; /* Remove any existing transforms */
+        flex-direction: column; /* Stack items vertically */
+        padding: 15px; /* Add padding for spacing */
+        position: absolute; /* Position relative to #settings-bar */
+        box-sizing: border-box; /* Include padding within width */
+        z-index: 1001; /* Ensure it appears above other elements */
+        border-radius: 8px; /* Rounded corners */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    }
+}
+
+
+#products-container {
+  margin-top: 20px; /* Add spacing to avoid overlap */
+}
+
+/* =========================
+   Filter Cog Hover Effects
+   ========================= */
+.filter-cog {
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.filter-cog:hover {
+    color: #007BFF;
+    text-decoration: underline;
+}
+
+.filter-cog svg path {
+    fill: #666 !important;
+    transition: fill 0.2s ease;
+}
+
+.filter-cog:hover svg path {
+    fill: #007BFF !important;
 }

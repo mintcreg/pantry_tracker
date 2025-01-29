@@ -1,6 +1,6 @@
 {
   "name": "Pantry Tracker",
-  "version": "1.0.53",
+  "version": "1.0.54",
   "slug": "pantry_tracker",
   "description": "A Home Assistant add-on to manage and track pantry items, with product categorization, real-time inventory updates, and intuitive controls.",
   "startup": "services",
