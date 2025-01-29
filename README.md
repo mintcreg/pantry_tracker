@@ -128,4 +128,3 @@ This project uses data and images provided by [OpenFoodFacts](https://world.open
 Visit [OpenFoodFacts](https://world.openfoodfacts.org/) to learn more.
 
 
-
