@@ -1,6 +1,6 @@
 # Changelog
 
-## [Version 1.0.54-dev](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.54)
+## [Version 1.0.54](https://github.com/mintcreg/pantry_tracker/releases/tag/v1.0.54)
 
 ### ✨ New Features
 - **API Key**: - Added API key for additional security in all calls except health (can be viewed and reset in settings)
@@ -9,7 +9,7 @@
 ### 🔄 Changes
 - Styling improvements (link colors/buttons in dark mode not reflecting light mode colors)
 
-### TODO
+### 📋 TODO
 
 - Fix lock on database deletion (function works but will throw errors)
 
